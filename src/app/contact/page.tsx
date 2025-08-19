@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import Container from '@/components/root/Container';
 import Header from '@/components/root/Header';
+import Footer from '@/components/root/Footer';
 
 interface Props {
 	title?: string;
@@ -81,6 +82,7 @@ export default function Contact() {
 					</div>
 				</section>
 			</Container>
+			<Footer />
 		</>
 	);
 }

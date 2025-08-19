@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import Header from '@/components/root/Header';
 import Container from '@/components/root/Container';
+import Footer from '@/components/root/Footer';
 
 type TimelineEntry = {
 	date: string;
@@ -38,7 +39,7 @@ export default function Events() {
 	return (
 		<>
 			<Header />
-			<Container scrollable>
+			<Container fluid>
 				<section className='bg-background py-8 md:py-20 h-full'>
 					<div className='container pb-14'>
 						<h1 className='text-foreground mb-10 text-center text-3xl font-bold tracking-tighter sm:text-6xl'>The History of Artificial Intelligence</h1>
@@ -62,6 +63,7 @@ export default function Events() {
 					</div>
 				</section>
 			</Container>
+			<Footer />
 		</>
 	);
 }

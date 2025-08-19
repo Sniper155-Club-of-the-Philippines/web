@@ -6,10 +6,11 @@ import { Button } from '@/components/ui/button';
 import Image from 'next/image';
 import cover from '@/assets/cover.jpg';
 import Link from 'next/link';
+import Footer from '@/components/root/Footer';
 
 const props = {
 	badge: '✨ YClub',
-	heading: 'Sniper155 Club of the Philippines',
+	heading: 'Sniper155 Club of the Philippines Inc.',
 	description: 'Ride with passion. Where Sniper155 enthusiasts unite to share their love for the ride, the community, and the journey ahead.',
 	buttons: {
 		primary: {
@@ -51,6 +52,7 @@ export default function Home() {
 					</div>
 				</section>
 			</Container>
+			<Footer />
 		</>
 	);
 }
