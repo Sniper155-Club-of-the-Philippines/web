@@ -1,4 +1,4 @@
-import { ArrowRight, ArrowUpRight } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import Container from '@/components/root/Container';
 import Header from '@/components/root/Header';
 import { Badge } from '@/components/ui/badge';
