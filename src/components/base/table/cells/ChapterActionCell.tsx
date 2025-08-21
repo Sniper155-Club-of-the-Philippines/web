@@ -5,7 +5,6 @@ import { loadingAtom } from '@/atoms/misc';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
-    DialogClose,
     DialogContent,
     DialogDescription,
     DialogFooter,
@@ -18,58 +17,57 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { useHttp } from '@/hooks/http';
 import { Chapter } from '@/types/chapter';
+import { ChapterFormInputs } from '@/types/form';
 import { useAtom } from 'jotai';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import ChapterForm from '@/components/base/forms/ChapterForm';
 
 type Props = {
     chapter: Chapter;
+    refetch?: () => void;
 };
 
-type Inputs = Omit<Chapter, 'created_at' | 'updated_at'> & { photo?: File };
-
-const ChapterActionCell = ({ chapter }: Props) => {
+const ChapterActionCell = ({ chapter, refetch }: Props) => {
     const http = useHttp();
     const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [, setLoading] = useAtom(loadingAtom);
-    const { register, handleSubmit, setValue } = useForm<Inputs>({
-        defaultValues: {
-            id: chapter.id,
-            name: chapter.name,
-        },
-    });
 
     const handleDelete = async () => {
         setLoading(true);
         try {
             await api.remove(http, chapter.id);
+            refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to delete chapter.');
+            toast('Unable to delete chapter.', {
+                closeButton: true,
+            });
         } finally {
             setDeleteOpen(false);
             setLoading(false);
         }
     };
 
-    const handleEdit = async (data: Inputs) => {
+    const handleEdit = async (data: ChapterFormInputs) => {
         setLoading(true);
-
         try {
             await api.update(http, data);
-            toast('Chapter updated successfully.');
+            toast('Chapter updated successfully.', {
+                closeButton: true,
+            });
+            setEditOpen(false);
+            refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to edit chapter.');
+            toast('Unable to edit chapter.', {
+                closeButton: true,
+            });
         } finally {
-            setEditOpen(false);
             setLoading(false);
         }
     };
@@ -96,53 +94,19 @@ const ChapterActionCell = ({ chapter }: Props) => {
             {/* Edit Dialog */}
             <Dialog open={editOpen} onOpenChange={setEditOpen}>
                 <DialogContent className='sm:max-w-[425px] md:max-w-[800px]'>
-                    <form onSubmit={handleSubmit(handleEdit)}>
-                        <DialogHeader>
-                            <DialogTitle>Edit Chapter</DialogTitle>
-                            <DialogDescription>
-                                Make changes to the chapter here. Click save
-                                when you&apos;re done.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className='grid gap-4 py-4'>
-                            <div className='grid grid-cols-1 md:grid-cols-4 items-center gap-4 md:max-h-[36px]'>
-                                <Label htmlFor='name' className='text-right'>
-                                    Name
-                                </Label>
-                                <Input
-                                    {...register('name')}
-                                    id='name'
-                                    name='name'
-                                    className='md:col-span-3'
-                                />
-                            </div>
-                            <div className='grid grid-cols-1 md:grid-cols-4 items-center gap-4 md:max-h-[36px]'>
-                                <Label htmlFor='photo' className='text-right'>
-                                    Photo
-                                </Label>
-                                <div className='md:col-span-3'>
-                                    <Input
-                                        id='photo'
-                                        type='file'
-                                        accept='image/*'
-                                        name='photo'
-                                        onChange={(e) => {
-                                            const file = e.target.files?.[0];
-                                            setValue('photo', file);
-                                        }}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <DialogClose asChild>
-                                <Button variant='outline' type='button'>
-                                    Cancel
-                                </Button>
-                            </DialogClose>
-                            <Button type='submit'>Save</Button>
-                        </DialogFooter>
-                    </form>
+                    <DialogHeader>
+                        <DialogTitle>Edit Chapter</DialogTitle>
+                        <DialogDescription>
+                            Make changes to the chapter here. Click save when
+                            you&apos;re done.
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <ChapterForm
+                        defaultValues={chapter}
+                        onSubmit={handleEdit}
+                        onCancel={() => setEditOpen(false)}
+                    />
                 </DialogContent>
             </Dialog>
 

@@ -1,4 +1,4 @@
-import { Model } from '@/types/model';
+import type { Model } from '@/types/model';
 
 export interface Chapter extends Model {
     name: string;

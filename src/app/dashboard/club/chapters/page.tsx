@@ -4,22 +4,34 @@ import { chapter } from '@/api';
 import { DataTable } from '@/components/ui/data-table';
 import { useHttp } from '@/hooks/http';
 import { Chapter } from '@/types/chapter';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
-import TableMenu from '@/components/root/table/TableMenu';
+import TableMenu from '@/components/base/table/TableMenu';
 import { useAtom } from 'jotai';
 import { loadingAtom } from '@/atoms/misc';
 import { exportToExcel } from '@/lib/utils';
 import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { saveAs } from 'file-saver';
-import ChapterActionCell from '@/components/root/table/cells/ChapterActionCell';
+import ChapterActionCell from '@/components/base/table/cells/ChapterActionCell';
 import { useQuery } from '@tanstack/react-query';
+import { ChapterFormInputs } from '@/types/form';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
+import ChapterForm from '@/components/base/forms/ChapterForm';
+import { Input } from '@/components/ui/input';
 
 export default function ClubChapters() {
     const http = useHttp();
     const [, setLoading] = useAtom(loadingAtom);
     const printRef = useRef<HTMLDivElement>(null);
+    const [createOpen, setCreateOpen] = useState(false);
+    const [search, setSearch] = useState('');
     const {
         data: chapters,
         refetch,
@@ -29,6 +41,25 @@ export default function ClubChapters() {
         queryFn: () => chapter.all(http),
     });
 
+    const handleCreate = async (data: ChapterFormInputs) => {
+        setLoading(true);
+        try {
+            await chapter.store(http, data);
+            toast('Chapter created successfully.', {
+                closeButton: true,
+            });
+            setCreateOpen(false);
+            refetch();
+        } catch (error) {
+            console.error(error);
+            toast('Unable to create chapter.', {
+                closeButton: true,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const handlePrint = async () => {
         setLoading(true);
         try {
@@ -37,7 +68,9 @@ export default function ClubChapters() {
             saveAs(pdf, 'chapters.pdf');
         } catch (error) {
             console.error(error);
-            toast('Unable to print PDF');
+            toast('Unable to print PDF', {
+                closeButton: true,
+            });
         } finally {
             setLoading(false);
         }
@@ -47,6 +80,7 @@ export default function ClubChapters() {
         {
             header: 'Name',
             accessorKey: 'name',
+            enableGlobalFilter: true,
         },
         {
             accessorKey: 'created_at',
@@ -84,15 +118,42 @@ export default function ClubChapters() {
         <div ref={printRef} className='flex flex-col'>
             <div className='flex items-center px-5 mb-4'>
                 <h4 className='text-2xl'>Chapters</h4>
-                <div className='inline ml-auto print:hidden'>
+                <div className='inline-flex gap-4 ml-auto print:hidden'>
+                    <Input
+                        type='search'
+                        placeholder='Search'
+                        onChange={(e) => setSearch(e.target.value)}
+                        value={search}
+                    />
                     <TableMenu
                         onRefresh={refetch}
                         onExport={exportData}
                         onPrint={handlePrint}
+                        onCreate={() => setCreateOpen(true)}
                     />
+                    {/* Create Dialog */}
+                    <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+                        <DialogContent className='sm:max-w-[800px]'>
+                            <DialogHeader>
+                                <DialogTitle>Create User</DialogTitle>
+                                <DialogDescription>
+                                    Fill in the form to add a new member.
+                                </DialogDescription>
+                            </DialogHeader>
+
+                            <ChapterForm
+                                onSubmit={handleCreate}
+                                onCancel={() => setCreateOpen(false)}
+                            />
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
-            <DataTable columns={columns} data={chapters ?? []} />
+            <DataTable
+                columns={columns}
+                data={chapters ?? []}
+                search={search}
+            />
         </div>
     );
 }

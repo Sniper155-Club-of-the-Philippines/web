@@ -89,7 +89,7 @@ export default function Footer({
                                 key={idx}
                                 className='hover:text-primary font-medium'
                             >
-                                <Button asChild>
+                                <Button asChild variant='secondary'>
                                     <a
                                         href={social.href}
                                         aria-label={social.label}

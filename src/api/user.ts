@@ -7,6 +7,12 @@ export async function all(http: Http) {
     return data.users;
 }
 
+export async function store(http: Http, payload: Partial<User>) {
+    const { data } = await http.post(`/v1/users`, payload);
+
+    return data;
+}
+
 export async function update(http: Http, payload: Partial<User>) {
     const FormData = await import('@avidian/form-data');
 

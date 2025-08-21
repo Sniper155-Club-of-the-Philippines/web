@@ -1,5 +1,5 @@
-import { Model } from '@/types/model';
-import { Chapter } from '@/types/chapter';
+import type { Model } from '@/types/model';
+import type { Chapter } from '@/types/chapter';
 
 export interface User extends Model {
     first_name: string;

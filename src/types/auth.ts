@@ -1,4 +1,4 @@
-import { TokenResponse } from '@react-oauth/google';
+import type { TokenResponse } from '@react-oauth/google';
 
 export type GoogleLoginResponse = Omit<
     TokenResponse,

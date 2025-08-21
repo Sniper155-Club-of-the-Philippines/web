@@ -7,6 +7,12 @@ export async function all(http: Http) {
     return data.chapters;
 }
 
+export async function store(http: Http, payload: Partial<Chapter>) {
+    const { data } = await http.post(`/v1/chapters`, payload);
+
+    return data;
+}
+
 export async function update(http: Http, payload: Partial<Chapter>) {
     const FormData = await import('@avidian/form-data');
 

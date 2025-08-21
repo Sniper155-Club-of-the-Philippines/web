@@ -4,6 +4,7 @@ import { twMerge } from 'tailwind-merge';
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { AccessorKeyColumnDefBase } from '@tanstack/react-table';
+import { KeyOf } from '@/types/object';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -57,4 +58,23 @@ export function exportToExcel<T, K extends keyof T>(
     // Save the file
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
     saveAs(blob, fileName);
+}
+
+export function searchArray<T>(
+    items: T[] | undefined,
+    search: string,
+    keys: KeyOf<T>[]
+) {
+    if (!items) return [];
+    if (!search) return items;
+
+    const lower = search.toLowerCase();
+
+    return items.filter((item) =>
+        keys.some((key) => {
+            const value = item[key];
+            if (value === null) return false;
+            return String(value).toLowerCase().includes(lower);
+        })
+    );
 }
