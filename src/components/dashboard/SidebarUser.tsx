@@ -19,9 +19,8 @@ import {
     useSidebar,
 } from '@/components/ui/sidebar';
 import { useAtom } from 'jotai';
-import { accessAtom, googleAtom, userAtom } from '@/atoms/auth';
+import { accessAtom, userAtom } from '@/atoms/auth';
 import { auth } from '@/api';
-import { googleLogout } from '@react-oauth/google';
 import { useHttp } from '@/hooks/http';
 import { RESET } from 'jotai/utils';
 import { useRouter } from 'next/navigation';
@@ -30,7 +29,6 @@ import { useMemo } from 'react';
 export default function SidebarUser() {
     const { isMobile } = useSidebar();
     const [user, setUser] = useAtom(userAtom);
-    const [google, setGoogle] = useAtom(googleAtom);
     const [, setAccess] = useAtom(accessAtom);
     const router = useRouter();
 
@@ -54,14 +52,6 @@ export default function SidebarUser() {
             await auth.logout(http);
         } catch (error) {
             console.error(error);
-        }
-
-        if (google) {
-            try {
-                googleLogout();
-            } catch (error) {
-                console.error(error);
-            }
         }
 
         setUser(RESET);

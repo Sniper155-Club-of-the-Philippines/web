@@ -2,11 +2,10 @@ import { useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { useAtom } from 'jotai';
-import { accessAtom, googleAtom, userAtom } from '@/atoms/auth';
+import { accessAtom, userAtom } from '@/atoms/auth';
 import { Access } from '@/types/models/auth';
 import { RESET } from 'jotai/utils';
 import { useHttp } from '@/hooks/http';
-import { googleLogout } from '@react-oauth/google';
 
 type JWTPayload = {
     exp: number;
@@ -18,7 +17,6 @@ const MIN_REFRESH_DELAY = 1000; // 1 second minimum delay
 export function useRefreshToken() {
     const http = useHttp();
     const [access, setAccess] = useAtom(accessAtom);
-    const [google, setGoogle] = useAtom(googleAtom);
     const [, setUser] = useAtom(userAtom);
     const router = useRouter();
     const refreshInProgress = useRef(false);
@@ -35,20 +33,11 @@ export function useRefreshToken() {
     const logout = useCallback(() => {
         if (!mounted.current) return;
 
-        if (google) {
-            try {
-                googleLogout();
-            } catch (error) {
-                console.debug('Failed to logout using google', error);
-            }
-        }
-
         setUser(RESET);
-        setGoogle(RESET);
         setAccess(RESET);
 
         router.push('/login');
-    }, [setAccess, setUser, router, google, setGoogle]);
+    }, [setAccess, setUser, router]);
 
     const refreshToken = useCallback(async (): Promise<boolean> => {
         if (refreshInProgress.current || !mounted.current) {

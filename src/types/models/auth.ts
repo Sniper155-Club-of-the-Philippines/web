@@ -1,9 +1,3 @@
-import type { CodeResponse, TokenResponse } from '@react-oauth/google';
-
-export type GoogleLoginResponse =
-    | Omit<TokenResponse, 'error' | 'error_description' | 'error_uri'>
-    | Omit<CodeResponse, 'error' | 'error_description' | 'error_uri'>;
-
 export type Token = string;
 
 export type Access = {

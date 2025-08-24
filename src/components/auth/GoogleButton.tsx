@@ -1,30 +1,59 @@
 'use client';
 
+import { useEffect } from 'react';
 import { faGoogle } from '@fortawesome/free-brands-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { useGoogleLogin } from '@react-oauth/google';
 import { Button } from '@/components/ui/button';
-import { GoogleLoginResponse } from '@/types/models/auth';
-import { configAtom } from '@/atoms/auth';
-import { useAtom } from 'jotai';
+import { Access } from '@/types/models/auth';
+import { User } from '@/types/models/user';
 
-type Props = {
-    onSuccess?: (response: GoogleLoginResponse) => void;
+type GoogleButtonProps = {
+    onSuccess?: (access: Access, user: User) => void;
+    onError?: (error: unknown) => void;
 };
 
-export default function GoogleButton({ onSuccess }: Props) {
-    const [config] = useAtom(configAtom);
+export default function GoogleButton({
+    onSuccess,
+    onError,
+}: GoogleButtonProps) {
+    useEffect(() => {
+        const handler = (event: MessageEvent) => {
+            // Only accept messages from same origin
+            if (event.origin !== window.location.origin) return;
 
-    const login = useGoogleLogin({
-        flow: 'auth-code',
-        redirect_uri: config?.google?.redirectUri,
-        onSuccess,
-    });
+            const { access, user, error } = event.data || {};
+
+            if (access && user) {
+                onSuccess?.(access, user);
+            } else if (error) {
+                onError?.(error);
+            }
+        };
+
+        window.addEventListener('message', handler);
+        return () => {
+            window.removeEventListener('message', handler);
+        };
+    }, [onSuccess, onError]);
+
+    const login = () => {
+        const width = 500;
+        const height = 600;
+
+        const left = window.screenX + (window.outerWidth - width) / 2;
+        const top = window.screenY + (window.outerHeight - height) / 2;
+
+        window.open(
+            `${process.env.NEXT_PUBLIC_API_URL}/v1/auth/oauth/google/redirect`,
+            'googleLogin',
+            `width=${width},height=${height},top=${top},left=${left},resizable,scrollbars`
+        );
+    };
 
     return (
         <Button
             variant='outline'
-            className='w-full'
+            className='w-full flex items-center gap-2'
             onClick={(e) => {
                 e.preventDefault();
                 login();

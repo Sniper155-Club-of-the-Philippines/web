@@ -18,18 +18,6 @@ export async function login(
     return data;
 }
 
-export async function loginWithGoogle(
-    http: AxiosInstance,
-    payload: { code: string } | { access_token: string }
-) {
-    const { data } = await http.post<{ user: User; access: Access }>(
-        '/v1/auth/oauth/google',
-        payload
-    );
-
-    return data;
-}
-
 export async function logout(http: AxiosInstance) {
     await http.get('/v1/auth/logout');
 }

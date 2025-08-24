@@ -1,9 +1,8 @@
 'use client';
 
 import { auth } from '@/api';
-import { accessAtom, googleAtom, userAtom } from '@/atoms/auth';
+import { accessAtom, userAtom } from '@/atoms/auth';
 import GoogleButton from '@/components/auth/GoogleButton';
-import GoogleButtonWrapper from '@/components/auth/ConfigProvider';
 import Logo from '@/components/root/Logo';
 import { Button } from '@/components/ui/button';
 import {
@@ -14,7 +13,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Access, GoogleLoginResponse } from '@/types/models/auth';
+import { Access } from '@/types/models/auth';
 import { Label } from '@radix-ui/react-label';
 import { useAtom } from 'jotai';
 import { toast } from 'sonner';
@@ -34,7 +33,6 @@ type Inputs = {
 export default function Login() {
     const { register, handleSubmit, control } = useForm<Inputs>();
     const [user, setUser] = useAtom(userAtom);
-    const [, setGoogle] = useAtom(googleAtom);
     const [access, setAccess] = useAtom(accessAtom);
     const [, setLoading] = useAtom(loadingAtom);
     const router = useRouter();
@@ -46,20 +44,6 @@ export default function Login() {
             const data = await auth.login(http, email, password);
 
             handleSuccess(data);
-        } catch (error) {
-            handleError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const onGoogleLogin = async (response: GoogleLoginResponse) => {
-        setLoading(true);
-        try {
-            const data = await auth.loginWithGoogle(http, response);
-
-            handleSuccess(data);
-            setGoogle(response);
         } catch (error) {
             handleError(error);
         } finally {
@@ -95,7 +79,7 @@ export default function Login() {
 
     useEffect(() => {
         if (access && user) {
-            router.push('/dashboard');
+            router.replace('/dashboard');
         }
     }, [access, router, user]);
 
@@ -154,11 +138,11 @@ export default function Login() {
                                         >
                                             Login
                                         </Button>
-                                        <GoogleButtonWrapper>
-                                            <GoogleButton
-                                                onSuccess={onGoogleLogin}
-                                            />
-                                        </GoogleButtonWrapper>
+                                        <GoogleButton
+                                            onSuccess={(access, user) => {
+                                                handleSuccess({ access, user });
+                                            }}
+                                        />
                                     </div>
                                 </div>
                             </form>
