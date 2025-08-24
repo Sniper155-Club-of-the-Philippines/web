@@ -13,12 +13,16 @@ export default function GoogleCallback() {
     const searchParams = useSearchParams();
     const [, setAccess] = useAtom(accessAtom);
     const [, setUser] = useAtom(userAtom);
+    const http = axios.create({
+        baseURL: process.env.NEXT_PUBLIC_API_URL,
+        withCredentials: true,
+    });
 
     const check = useCallback(async () => {
         const accessToken = searchParams.get('access_token');
         if (!accessToken) return;
 
-        const { data } = await axios.get<{ access: Access; user: User }>(
+        const { data } = await http.get<{ access: Access; user: User }>(
             '/v1/auth/refresh',
             {
                 headers: {
