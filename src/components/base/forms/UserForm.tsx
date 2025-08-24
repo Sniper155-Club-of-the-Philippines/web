@@ -10,6 +10,7 @@ import { useHttp } from '@/hooks/http';
 import { useEffect } from 'react';
 import Select from '@/components/base/inputs/Select';
 import { UserFormInputs } from '@/types/form';
+import { useChapterQuery } from '@/hooks/queries';
 
 type Props = {
     defaultValues?: Partial<UserFormInputs>;
@@ -24,7 +25,6 @@ const UserForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
             defaultValues,
         });
 
-    // refetch when defaultValues change (edit case)
     useEffect(() => {
         if (defaultValues) reset(defaultValues);
     }, [defaultValues, reset]);
@@ -34,10 +34,7 @@ const UserForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
         queryFn: () => auth.designations(http),
     });
 
-    const { data: chapters } = useQuery({
-        queryKey: ['chapters'],
-        queryFn: () => chapter.all(http),
-    });
+    const { data: chapters } = useChapterQuery(false);
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -78,6 +75,34 @@ const UserForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                         id='email'
                         name='email'
                         type='email'
+                        className='md:col-span-3'
+                    />
+                </div>
+
+                {/* Address */}
+                <div className='grid grid-cols-1 md:grid-cols-4 items-center gap-4 md:max-h-[36px]'>
+                    <Label htmlFor='address' className='text-right'>
+                        Address
+                    </Label>
+                    <Input
+                        {...register('address')}
+                        id='address'
+                        name='address'
+                        type='text'
+                        className='md:col-span-3'
+                    />
+                </div>
+
+                {/* Phone */}
+                <div className='grid grid-cols-1 md:grid-cols-4 items-center gap-4 md:max-h-[36px]'>
+                    <Label htmlFor='phone' className='text-right'>
+                        Contact
+                    </Label>
+                    <Input
+                        {...register('phone')}
+                        id='phone'
+                        name='phone'
+                        type='tel'
                         className='md:col-span-3'
                     />
                 </div>

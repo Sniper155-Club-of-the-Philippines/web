@@ -2,7 +2,7 @@
 
 import { GoogleOAuthProvider } from '@react-oauth/google';
 import { useCallback, useEffect, useRef } from 'react';
-import { Config } from '@/types/auth';
+import { Config } from '@/types/models/auth';
 import { useAtom } from 'jotai';
 import { configAtom } from '@/atoms/auth';
 import { useHttp } from '@/hooks/http';

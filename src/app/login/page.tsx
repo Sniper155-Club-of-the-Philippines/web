@@ -14,8 +14,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
-import { Access, GoogleLoginResponse } from '@/types/auth';
-import { isException } from '@avidian/http';
+import { Access, GoogleLoginResponse } from '@/types/models/auth';
 import { Label } from '@radix-ui/react-label';
 import { useAtom } from 'jotai';
 import { toast } from 'sonner';
@@ -23,8 +22,9 @@ import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { useEffect, useMemo } from 'react';
 import { loadingAtom } from '@/atoms/misc';
 import { useRouter } from 'next/navigation';
-import { User } from '@/types/user';
+import { User } from '@/types/models/user';
 import { useHttp } from '@/hooks/http';
+import { isAxiosError } from 'axios';
 
 type Inputs = {
     email: string;
@@ -76,7 +76,7 @@ export default function Login() {
     };
 
     const handleError = (error: unknown) => {
-        if (isException(error)) {
+        if (isAxiosError(error)) {
             toast('Unable to login', {
                 description: error.response?.data?.message,
                 closeButton: true,

@@ -1,9 +1,7 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '@/app/globals.css';
-import { ThemeProvider } from '@/components/ThemeProvider';
-import Spinner from '@/components/root/Spinner';
-import { Toaster } from '@/components/ui/sonner';
+import RootLayoutClient from './RootLayoutClient';
 
 const font = Inter({
     subsets: ['latin'],
@@ -39,22 +37,10 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
     children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
     return (
-        <html lang='en' suppressHydrationWarning>
-            <body className={`${font.className} antialiased`}>
-                <ThemeProvider
-                    attribute='class'
-                    defaultTheme='system'
-                    enableSystem
-                >
-                    <Spinner />
-                    <Toaster />
-                    {children}
-                </ThemeProvider>
-            </body>
-        </html>
+        <RootLayoutClient fontClass={font.className}>
+            {children}
+        </RootLayoutClient>
     );
 }

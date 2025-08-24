@@ -3,7 +3,7 @@
 import { user } from '@/api';
 import { DataTable } from '@/components/ui/data-table';
 import { useHttp } from '@/hooks/http';
-import { User } from '@/types/user';
+import { User } from '@/types/models/user';
 import { useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import TableMenu from '@/components/base/table/TableMenu';
@@ -14,7 +14,6 @@ import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { saveAs } from 'file-saver';
 import UserActionCell from '@/components/base/table/cells/UserActionCell';
-import { useQuery } from '@tanstack/react-query';
 import {
     Dialog,
     DialogContent,
@@ -25,6 +24,8 @@ import {
 import UserForm from '@/components/base/forms/UserForm';
 import { UserFormInputs } from '@/types/form';
 import { Input } from '@/components/ui/input';
+import { useUserQuery } from '@/hooks/queries';
+import { userAtom } from '@/atoms/auth';
 
 export default function ClubMembers() {
     const http = useHttp();
@@ -32,17 +33,8 @@ export default function ClubMembers() {
     const printRef = useRef<HTMLDivElement>(null);
     const [createOpen, setCreateOpen] = useState(false);
     const [search, setSearch] = useState('');
-    const { data: users, refetch } = useQuery({
-        queryKey: ['users'],
-        queryFn: async () => {
-            setLoading(true);
-            try {
-                return await user.all(http);
-            } finally {
-                setLoading(false);
-            }
-        },
-    });
+    const { data: users, refetch } = useUserQuery();
+    const [me] = useAtom(userAtom);
 
     const handleCreate = async (data: UserFormInputs) => {
         setLoading(true);
@@ -91,6 +83,11 @@ export default function ClubMembers() {
             enableGlobalFilter: true,
         },
         {
+            accessorKey: 'address',
+            header: 'Address',
+            enableGlobalFilter: true,
+        },
+        {
             accessorKey: 'designation',
             accessorFn: (row) => (row.designation ? row.designation : 'N/A'),
             header: 'Designation',
@@ -124,6 +121,10 @@ export default function ClubMembers() {
         {
             id: 'actions',
             cell: ({ row }) => {
+                if (row.original.id === me?.id) {
+                    return null;
+                }
+
                 return <UserActionCell user={row.original} refetch={refetch} />;
             },
         },
@@ -135,9 +136,9 @@ export default function ClubMembers() {
 
     return (
         <div ref={printRef} className='flex flex-col'>
-            <div className='flex items-center px-5 mb-4'>
-                <h4 className='text-2xl'>Members</h4>
-                <div className='inline-flex gap-4 ml-auto print:hidden'>
+            <div className='flex md:items-center px-5 mb-4 flex-col md:flex-row'>
+                <h4 className='text-2xl mr-4'>Members</h4>
+                <div className='inline-flex gap-4 md:ml-auto print:hidden flex-col md:flex-row mt-2 md:mt-0'>
                     <Input
                         type='search'
                         placeholder='Search'

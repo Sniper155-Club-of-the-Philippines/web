@@ -18,7 +18,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useHttp } from '@/hooks/http';
-import { User } from '@/types/user';
+import { User } from '@/types/models/user';
 import { useAtom } from 'jotai';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';

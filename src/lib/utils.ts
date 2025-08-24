@@ -60,6 +60,31 @@ export function exportToExcel<T, K extends keyof T>(
     saveAs(blob, fileName);
 }
 
+export async function urlToFile(
+    url: string,
+    filename?: string,
+    mimeType?: string
+): Promise<File> {
+    const response = await fetch(url);
+
+    // Try to infer filename from Content-Disposition header
+    if (!filename) {
+        const contentDisposition = response.headers.get('Content-Disposition');
+        const match = contentDisposition?.match(
+            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i
+        );
+        if (match?.[1]) {
+            filename = match[1].replace(/['"]/g, ''); // strip quotes
+        } else {
+            // fallback: take from URL path
+            filename = url.split('/').pop() || 'download';
+        }
+    }
+
+    const blob = await response.blob();
+    return new File([blob], filename, { type: mimeType ?? blob.type });
+}
+
 export function searchArray<T>(
     items: T[] | undefined,
     search: string,

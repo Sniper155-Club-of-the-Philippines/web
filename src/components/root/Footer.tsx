@@ -1,9 +1,8 @@
 import React from 'react';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook } from '@fortawesome/free-brands-svg-icons';
 import Logo from '@/components/root/Logo';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
+import { SOCIAL_LINKS } from '@/constants';
 
 interface Props {
     logo?: {
@@ -27,29 +26,6 @@ interface Props {
     }>;
 }
 
-const defaultSocialLinks = [
-    {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
-        href: 'https://www.facebook.com/profile.php?id=61569977818058',
-        label: 'S155CP Official Page',
-    },
-    {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
-        href: 'https://www.facebook.com/groups/824433192468479',
-        label: 'S155CP Visitor Group',
-    },
-    {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
-        href: 'https://www.facebook.com/groups/sniper155clubofthephilippinesofficial',
-        label: 'S155CP Official Group',
-    },
-    {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
-        href: 'https://forms.gle/x2oWv29Sb54RikV17',
-        label: 'S155CP Invitation Form',
-    },
-];
-
 const defaultLegalLinks = [
     { name: 'Terms and Conditions', href: '/terms-and-conditions' },
     { name: 'Privacy Policy', href: '/privacy-policy' },
@@ -61,7 +37,7 @@ export default function Footer({
         title: 'S155CP',
     },
     description = 'Where riders unite to share knowledge, experiences, and camaraderie.',
-    socialLinks = defaultSocialLinks,
+    socialLinks = SOCIAL_LINKS,
     copyright = '© 2025 S155CP Inc. All rights reserved.',
     legalLinks = defaultLegalLinks,
 }: Props) {

@@ -58,6 +58,20 @@ const ChapterForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                         />
                     </div>
                 </div>
+
+                {/* Page URL */}
+                <div className='grid grid-cols-1 md:grid-cols-4 items-center gap-4 md:max-h-[36px]'>
+                    <Label htmlFor='page_url' className='text-right'>
+                        Page URL
+                    </Label>
+                    <Input
+                        {...register('page_url')}
+                        id='page_url'
+                        type='url'
+                        name='page_url'
+                        className='md:col-span-3'
+                    />
+                </div>
             </div>
 
             <div className='flex justify-end gap-2 mt-6'>

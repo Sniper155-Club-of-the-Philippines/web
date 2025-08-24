@@ -3,7 +3,7 @@
 import { chapter } from '@/api';
 import { DataTable } from '@/components/ui/data-table';
 import { useHttp } from '@/hooks/http';
-import { Chapter } from '@/types/chapter';
+import { Chapter } from '@/types/models/chapter';
 import { useEffect, useRef, useState } from 'react';
 import dayjs from 'dayjs';
 import TableMenu from '@/components/base/table/TableMenu';
@@ -14,7 +14,6 @@ import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { saveAs } from 'file-saver';
 import ChapterActionCell from '@/components/base/table/cells/ChapterActionCell';
-import { useQuery } from '@tanstack/react-query';
 import { ChapterFormInputs } from '@/types/form';
 import {
     Dialog,
@@ -25,6 +24,7 @@ import {
 } from '@/components/ui/dialog';
 import ChapterForm from '@/components/base/forms/ChapterForm';
 import { Input } from '@/components/ui/input';
+import { useChapterQuery } from '@/hooks/queries';
 
 export default function ClubChapters() {
     const http = useHttp();
@@ -32,14 +32,7 @@ export default function ClubChapters() {
     const printRef = useRef<HTMLDivElement>(null);
     const [createOpen, setCreateOpen] = useState(false);
     const [search, setSearch] = useState('');
-    const {
-        data: chapters,
-        refetch,
-        isLoading,
-    } = useQuery({
-        queryKey: ['chapters'],
-        queryFn: () => chapter.all(http),
-    });
+    const { data: chapters, refetch, isLoading } = useChapterQuery();
 
     const handleCreate = async (data: ChapterFormInputs) => {
         setLoading(true);
@@ -83,6 +76,22 @@ export default function ClubChapters() {
             enableGlobalFilter: true,
         },
         {
+            header: 'Page',
+            accessorKey: 'page',
+            enableGlobalFilter: true,
+            cell: ({ row }) =>
+                row.original?.page_url && (
+                    <a
+                        href={row.original?.page_url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-primary hover:underline'
+                    >
+                        Link
+                    </a>
+                ),
+        },
+        {
             accessorKey: 'created_at',
             accessorFn: (row) =>
                 dayjs(row.created_at).format('MMM DD, YYYY hh:mm A'),
@@ -116,9 +125,9 @@ export default function ClubChapters() {
 
     return (
         <div ref={printRef} className='flex flex-col'>
-            <div className='flex items-center px-5 mb-4'>
-                <h4 className='text-2xl'>Chapters</h4>
-                <div className='inline-flex gap-4 ml-auto print:hidden'>
+            <div className='flex md:items-center px-5 mb-4 flex-col md:flex-row'>
+                <h4 className='text-2xl mr-4'>Chapters</h4>
+                <div className='inline-flex gap-4 md:ml-auto print:hidden flex-col md:flex-row mt-2 md:mt-0'>
                     <Input
                         type='search'
                         placeholder='Search'
@@ -135,9 +144,9 @@ export default function ClubChapters() {
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                         <DialogContent className='sm:max-w-[800px]'>
                             <DialogHeader>
-                                <DialogTitle>Create User</DialogTitle>
+                                <DialogTitle>Create Chapter</DialogTitle>
                                 <DialogDescription>
-                                    Fill in the form to add a new member.
+                                    Fill in the form to add a new chapter.
                                 </DialogDescription>
                             </DialogHeader>
 

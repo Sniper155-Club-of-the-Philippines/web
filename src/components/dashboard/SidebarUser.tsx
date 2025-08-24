@@ -25,6 +25,7 @@ import { googleLogout } from '@react-oauth/google';
 import { useHttp } from '@/hooks/http';
 import { RESET } from 'jotai/utils';
 import { useRouter } from 'next/navigation';
+import { useMemo } from 'react';
 
 export default function SidebarUser() {
     const { isMobile } = useSidebar();
@@ -37,9 +38,16 @@ export default function SidebarUser() {
 
     const name = `${user?.last_name}, ${user?.first_name}`;
     const email = `${user?.email}`;
-    const picture =
-        user?.photo_url ??
-        `https://api.dicebear.com/7.x/initials/svg?seed=${user?.first_name}%20${user?.last_name}`;
+    const picture = useMemo(() => {
+        if (user) {
+            return (
+                user?.photo_url ??
+                `https://api.dicebear.com/7.x/initials/svg?seed=${user?.first_name}%20${user?.last_name}`
+            );
+        }
+
+        return null;
+    }, [user]);
 
     const logout = async () => {
         try {
@@ -73,7 +81,9 @@ export default function SidebarUser() {
                             className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                         >
                             <Avatar className='h-8 w-8 rounded-lg'>
-                                <AvatarImage src={picture} alt={name} />
+                                {picture && (
+                                    <AvatarImage src={picture} alt={name} />
+                                )}
                                 <AvatarFallback className='rounded-lg'>
                                     CN
                                 </AvatarFallback>
@@ -98,7 +108,9 @@ export default function SidebarUser() {
                         <DropdownMenuLabel className='p-0 font-normal'>
                             <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
                                 <Avatar className='h-8 w-8 rounded-lg'>
-                                    <AvatarImage src={picture} alt={name} />
+                                    {picture && (
+                                        <AvatarImage src={picture} alt={name} />
+                                    )}
                                     <AvatarFallback className='rounded-lg'>
                                         CN
                                     </AvatarFallback>

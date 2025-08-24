@@ -18,7 +18,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useHttp } from '@/hooks/http';
-import { Chapter } from '@/types/chapter';
+import { Chapter } from '@/types/models/chapter';
 import { ChapterFormInputs } from '@/types/form';
 import { useAtom } from 'jotai';
 import { MoreHorizontal } from 'lucide-react';

@@ -1,5 +1,5 @@
-import { Access, Config, GoogleLoginResponse } from '@/types/auth';
-import { User } from '@/types/user';
+import { Access, Config, GoogleLoginResponse } from '@/types/models/auth';
+import { User } from '@/types/models/user';
 import { atom } from 'jotai';
 import { atomWithStorage } from 'jotai/utils';
 

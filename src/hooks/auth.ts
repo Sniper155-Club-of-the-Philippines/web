@@ -3,7 +3,7 @@ import { useRouter } from 'next/navigation';
 import { jwtDecode } from 'jwt-decode';
 import { useAtom } from 'jotai';
 import { accessAtom, googleAtom, userAtom } from '@/atoms/auth';
-import { Access } from '@/types/auth';
+import { Access } from '@/types/models/auth';
 import { RESET } from 'jotai/utils';
 import { useHttp } from '@/hooks/http';
 import { googleLogout } from '@react-oauth/google';
