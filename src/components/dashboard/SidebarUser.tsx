@@ -55,7 +55,6 @@ export default function SidebarUser() {
         }
 
         setUser(RESET);
-        setGoogle(RESET);
         setAccess(RESET);
 
         router.push('/login');
