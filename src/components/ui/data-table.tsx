@@ -31,6 +31,8 @@ export interface DataTableRef {
     virtualizer: Virtualizer<HTMLDivElement, Element> | null;
 }
 
+const ROW_HEIGHT = 48;
+
 export const DataTable = React.forwardRef<
     DataTableRef,
     DataTableProps<any, any>
@@ -55,7 +57,7 @@ export const DataTable = React.forwardRef<
     const virtualizer = useVirtualizer({
         count: table.getRowModel().rows.length,
         getScrollElement: () => scrollRef.current,
-        estimateSize: () => 48,
+        estimateSize: () => ROW_HEIGHT,
         overscan: 10,
     });
 
@@ -114,7 +116,10 @@ export const DataTable = React.forwardRef<
                     {virtualRows.map((vr) => {
                         const row = table.getRowModel().rows[vr.index];
                         return (
-                            <TableRow key={row.id}>
+                            <TableRow
+                                key={row.id}
+                                style={{ height: ROW_HEIGHT }}
+                            >
                                 {row.getVisibleCells().map((cell) => (
                                     <TableCell key={cell.id}>
                                         {flexRender(

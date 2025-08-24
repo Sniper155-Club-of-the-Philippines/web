@@ -39,7 +39,7 @@ export function useRefreshToken() {
             try {
                 googleLogout();
             } catch (error) {
-                console.error(error);
+                console.debug('Failed to logout using google', error);
             }
         }
 
@@ -68,7 +68,7 @@ export function useRefreshToken() {
             // Don't reset user - let other components handle user data refresh if needed
             return true;
         } catch (error) {
-            console.error('Failed to refresh token:', error);
+            console.debug('Failed to refresh token:', error);
 
             if (!mounted.current) return false;
 
@@ -107,7 +107,7 @@ export function useRefreshToken() {
                     `Token refresh scheduled in ${Math.round(delay / 1000)}s`
                 );
             } catch (error) {
-                console.error('Invalid token format:', error);
+                console.debug('Invalid token format:', error);
                 logout();
             }
         },
@@ -139,7 +139,7 @@ export function useRefreshToken() {
                 // Token is still valid, schedule normal refresh
                 scheduleRefresh(token);
             } catch (error) {
-                console.error('Error handling page load token check:', error);
+                console.debug('Error handling page load token check:', error);
                 logout();
             }
         },
