@@ -5,13 +5,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { useGoogleLogin } from '@react-oauth/google';
 import { Button } from '@/components/ui/button';
 import { GoogleLoginResponse } from '@/types/models/auth';
+import { configAtom } from '@/atoms/auth';
+import { useAtom } from 'jotai';
 
 type Props = {
     onSuccess?: (response: GoogleLoginResponse) => void;
 };
 
 export default function GoogleButton({ onSuccess }: Props) {
+    const [config] = useAtom(configAtom);
+
     const login = useGoogleLogin({
+        redirect_uri: config?.google?.redirectUri,
         onSuccess(response) {
             onSuccess?.(response);
         },

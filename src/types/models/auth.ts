@@ -16,5 +16,6 @@ export type Access = {
 export type Config = {
     google: {
         clientId: string;
+        redirectUri?: string;
     };
 };
