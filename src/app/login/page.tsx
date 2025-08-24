@@ -56,10 +56,7 @@ export default function Login() {
     const onGoogleLogin = async (response: GoogleLoginResponse) => {
         setLoading(true);
         try {
-            const data = await auth.loginWithGoogle(
-                http,
-                response.access_token
-            );
+            const data = await auth.loginWithGoogle(http, response);
 
             handleSuccess(data);
             setGoogle(response);

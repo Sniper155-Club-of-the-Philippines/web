@@ -20,13 +20,11 @@ export async function login(
 
 export async function loginWithGoogle(
     http: AxiosInstance,
-    accessToken: string
+    payload: { code: string } | { access_token: string }
 ) {
     const { data } = await http.post<{ user: User; access: Access }>(
         '/v1/auth/oauth/google',
-        {
-            access_token: accessToken,
-        }
+        payload
     );
 
     return data;

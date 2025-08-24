@@ -16,10 +16,9 @@ export default function GoogleButton({ onSuccess }: Props) {
     const [config] = useAtom(configAtom);
 
     const login = useGoogleLogin({
+        flow: 'auth-code',
         redirect_uri: config?.google?.redirectUri,
-        onSuccess(response) {
-            onSuccess?.(response);
-        },
+        onSuccess,
     });
 
     return (

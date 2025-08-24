@@ -39,14 +39,12 @@ export default function ConfigProvider({
         fetchConfig();
     }, [config, setConfig, fetchConfig]);
 
-    const clientId = config?.google?.clientId;
-
-    if (!clientId) {
+    if (!config?.google) {
         return null;
     }
 
     return (
-        <GoogleOAuthProvider clientId={clientId}>
+        <GoogleOAuthProvider clientId={config.google.clientId}>
             {children}
         </GoogleOAuthProvider>
     );
