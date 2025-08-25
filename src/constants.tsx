@@ -1,6 +1,6 @@
 import coverImg from '@/assets/cover.jpg';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFacebook } from '@fortawesome/free-brands-svg-icons';
+import { faFacebook, faGoogle } from '@fortawesome/free-brands-svg-icons';
 
 export const HOME_PANEL = {
     badge: '✨ YClub',
@@ -44,22 +44,28 @@ export const SETTING_TYPES = {
 
 export const SOCIAL_LINKS = [
     {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
+        icon: (
+            <FontAwesomeIcon icon={faFacebook} className='size-4 md:size-5' />
+        ),
         href: 'https://www.facebook.com/profile.php?id=61569977818058',
         label: 'S155CP Official Page',
     },
     {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
+        icon: (
+            <FontAwesomeIcon icon={faFacebook} className='size-4 md:size-5' />
+        ),
         href: 'https://www.facebook.com/groups/824433192468479',
         label: 'S155CP Visitor Group',
     },
     {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
+        icon: (
+            <FontAwesomeIcon icon={faFacebook} className='size-4 md:size-5' />
+        ),
         href: 'https://www.facebook.com/groups/sniper155clubofthephilippinesofficial',
         label: 'S155CP Official Group',
     },
     {
-        icon: <FontAwesomeIcon icon={faFacebook} className='size-5' />,
+        icon: <FontAwesomeIcon icon={faGoogle} className='size-4 md:size-5' />,
         href: 'https://forms.gle/x2oWv29Sb54RikV17',
         label: 'S155CP Invitation Form',
     },

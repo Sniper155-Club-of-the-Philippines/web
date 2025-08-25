@@ -5,6 +5,7 @@ import { ThemeProvider } from '@/components/ThemeProvider';
 import Spinner from '@/components/root/Spinner';
 import { Toaster } from '@/components/ui/sonner';
 import QueryProvider from '@/components/base/QueryProvider';
+import { cn } from '@/lib/utils';
 
 export default function RootLayoutClient({
     children,
@@ -19,9 +20,10 @@ export default function RootLayoutClient({
         <html
             lang='en'
             suppressHydrationWarning
-            className={
-                pathname.startsWith('/dashboard') ? 'overflow-hidden' : ''
-            }
+            className={cn(
+                pathname.startsWith('/dashboard') ? 'overflow-hidden' : '',
+                pathname.startsWith('/profile') ? 'overflow-x-hidden' : ''
+            )}
         >
             <body className={`${fontClass} antialiased`}>
                 <ThemeProvider

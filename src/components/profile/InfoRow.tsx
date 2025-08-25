@@ -17,27 +17,27 @@ export default function InfoRow({
         useNext ? (
             <Link
                 href={href}
-                className='text-sm md:text-lg hover:underline text-sky-400 break-all md:break-normal text-center md:text-left'
+                className='text-[10px] md:text-lg hover:underline text-sky-400 break-all md:break-normal text-center md:text-left'
             >
                 {value}
             </Link>
         ) : (
             <a
                 href={href}
-                className='text-sm md:text-lg hover:underline text-sky-400 break-all md:break-normal text-center md:text-left'
+                className='text-[10px] md:text-lg hover:underline text-sky-400 break-all md:break-normal text-center md:text-left'
             >
                 {value}
             </a>
         )
     ) : (
-        <span className='text-sm md:text-lg break-all md:break-normal text-center md:text-left'>
+        <span className='text-[10px] md:text-lg break-all md:break-normal text-center md:text-left'>
             {value}
         </span>
     );
 
     return (
-        <div className='flex flex-col md:flex-row items-center justify-center'>
-            <span className='text-sm md:text-lg font-semibold md:mr-1'>
+        <div className='flex flex-row items-center justify-center'>
+            <span className='text-[10px] md:text-lg font-semibold mr-1'>
                 {label}:
             </span>
             {content}

@@ -124,9 +124,9 @@ export default async function Profile({ params }: Props) {
             />
 
             <Card
-                className={`h-full w-[95%] max-w-[1000px] relative rounded-2xl py-0 shadow-2xl ${background} drop-shadow-2xl`}
+                className={`w-[1000px] relative rounded-2xl py-0 shadow-2xl ${background} drop-shadow-2xl`}
             >
-                <CardHeader className='relative h-64 md:h-[300px] border-b-3 border-accent-foreground'>
+                <CardHeader className='relative h-64 md:h-[500px] border-b-3 border-accent-foreground'>
                     <Image
                         src={national.src}
                         alt='Sniper 155 Club of the Philippines - National Banner'
@@ -150,136 +150,177 @@ export default async function Profile({ params }: Props) {
                             avatar ? 'pt-[100px] md:pt-[175px]' : ''
                         )}
                     >
-                        <h1 className='text-center text-3xl md:text-4xl font-extrabold tracking-tight'>
+                        <h1 className='text-center text-xl md:text-4xl font-extrabold tracking-tight'>
                             {name}
                         </h1>
                         {user?.designation && (
-                            <h2 className='text-xl md:text-2xl font-semibold tracking-tight mt-2'>
+                            <h2 className='text md:text-2xl font-semibold tracking-tight mt-2'>
                                 {user.designation}
                             </h2>
                         )}
 
-                        <section
-                            aria-labelledby='profile-info'
-                            className='flex flex-col md:flex-row gap-[30px] w-full mt-6'
-                        >
-                            <div className='w-full md:w-3/12 relative flex items-center justify-center h-60 md:h-auto'>
-                                {user?.chapter?.photo_url && (
-                                    <Image
-                                        src={user.chapter.photo_url}
-                                        alt={`${user.chapter.name} Chapter Logo`}
-                                        fill
-                                        className='object-contain bg-no-repeat bg-center h-full w-full'
-                                    />
-                                )}
-                            </div>
-                            <div className='w-full md:w-9/12 flex flex-col items-center justify-center'>
-                                <div className='w-full p-8 rounded-2xl bg-accent gap-4 flex flex-col'>
-                                    {user?.chapter && (
-                                        <InfoRow
-                                            label='Chapter'
-                                            value={user.chapter.name}
-                                        />
-                                    )}
-                                    {user?.email && (
-                                        <InfoRow
-                                            label='Email'
-                                            value={user.email}
-                                            href={`mailto:${user.email}`}
-                                        />
-                                    )}
-                                    {user?.phone && (
-                                        <InfoRow
-                                            label='Contact'
-                                            value={user.phone}
-                                            href={`tel:${user.phone}`}
-                                        />
-                                    )}
-                                    {user?.address && (
-                                        <InfoRow
-                                            label='Address'
-                                            value={user.address}
-                                        />
-                                    )}
-                                    <InfoRow
-                                        label='Website'
-                                        value='https://sniper155clubofthephilippines.com'
-                                        href='https://sniper155clubofthephilippines.com'
-                                        useNext
-                                    />
-                                </div>
-                            </div>
-                        </section>
-
-                        <section
-                            aria-labelledby='social-and-news'
-                            className='grid grid-cols-1 md:grid-cols-2 justify-center py-8 md:px-5 gap-10 w-full'
-                        >
-                            <div className='text-center'>
-                                <h3 id='social-and-news' className='text-2xl'>
-                                    Connect with us
-                                </h3>
-                                <div className='flex flex-col gap-2 mt-2'>
-                                    {SOCIAL_LINKS.map((social, index) => (
-                                        <Button
-                                            key={index}
-                                            asChild
-                                            variant='outline'
-                                        >
-                                            <a
-                                                href={social.href}
-                                                aria-label={social.label}
-                                                target='_blank'
-                                                rel='noopener noreferrer'
-                                            >
-                                                {social.label}
-                                                {social.icon}
-                                            </a>
-                                        </Button>
-                                    ))}
-                                </div>
-                            </div>
-                            <div className='text-center'>
-                                <h3 className='text-2xl'>
-                                    Announcements & Updates
-                                </h3>
-                                <div className='flex flex-col gap-2 mt-2 relative aspect-video'>
-                                    <Image
-                                        src={news.src}
-                                        fill
-                                        className='object-cover rounded-xl hover:scale-105 transition-[0.3s] hover:cursor-pointer'
-                                        alt='Latest news and updates'
-                                    />
-                                </div>
-                            </div>
-                            <div className='text-center'>
-                                <h3 className='text-2xl'>Powered by</h3>
-                                <div className='grid grid-cols-3 gap-2 h-20'>
-                                    {[imprint, yamaha, yclub].map((img, i) => (
-                                        <div key={i} className='relative'>
+                        <div className='scale-wrapper h-[650px] md:h-[820px] overflow-hidden'>
+                            <div className='scale-container'>
+                                <section
+                                    aria-labelledby='profile-info'
+                                    className='flex flex-row gap-5 md:gap-[30px] items-center w-full md:mt-6 px-0 md:px-10'
+                                >
+                                    {user?.chapter?.photo_url && (
+                                        <div className='w-3/12 relative flex items-center justify-center h-60'>
                                             <Image
-                                                src={img.src}
-                                                alt={
-                                                    img.src.includes('yamaha')
-                                                        ? 'Yamaha'
-                                                        : img.src.includes(
-                                                              'yclub'
-                                                          )
-                                                        ? 'YClub'
-                                                        : 'Imprint Customs'
-                                                }
+                                                src={user.chapter.photo_url}
+                                                alt={`${user.chapter.name} Chapter Logo`}
                                                 fill
-                                                className='object-contain'
+                                                className='object-contain bg-no-repeat bg-center h-full w-full'
                                             />
                                         </div>
-                                    ))}
+                                    )}
+                                    <div
+                                        className={cn(
+                                            'flex flex-col items-center justify-center',
+                                            user?.chapter?.photo_url
+                                                ? 'w-9/12'
+                                                : 'w-full'
+                                        )}
+                                    >
+                                        <div className='w-full p-4 md:p-8 rounded-2xl bg-accent gap-4 flex flex-col'>
+                                            {user?.chapter && (
+                                                <InfoRow
+                                                    label='Chapter'
+                                                    value={user.chapter.name}
+                                                />
+                                            )}
+                                            {user?.email && (
+                                                <InfoRow
+                                                    label='Email'
+                                                    value={user.email}
+                                                    href={`mailto:${user.email}`}
+                                                />
+                                            )}
+                                            {user?.phone && (
+                                                <InfoRow
+                                                    label='Contact'
+                                                    value={user.phone}
+                                                    href={`tel:${user.phone}`}
+                                                />
+                                            )}
+                                            {user?.address && (
+                                                <InfoRow
+                                                    label='Address'
+                                                    value={user.address}
+                                                />
+                                            )}
+                                            <InfoRow
+                                                label='Website'
+                                                value='https://sniper155clubofthephilippines.com'
+                                                href='https://sniper155clubofthephilippines.com'
+                                                useNext
+                                            />
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <section
+                                    aria-labelledby='social-and-news'
+                                    className='grid grid-cols-2 justify-center py-8 md:px-5 gap-10 w-full'
+                                >
+                                    <div className='text-center'>
+                                        <h3
+                                            id='social-and-news'
+                                            className='text-base md:text-2xl'
+                                        >
+                                            Connect with us
+                                        </h3>
+                                        <div className='flex flex-col gap-2 mt-2'>
+                                            {SOCIAL_LINKS.map(
+                                                (social, index) => (
+                                                    <Button
+                                                        key={index}
+                                                        asChild
+                                                        variant='outline'
+                                                    >
+                                                        <a
+                                                            href={social.href}
+                                                            aria-label={
+                                                                social.label
+                                                            }
+                                                            target='_blank'
+                                                            rel='noopener noreferrer'
+                                                            className='text-[10px] md:text-base'
+                                                        >
+                                                            {social.label}
+                                                            {social.icon}
+                                                        </a>
+                                                    </Button>
+                                                )
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className='text-center'>
+                                        <h3 className='text-base md:text-2xl'>
+                                            Announcements & Updates
+                                        </h3>
+                                        <div className='flex flex-col gap-2 mt-2 relative aspect-video'>
+                                            <a
+                                                href='https://www.facebook.com/groups/sniper155clubofthephilippinesofficial'
+                                                target='_blank'
+                                                rel='noreferrer noopener'
+                                            >
+                                                <Image
+                                                    src={news.src}
+                                                    fill
+                                                    className='object-cover rounded-xl hover:scale-105 transition-[0.3s] hover:cursor-pointer'
+                                                    alt='Latest news and updates'
+                                                />
+                                            </a>
+                                        </div>
+                                    </div>
+                                </section>
+
+                                <div className='text-center scale-100 pt-4'>
+                                    <h3 className='text-base md:text-2xl'>
+                                        Powered by
+                                    </h3>
+                                    <div className='grid grid-cols-3 gap-2 h-28 mt-4 items-center'>
+                                        {[imprint, yamaha, yclub].map(
+                                            (img, i) => (
+                                                <div
+                                                    key={i}
+                                                    className={`relative ${
+                                                        img.src.includes(
+                                                            'yamaha'
+                                                        )
+                                                            ? 'h-18'
+                                                            : 'h-full'
+                                                    }`}
+                                                >
+                                                    <Image
+                                                        src={img.src}
+                                                        alt={
+                                                            img.src.includes(
+                                                                'yamaha'
+                                                            )
+                                                                ? 'Yamaha'
+                                                                : img.src.includes(
+                                                                      'yclub'
+                                                                  )
+                                                                ? 'YClub'
+                                                                : 'Imprint Customs'
+                                                        }
+                                                        fill
+                                                        className='object-contain'
+                                                    />
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </section>
+                        </div>
                     </article>
                 </CardContent>
                 <CardFooter className='bg-slate-900 py-4 rounded-b-2xl shadow-lg'>
-                    <div className='text-center w-full text-sm'>
+                    <div className='text-center w-full text-xs md:text-sm'>
                         © 2025 Sniper 155 Club of the Philippines Inc. All
                         Rights Reserved.
                     </div>

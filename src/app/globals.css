@@ -119,4 +119,34 @@
     body {
         @apply bg-background text-foreground;
     }
+
+    .scale-wrapper {
+        @apply w-screen flex justify-center items-start;
+    }
+
+    .scale-container {
+        transform-origin: top center;
+        @apply w-[1000px];
+    }
+}
+
+@media (max-width: 1200px) {
+    .scale-container {
+        transform: scale(0.9);
+    }
+}
+@media (max-width: 1000px) {
+    .scale-container {
+        transform: scale(0.85);
+    }
+}
+@media (max-width: 800px) {
+    .scale-container {
+        transform: scale(0.8);
+    }
+}
+@media (max-width: 600px) {
+    .scale-container {
+        transform: scale(0.9);
+    }
 }
