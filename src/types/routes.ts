@@ -8,7 +8,7 @@ export interface RouteItem {
 export interface Route {
     title: string;
     url: string;
-    icon: LucideIcon;
+    icon?: LucideIcon;
     items?: RouteItem[];
 }
 

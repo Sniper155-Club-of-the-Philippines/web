@@ -25,6 +25,13 @@ import {
 import ChapterForm from '@/components/base/forms/ChapterForm';
 import { Input } from '@/components/ui/input';
 import { useChapterQuery } from '@/hooks/queries';
+import {
+    Popover,
+    PopoverContent,
+    PopoverTrigger,
+} from '@/components/ui/popover';
+import Image from 'next/image';
+import { HoverPopover } from '@/components/base/popovers/HoverPopover';
 
 export default function ClubChapters() {
     const http = useHttp();
@@ -74,6 +81,30 @@ export default function ClubChapters() {
             header: 'Name',
             accessorKey: 'name',
             enableGlobalFilter: true,
+            cell: ({ row }) => {
+                if (!row.original.photo_url) {
+                    return row.original.name;
+                }
+
+                return (
+                    <HoverPopover
+                        trigger={
+                            <span className='hover:cursor-pointer hover:underline'>
+                                {row.original.name}
+                            </span>
+                        }
+                    >
+                        <div className='relative aspect-[4/3] w-full'>
+                            <Image
+                                src={row.original.photo_url}
+                                alt={row.original.name}
+                                fill
+                                className='object-contain rounded-md'
+                            />
+                        </div>
+                    </HoverPopover>
+                );
+            },
         },
         {
             header: 'Page',
