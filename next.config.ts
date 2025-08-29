@@ -6,6 +6,21 @@ const nextConfig: NextConfig = {
     images: {
         remotePatterns: [],
     },
+    async headers() {
+        return [
+            {
+                source: '/:all*(svg|jpg|png|gif|webp|js|css)',
+                headers: [
+                    { key: 'Access-Control-Allow-Origin', value: '*' },
+                    {
+                        key: 'Access-Control-Allow-Methods',
+                        value: 'GET,OPTIONS',
+                    },
+                    { key: 'Access-Control-Allow-Headers', value: '*' },
+                ],
+            },
+        ];
+    },
 };
 
 const withBundleAnalyzer = initWithBundleAnalyzer({
