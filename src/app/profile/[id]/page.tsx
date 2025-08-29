@@ -143,7 +143,7 @@ export default async function Profile({ params }: Props) {
                         </Avatar>
                     )}
                 </CardHeader>
-                <CardContent>
+                <CardContent className='px-0 md:px-6'>
                     <article
                         className={cn(
                             'flex flex-col items-center w-full md:px-5 pb-5',
@@ -154,7 +154,7 @@ export default async function Profile({ params }: Props) {
                             {name}
                         </h1>
                         {user?.designation && (
-                            <h2 className='text md:text-2xl font-semibold tracking-tight mt-2'>
+                            <h2 className='text md:text-2xl font-semibold tracking-tight mt-2 mb-3 md:mb-0'>
                                 {user.designation}
                             </h2>
                         )}
@@ -163,10 +163,10 @@ export default async function Profile({ params }: Props) {
                             <div className='scale-container'>
                                 <section
                                     aria-labelledby='profile-info'
-                                    className='flex flex-row gap-5 md:gap-[30px] items-center w-full md:mt-6 px-0 md:px-10'
+                                    className='flex flex-row gap-1 md:gap-[30px] items-center w-full md:mt-6 px-0 md:px-10'
                                 >
                                     {user?.chapter?.photo_url && (
-                                        <div className='w-3/12 relative flex items-center justify-center h-60'>
+                                        <div className='w-4/12 relative flex items-center justify-center h-60'>
                                             <Image
                                                 src={user.chapter.photo_url}
                                                 alt={`${user.chapter.name} Chapter Logo`}
@@ -179,7 +179,7 @@ export default async function Profile({ params }: Props) {
                                         className={cn(
                                             'flex flex-col items-center justify-center',
                                             user?.chapter?.photo_url
-                                                ? 'w-9/12'
+                                                ? 'w-8/12'
                                                 : 'w-full'
                                         )}
                                     >

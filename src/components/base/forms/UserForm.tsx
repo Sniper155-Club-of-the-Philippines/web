@@ -12,14 +12,16 @@ import Select from '@/components/base/inputs/Select';
 import { UserFormInputs } from '@/types/form';
 import { useChapterQuery } from '@/hooks/queries';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
+import { cn } from '@/lib/utils';
 
 type Props = {
     defaultValues?: Partial<UserFormInputs>;
     onSubmit: (data: UserFormInputs) => void | Promise<void>;
     onCancel?: () => void;
+    className?: string;
 };
 
-const UserForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
+const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
     const http = useHttp();
     const { register, handleSubmit, watch, setValue, reset } =
         useForm<UserFormInputs>({
@@ -39,7 +41,12 @@ const UserForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <div className='space-y-2 py-6 max-h-[60vh] overflow-y-auto'>
+            <div
+                className={cn(
+                    'space-y-2 py-6 max-h-[60vh] overflow-y-auto',
+                    className
+                )}
+            >
                 {/* Section: Basic Info */}
                 <div className='rounded-2xl border p-6 shadow-sm'>
                     <h3 className='text-lg font-semibold mb-4'>

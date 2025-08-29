@@ -112,7 +112,7 @@ const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
 
                 {isMobile ? (
                     <Drawer open={open} onOpenChange={setOpen}>
-                        <DrawerHeader>
+                        <DrawerHeader className='hidden'>
                             <DrawerTitle>{placeholder}</DrawerTitle>
                         </DrawerHeader>
                         {trigger}

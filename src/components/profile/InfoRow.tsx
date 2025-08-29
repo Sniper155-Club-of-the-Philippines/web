@@ -36,9 +36,10 @@ export default function InfoRow({
     );
 
     return (
-        <div className='flex flex-row items-center justify-center'>
+        <div className='flex flex-col md:flex-row items-center justify-center'>
             <span className='text-[10px] md:text-lg font-semibold mr-1'>
-                {label}:
+                {label}
+                <span className='hidden md:inline'>:</span>
             </span>
             {content}
         </div>

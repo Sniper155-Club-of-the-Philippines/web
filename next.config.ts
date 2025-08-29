@@ -12,6 +12,17 @@ const withBundleAnalyzer = initWithBundleAnalyzer({
     enabled: process.env.ANALYZE === 'true',
 });
 
+if (process.env.NEXT_PUBLIC_STORAGE_URL) {
+    const url = new URL(process.env.NEXT_PUBLIC_STORAGE_URL);
+
+    nextConfig.images?.remotePatterns?.push({
+        protocol: url.protocol.replace(':', ''),
+        hostname: url.hostname,
+        port: url.port,
+        pathname: '/**',
+    } as RemotePattern);
+}
+
 if (process.env.NEXT_PUBLIC_API_URL) {
     const url = new URL(process.env.NEXT_PUBLIC_API_URL);
 

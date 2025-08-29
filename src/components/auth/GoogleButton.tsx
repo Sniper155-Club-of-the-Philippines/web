@@ -6,10 +6,11 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { Button } from '@/components/ui/button';
 import { Access } from '@/types/models/auth';
 import { User } from '@/types/models/user';
+import type { AxiosError } from 'axios';
 
 type GoogleButtonProps = {
     onSuccess?: (access: Access, user: User) => void;
-    onError?: (error: unknown) => void;
+    onError?: (error: Error | AxiosError) => void;
 };
 
 export default function GoogleButton({
@@ -17,7 +18,13 @@ export default function GoogleButton({
     onError,
 }: GoogleButtonProps) {
     useEffect(() => {
-        const handler = (event: MessageEvent) => {
+        const handler = (
+            event: MessageEvent<{
+                access: Access;
+                user: User;
+                error?: Error | AxiosError;
+            }>
+        ) => {
             // Only accept messages from same origin
             if (event.origin !== window.location.origin) return;
 

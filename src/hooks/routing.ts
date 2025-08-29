@@ -1,5 +1,5 @@
 import { routes } from '@/lib/routes';
-import { RouteSection, BreadcrumbData, Breadcrumb } from '@/types/routes';
+import type { RouteSection, BreadcrumbData, Breadcrumb } from '@/types/routes';
 import { usePathname } from 'next/navigation';
 
 export function useParseBreadcrumbsFromUrl(
@@ -19,24 +19,21 @@ export function useParseBreadcrumbsFromUrl(
     // Find matching route and item
     for (const section of routes) {
         for (const route of section.routes) {
-            // Check if current path matches the main route
             const routeCleanPath = route.url.replace('/dashboard', '');
 
             if (cleanPath === routeCleanPath) {
                 return {
-                    route: route,
+                    route,
                     routeItem: null,
                 };
             }
 
-            // Check if current path matches any of the route items
             if (route.items) {
                 for (const item of route.items) {
                     const itemCleanPath = item.url.replace('/dashboard', '');
-
                     if (cleanPath === itemCleanPath) {
                         return {
-                            route: route,
+                            route,
                             routeItem: item,
                         };
                     }
@@ -45,7 +42,17 @@ export function useParseBreadcrumbsFromUrl(
         }
     }
 
-    return null;
+    return {
+        route: {
+            title: cleanPath
+                .split('/')
+                .filter(Boolean)
+                .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
+                .join(' / '), // crude title generation
+            url: currentPath,
+        },
+        routeItem: null,
+    };
 }
 
 export function useRouteBreadcrumbs(): Breadcrumb[] {

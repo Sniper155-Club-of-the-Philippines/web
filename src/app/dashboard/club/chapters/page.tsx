@@ -25,11 +25,6 @@ import {
 import ChapterForm from '@/components/base/forms/ChapterForm';
 import { Input } from '@/components/ui/input';
 import { useChapterQuery } from '@/hooks/queries';
-import {
-    Popover,
-    PopoverContent,
-    PopoverTrigger,
-} from '@/components/ui/popover';
 import Image from 'next/image';
 import { HoverPopover } from '@/components/base/popovers/HoverPopover';
 

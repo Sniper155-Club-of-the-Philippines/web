@@ -25,6 +25,7 @@ import { useHttp } from '@/hooks/http';
 import { RESET } from 'jotai/utils';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
+import Link from 'next/link';
 
 export default function SidebarUser() {
     const { isMobile } = useSidebar();
@@ -117,10 +118,12 @@ export default function SidebarUser() {
                         <DropdownMenuSeparator />
                         <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <DropdownMenuItem>
-                                <Settings />
-                                Settings
-                            </DropdownMenuItem>
+                            <Link href='/dashboard/settings'>
+                                <DropdownMenuItem>
+                                    <Settings />
+                                    Settings
+                                </DropdownMenuItem>
+                            </Link>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={logout}>
