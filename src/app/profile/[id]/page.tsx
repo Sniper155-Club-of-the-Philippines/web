@@ -159,7 +159,7 @@ export default async function Profile({ params }: Props) {
                             </h2>
                         )}
 
-                        <div className='scale-wrapper h-[650px] md:h-[820px] overflow-hidden'>
+                        <div className='scale-wrapper h-[630px] sm:h-[650px] md:h-[770px] lg:h-[820px] overflow-hidden'>
                             <div className='scale-container'>
                                 <section
                                     aria-labelledby='profile-info'
