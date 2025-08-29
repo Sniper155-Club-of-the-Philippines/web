@@ -122,7 +122,6 @@ export default async function Profile({ params }: Props) {
                 type='application/ld+json'
                 dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
             />
-
             <Card
                 className={`w-[1000px] relative rounded-2xl py-0 shadow-2xl ${background} drop-shadow-2xl`}
             >
