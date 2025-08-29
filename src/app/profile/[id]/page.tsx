@@ -146,7 +146,7 @@ export default async function Profile({ params }: Props) {
                 <CardContent className='px-0 md:px-6'>
                     <article
                         className={cn(
-                            'flex flex-col items-center w-full md:px-5 pb-5',
+                            'flex flex-col items-center w-full md:px-5',
                             avatar ? 'pt-[100px] md:pt-[175px]' : ''
                         )}
                     >
@@ -159,7 +159,7 @@ export default async function Profile({ params }: Props) {
                             </h2>
                         )}
 
-                        <div className='scale-wrapper h-[630px] sm:h-[650px] md:h-[770px] lg:h-[820px] overflow-hidden'>
+                        <div className='scale-wrapper h-[600px] sm:h-[620px] md:h-[770px] lg:h-[820px] overflow-hidden'>
                             <div className='scale-container'>
                                 <section
                                     aria-labelledby='profile-info'
