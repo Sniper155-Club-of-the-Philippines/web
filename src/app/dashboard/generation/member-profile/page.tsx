@@ -77,16 +77,17 @@ export default function MemberProfile() {
         {
             header: 'URL (shortened)',
             accessorKey: 'shortened_url',
-            cell: ({ row }) => (
-                <a
-                    href={row.original.shortened_url}
-                    target='_blank'
-                    rel='noopener noreferrer'
-                    className='text-primary hover:underline'
-                >
-                    {row.original.shortened_url}
-                </a>
-            ),
+            cell: ({ row }) =>
+                row.original.shortened_url && (
+                    <a
+                        href={row.original.shortened_url}
+                        target='_blank'
+                        rel='noopener noreferrer'
+                        className='text-primary hover:underline'
+                    >
+                        {row.original.shortened_url}
+                    </a>
+                ),
         },
         {
             accessorKey: 'created_at',
