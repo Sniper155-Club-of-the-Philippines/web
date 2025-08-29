@@ -46,7 +46,7 @@ export default function NFCID() {
             .setOrganization('Sniper 155 Club of the Philippines Inc.')
             .addUrl({
                 label: 'Profile',
-                value: profile.shortened_url || profile.url,
+                value: profile.url,
                 type: 'home',
             });
 
