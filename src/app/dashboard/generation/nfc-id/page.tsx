@@ -202,7 +202,7 @@ export default function NFCID() {
                                 });
                             }}
                         >
-                            <code className='relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold'>
+                            <code className='relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold whitespace-pre-wrap break-all'>
                                 {vcard.toString()}
                             </code>
                             <span className='absolute right-2 top-2 text-xs opacity-0 group-hover:opacity-100 transition'>
