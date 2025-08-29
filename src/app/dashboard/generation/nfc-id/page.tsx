@@ -78,9 +78,15 @@ export default function NFCID() {
 
             const vcardBuffer = encoder.encode(vcard.toString()).buffer;
 
-            await writeToTag('text/vcard', vcardBuffer, true, 5);
+            await writeToTag('text/x-vcard', vcardBuffer, true, 5);
+            toast('NFC Write Successful', {
+                closeButton: true,
+            });
         } catch (error) {
             console.error(error);
+            toast('NFC Write Error', {
+                closeButton: true,
+            });
         } finally {
             setWriting(false);
         }
@@ -165,7 +171,7 @@ export default function NFCID() {
                     />
                 </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-5'>
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-5 max-h-[calc(100vh-190px)] md:max-h-none overflow-y-scroll md:overflow-y-hidden pb-5 md:pb-0'>
                 <div className='flex flex-col gap-4'>
                     <Label>QR Code</Label>
                     <div className='h-[300px] w-[300px]'>
