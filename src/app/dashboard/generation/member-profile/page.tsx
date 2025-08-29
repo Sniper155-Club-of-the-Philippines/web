@@ -37,14 +37,14 @@ export default function MemberProfile() {
         setLoading(true);
         try {
             await profile.store(http, data);
-            toast('Profile created successfully.', {
+            toast.success('Profile created successfully.', {
                 closeButton: true,
             });
             setCreateOpen(false);
             refetch();
         } catch (error) {
             console.error(error);
-            toast('Unable to create profile.', {
+            toast.error('Unable to create profile.', {
                 closeButton: true,
             });
         } finally {

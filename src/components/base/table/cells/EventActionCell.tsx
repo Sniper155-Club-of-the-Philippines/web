@@ -45,7 +45,7 @@ const EventActionCell = ({ event, refetch, onPreview }: Props) => {
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to delete event.', {
+            toast.error('Unable to delete event.', {
                 closeButton: true,
             });
         } finally {
@@ -58,14 +58,14 @@ const EventActionCell = ({ event, refetch, onPreview }: Props) => {
         setLoading(true);
         try {
             await api.update(http, data);
-            toast('Event updated successfully.', {
+            toast.success('Event updated successfully.', {
                 closeButton: true,
             });
             setEditOpen(false);
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to edit event.', {
+            toast.error('Unable to edit event.', {
                 closeButton: true,
             });
         } finally {

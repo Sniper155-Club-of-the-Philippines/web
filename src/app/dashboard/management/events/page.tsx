@@ -43,14 +43,14 @@ export default function Events() {
         setLoading(true);
         try {
             await event.store(http, data);
-            toast('Event created successfully.', {
+            toast.success('Event created successfully.', {
                 closeButton: true,
             });
             setCreateOpen(false);
             refetch();
         } catch (error) {
             console.error(error);
-            toast('Unable to create event.', {
+            toast.error('Unable to create event.', {
                 closeButton: true,
             });
         } finally {

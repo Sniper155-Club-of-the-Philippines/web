@@ -44,7 +44,7 @@ const ChapterActionCell = ({ chapter, refetch }: Props) => {
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to delete chapter.', {
+            toast.error('Unable to delete chapter.', {
                 closeButton: true,
             });
         } finally {
@@ -57,14 +57,14 @@ const ChapterActionCell = ({ chapter, refetch }: Props) => {
         setLoading(true);
         try {
             await api.update(http, data);
-            toast('Chapter updated successfully.', {
+            toast.success('Chapter updated successfully.', {
                 closeButton: true,
             });
             setEditOpen(false);
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to edit chapter.', {
+            toast.error('Unable to edit chapter.', {
                 closeButton: true,
             });
         } finally {

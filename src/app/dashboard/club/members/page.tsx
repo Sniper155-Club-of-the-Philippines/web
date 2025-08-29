@@ -40,14 +40,14 @@ export default function ClubMembers() {
         setLoading(true);
         try {
             await user.store(http, data);
-            toast('Member created successfully.', {
+            toast.success('Member created successfully.', {
                 closeButton: true,
             });
             setCreateOpen(false);
             refetch();
         } catch (error) {
             console.error(error);
-            toast('Unable to create member.', {
+            toast.error('Unable to create member.', {
                 closeButton: true,
             });
         } finally {
@@ -63,7 +63,7 @@ export default function ClubMembers() {
             saveAs(pdf, 'members.pdf');
         } catch (error) {
             console.error(error);
-            toast('Unable to print PDF', {
+            toast.error('Unable to print PDF', {
                 closeButton: true,
             });
         } finally {

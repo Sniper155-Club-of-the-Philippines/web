@@ -124,10 +124,10 @@ export default function SettingForm<T extends Record<string, any>>({
 
             await Promise.all(requests);
 
-            toast('Setting saved successfully.', { closeButton: true });
+            toast.success('Setting saved successfully.', { closeButton: true });
         } catch (error) {
             console.error(error);
-            toast('Unable to save setting.', { closeButton: true });
+            toast.error('Unable to save setting.', { closeButton: true });
         } finally {
             setLoading(false);
         }

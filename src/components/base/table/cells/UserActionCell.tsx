@@ -44,7 +44,7 @@ const UserActionCell = ({ user, refetch }: Props) => {
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to delete member.', {
+            toast.success('Unable to delete member.', {
                 closeButton: true,
             });
         } finally {
@@ -57,14 +57,14 @@ const UserActionCell = ({ user, refetch }: Props) => {
         setLoading(true);
         try {
             await api.update(http, data);
-            toast('Member updated successfully.', {
+            toast.success('Member updated successfully.', {
                 closeButton: true,
             });
             setEditOpen(false);
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to edit member.', {
+            toast.error('Unable to edit member.', {
                 closeButton: true,
             });
         } finally {

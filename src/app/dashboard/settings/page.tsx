@@ -18,12 +18,12 @@ export default function Settings() {
         setLoading(true);
         try {
             await api.update(http, data);
-            toast('Settings saved successfully.', {
+            toast.success('Settings saved successfully.', {
                 closeButton: true,
             });
         } catch (error) {
             console.error(error);
-            toast('Unable to save settings.', {
+            toast.error('Unable to save settings.', {
                 closeButton: true,
             });
         } finally {

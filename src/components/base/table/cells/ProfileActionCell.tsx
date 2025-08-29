@@ -41,7 +41,7 @@ const ProfileActionCell = ({ profile, refetch }: Props) => {
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast('Unable to delete profile.', {
+            toast.error('Unable to delete profile.', {
                 closeButton: true,
             });
         } finally {

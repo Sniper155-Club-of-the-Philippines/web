@@ -40,14 +40,14 @@ export default function ClubChapters() {
         setLoading(true);
         try {
             await chapter.store(http, data);
-            toast('Chapter created successfully.', {
+            toast.success('Chapter created successfully.', {
                 closeButton: true,
             });
             setCreateOpen(false);
             refetch();
         } catch (error) {
             console.error(error);
-            toast('Unable to create chapter.', {
+            toast.error('Unable to create chapter.', {
                 closeButton: true,
             });
         } finally {
@@ -63,7 +63,7 @@ export default function ClubChapters() {
             saveAs(pdf, 'chapters.pdf');
         } catch (error) {
             console.error(error);
-            toast('Unable to print PDF', {
+            toast.error('Unable to print PDF', {
                 closeButton: true,
             });
         } finally {

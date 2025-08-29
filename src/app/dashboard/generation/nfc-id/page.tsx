@@ -3,8 +3,7 @@
 import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { Label } from '@/components/ui/label';
 import { useProfileQuery } from '@/hooks/queries';
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { VCard } from '@scr2em/vcard';
+import { useEffect, useRef, useState } from 'react';
 import { Profile } from '@/types/models/profile';
 import QRCode from 'qr-code-styling';
 import { Button } from '@/components/ui/button';
@@ -17,6 +16,7 @@ import {
 } from 'webnfc';
 import { toast } from 'sonner';
 import { useLogo } from '@/contexts/logo';
+import { useVCard } from '@/hooks/data';
 
 const encoder = new TextEncoder();
 
@@ -34,41 +34,15 @@ export default function NFCID() {
     const qrCodeInstance = useRef<QRCode | null>(null);
     const [writing, setWriting] = useState(false);
 
-    const vcard = useMemo(() => {
-        if (!profile?.user) {
-            return null;
-        }
-
-        const user = profile.user;
-
-        const card = new VCard()
-            .setName(user.first_name, user.last_name)
-            .setOrganization('Sniper 155 Club of the Philippines Inc.')
-            .addUrl({
-                label: 'Profile',
-                value: profile.url,
-                type: 'home',
-            });
-
-        if (user.designation) {
-            card.setJobTitle(user.designation);
-        }
-
-        if (user.phone) {
-            card.addPhone({
-                label: 'Phone',
-                type: 'cell',
-                value: user.phone,
-            });
-        }
-
-        return card;
-    }, [profile]);
+    const vcard = useVCard(profile);
 
     const writeToNfc = async () => {
         setWriting(true);
         try {
             if (!vcard) {
+                toast.error('No VCard available', {
+                    closeButton: true,
+                });
                 return;
             }
 
@@ -79,12 +53,12 @@ export default function NFCID() {
             const vcardBuffer = encoder.encode(vcard.toString()).buffer;
 
             await writeToTag('text/x-vcard', vcardBuffer, true, 5);
-            toast('NFC Write Successful', {
+            toast.success('NFC Write Successful', {
                 closeButton: true,
             });
         } catch (error) {
             console.error(error);
-            toast('NFC Write Error', {
+            toast.error('NFC Write Error', {
                 closeButton: true,
             });
         } finally {
@@ -121,13 +95,13 @@ export default function NFCID() {
     }, [vcard, logoUrl]);
 
     const onPermissionGrant = () => {
-        toast('NFC Permission Granted', {
+        toast.info('NFC Permission Granted', {
             closeButton: true,
         });
     };
 
     const onPermissionDenied = () => {
-        toast('NFC Permission Denied', {
+        toast.warning('NFC Permission Denied', {
             closeButton: true,
         });
     };
@@ -197,7 +171,7 @@ export default function NFCID() {
                             className='bg-muted h-full whitespace-pre-wrap cursor-pointer group relative'
                             onClick={() => {
                                 navigator.clipboard.writeText(vcard.toString());
-                                toast('Copied VCard to clipboard', {
+                                toast.info('Copied VCard to clipboard', {
                                     closeButton: true,
                                 });
                             }}

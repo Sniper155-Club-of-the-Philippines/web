@@ -58,13 +58,13 @@ export default function Login() {
 
     const handleError = (error: unknown) => {
         if (isAxiosError(error)) {
-            toast('Unable to login', {
+            toast.error('Unable to login', {
                 description: error.response?.data?.message,
                 closeButton: true,
             });
         } else {
             console.error(error);
-            toast('Unable to login', {
+            toast.error('Unable to login', {
                 closeButton: true,
             });
         }
