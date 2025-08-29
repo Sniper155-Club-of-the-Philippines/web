@@ -166,7 +166,7 @@ export default async function Profile({ params }: Props) {
                                     className='flex flex-row gap-1 md:gap-[30px] items-center w-full md:mt-6 px-0 md:px-10'
                                 >
                                     {user?.chapter?.photo_url && (
-                                        <div className='w-4/12 relative flex items-center justify-center h-60'>
+                                        <div className='w-10/24 relative flex items-center justify-center h-60'>
                                             <Image
                                                 src={user.chapter.photo_url}
                                                 alt={`${user.chapter.name} Chapter Logo`}
@@ -179,7 +179,7 @@ export default async function Profile({ params }: Props) {
                                         className={cn(
                                             'flex flex-col items-center justify-center',
                                             user?.chapter?.photo_url
-                                                ? 'w-8/12'
+                                                ? 'w-14/24'
                                                 : 'w-full'
                                         )}
                                     >
