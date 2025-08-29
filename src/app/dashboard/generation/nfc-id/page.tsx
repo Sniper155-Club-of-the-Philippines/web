@@ -32,6 +32,7 @@ export default function NFCID() {
             value: profile.id,
         })) ?? [];
     const qrCodeInstance = useRef<QRCode | null>(null);
+    const [writing, setWriting] = useState(false);
 
     const vcard = useMemo(() => {
         if (!profile?.user) {
@@ -65,6 +66,7 @@ export default function NFCID() {
     }, [profile]);
 
     const writeToNfc = async () => {
+        setWriting(true);
         try {
             if (!vcard) {
                 return;
@@ -76,9 +78,11 @@ export default function NFCID() {
 
             const vcardBuffer = encoder.encode(vcard.toString()).buffer;
 
-            await writeToTag('text/vcard', vcardBuffer);
+            await writeToTag('text/vcard', vcardBuffer, true, 5);
         } catch (error) {
             console.error(error);
+        } finally {
+            setWriting(false);
         }
     };
 
@@ -161,7 +165,7 @@ export default function NFCID() {
                     />
                 </div>
             </div>
-            <div className='flex gap-5'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-5'>
                 <div className='flex flex-col gap-4'>
                     <Label>QR Code</Label>
                     <div className='h-[300px] w-[300px]'>
@@ -175,7 +179,9 @@ export default function NFCID() {
                         <Button onClick={downloadQrCode}>Download</Button>
                     )}
                     {nfcSupported && vcard && (
-                        <Button onClick={writeToNfc}>Write to NFC</Button>
+                        <Button onClick={writeToNfc} disabled={writing}>
+                            {writing ? 'Writing' : 'Write to NFC'}
+                        </Button>
                     )}
                 </div>
                 {vcard && (
