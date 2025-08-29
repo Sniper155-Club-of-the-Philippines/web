@@ -38,7 +38,7 @@ export default function Footer({
     },
     description = 'Where riders unite to share knowledge, experiences, and camaraderie.',
     socialLinks = SOCIAL_LINKS,
-    copyright = '© 2025 S155CP Inc. All rights reserved.',
+    copyright = '© 2021 S155CP Inc. All rights reserved.',
     legalLinks = defaultLegalLinks,
 }: Props) {
     return (
