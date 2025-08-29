@@ -4,7 +4,6 @@ import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { Label } from '@/components/ui/label';
 import { useProfileQuery } from '@/hooks/queries';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import logo from '@/assets/national.png';
 import { VCard } from '@scr2em/vcard';
 import { Profile } from '@/types/models/profile';
 import QRCode from 'qr-code-styling';
@@ -17,11 +16,12 @@ import {
     writeToTag,
 } from 'webnfc';
 import { toast } from 'sonner';
+import { useLogo } from '@/contexts/logo';
 
 const encoder = new TextEncoder();
-const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL}${logo.src}`;
 
 export default function NFCID() {
+    const logoUrl = useLogo();
     const { data: profiles } = useProfileQuery();
     const [profile, setProfile] = useState<Profile | null>();
     const canvasRef = useRef<HTMLDivElement>(null);
@@ -101,14 +101,14 @@ export default function NFCID() {
             height: 300,
             type: 'svg',
             data: vcard.toString(),
-            image: logoUrl,
+            image: logoUrl ?? undefined,
             imageOptions: {
                 crossOrigin: 'anonymous',
             },
         });
 
         qrCodeInstance.current.append(canvasRef.current);
-    }, [vcard]);
+    }, [vcard, logoUrl]);
 
     const onPermissionGrant = () => {
         toast('NFC Permission Granted', {
