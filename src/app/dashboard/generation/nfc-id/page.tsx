@@ -13,12 +13,10 @@ import {
     requestAccessToNFC,
     nfcEvents,
     writeToTag,
-} from 'webnfc';
+} from '@/lib/web-nfc';
 import { toast } from 'sonner';
 import { useLogo } from '@/contexts/logo';
 import { useVCard } from '@/hooks/data';
-
-const encoder = new TextEncoder();
 
 export default function NFCID() {
     const logoUrl = useLogo();
@@ -50,11 +48,20 @@ export default function NFCID() {
                 await requestAccessToNFC();
             }
 
-            const vcardBuffer = encoder.encode(vcard.toString()).buffer;
-            const urlBuffer = encoder.encode(profile.url).buffer;
-
-            await writeToTag('text/uri-list', urlBuffer, true, 5);
-            await writeToTag('text/vcard', vcardBuffer, false, 5);
+            await writeToTag(
+                [
+                    {
+                        recordType: 'url',
+                        data: profile.url,
+                    },
+                    {
+                        recordType: 'mime',
+                        mediaType: 'text/vcard',
+                        data: vcard.toString(),
+                    },
+                ],
+                { overwrite: true, timeoutInSeconds: 5 }
+            );
 
             toast.success('NFC Write Successful', {
                 closeButton: true,
