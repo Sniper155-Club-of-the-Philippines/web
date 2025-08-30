@@ -120,6 +120,11 @@ export function createVcard(profile?: Profile | null) {
             label: 'Profile',
             value: profile.url,
             type: 'home',
+        })
+        .addEmail({
+            label: 'Email',
+            value: user.email,
+            type: 'home',
         });
 
     if (user.designation) {
