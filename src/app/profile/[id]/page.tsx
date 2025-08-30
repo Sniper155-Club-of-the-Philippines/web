@@ -20,6 +20,7 @@ import { cn } from '@/lib/utils';
 import type { Metadata } from 'next';
 import type { Profile } from '@/types/models/profile';
 import { notFound } from 'next/navigation';
+import ProfileButton from '@/components/base/buttons/ProfileButton';
 
 type Props = {
     params: Promise<{ id: string }>;
@@ -214,6 +215,11 @@ export default async function Profile({ params }: Props) {
                                                 value='https://sniper155clubofthephilippines.com'
                                                 href='https://sniper155clubofthephilippines.com'
                                                 useNext
+                                            />
+                                            <ProfileButton
+                                                profile={data}
+                                                name={name}
+                                                className='text-[9px] h-6'
                                             />
                                         </div>
                                     </div>

@@ -5,6 +5,8 @@ import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
 import { AccessorKeyColumnDefBase } from '@tanstack/react-table';
 import { KeyOf } from '@/types/object';
+import { Profile } from '@/types/models/profile';
+import { VCard } from '@scr2em/vcard';
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -102,4 +104,35 @@ export function searchArray<T>(
             return String(value).toLowerCase().includes(lower);
         })
     );
+}
+
+export function createVcard(profile?: Profile | null) {
+    if (!profile?.user) {
+        return null;
+    }
+
+    const user = profile.user;
+
+    const card = new VCard()
+        .setName(user.first_name, user.last_name)
+        .setOrganization('Sniper 155 Club of the Philippines Inc.')
+        .addUrl({
+            label: 'Profile',
+            value: profile.url,
+            type: 'home',
+        });
+
+    if (user.designation) {
+        card.setJobTitle(user.designation);
+    }
+
+    if (user.phone) {
+        card.addPhone({
+            label: 'Phone',
+            type: 'cell',
+            value: user.phone,
+        });
+    }
+
+    return card;
 }

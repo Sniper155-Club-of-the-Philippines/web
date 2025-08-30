@@ -9,33 +9,23 @@ import { cn } from '@/lib/utils';
 
 export default function RootLayoutClient({
     children,
-    fontClass,
 }: {
     children: React.ReactNode;
-    fontClass: string;
 }) {
     const pathname = usePathname();
 
     return (
-        <html
-            lang='en'
-            suppressHydrationWarning
-            className={cn(
-                pathname.startsWith('/dashboard') ? 'overflow-hidden' : '',
-                pathname.startsWith('/profile') ? 'overflow-x-hidden' : ''
-            )}
-        >
-            <body className={`${fontClass} antialiased`}>
-                <ThemeProvider
-                    attribute='class'
-                    defaultTheme='system'
-                    enableSystem
-                >
-                    <Spinner />
-                    <Toaster />
-                    <QueryProvider>{children}</QueryProvider>
-                </ThemeProvider>
-            </body>
-        </html>
+        <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
+            <div
+                className={cn(
+                    pathname.startsWith('/dashboard') && 'overflow-hidden',
+                    pathname.startsWith('/profile') && 'overflow-x-hidden'
+                )}
+            >
+                <Spinner />
+                <Toaster />
+                <QueryProvider>{children}</QueryProvider>
+            </div>
+        </ThemeProvider>
     );
 }

@@ -27,9 +27,9 @@ export default function NFCID() {
     const canvasRef = useRef<HTMLDivElement>(null);
     const [nfcSupported, setNfcSupported] = useState(false);
     const options =
-        profiles?.map((profile) => ({
-            label: `${profile.user?.last_name}, ${profile.user?.first_name}`,
-            value: profile.id,
+        profiles?.map(({ id, user }) => ({
+            label: `${user?.last_name}, ${user?.first_name}`,
+            value: id,
         })) ?? [];
     const qrCodeInstance = useRef<QRCode | null>(null);
     const [writing, setWriting] = useState(false);
@@ -39,8 +39,8 @@ export default function NFCID() {
     const writeToNfc = async () => {
         setWriting(true);
         try {
-            if (!vcard) {
-                toast.error('No VCard available', {
+            if (!vcard || !profile) {
+                toast.error('No Profile available', {
                     closeButton: true,
                 });
                 return;
@@ -51,8 +51,11 @@ export default function NFCID() {
             }
 
             const vcardBuffer = encoder.encode(vcard.toString()).buffer;
+            const urlBuffer = encoder.encode(profile.url).buffer;
 
-            await writeToTag('text/x-vcard', vcardBuffer, true, 5);
+            await writeToTag('text/uri-list', urlBuffer, true, 5);
+            await writeToTag('text/vcard', vcardBuffer, false, 5);
+
             toast.success('NFC Write Successful', {
                 closeButton: true,
             });
@@ -74,7 +77,7 @@ export default function NFCID() {
     };
 
     useEffect(() => {
-        if (!vcard || !canvasRef.current) {
+        if (!profile || !canvasRef.current) {
             return;
         }
 
@@ -84,7 +87,7 @@ export default function NFCID() {
             width: 300,
             height: 300,
             type: 'svg',
-            data: vcard.toString(),
+            data: profile.url,
             image: logoUrl ?? undefined,
             imageOptions: {
                 crossOrigin: 'anonymous',
@@ -92,7 +95,7 @@ export default function NFCID() {
         });
 
         qrCodeInstance.current.append(canvasRef.current);
-    }, [vcard, logoUrl]);
+    }, [profile, logoUrl]);
 
     const onPermissionGrant = () => {
         toast.info('NFC Permission Granted', {

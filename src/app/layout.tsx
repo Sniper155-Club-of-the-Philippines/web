@@ -37,10 +37,14 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
     children,
-}: Readonly<{ children: React.ReactNode }>) {
+}: {
+    children: React.ReactNode;
+}) {
     return (
-        <RootLayoutClient fontClass={font.className}>
-            {children}
-        </RootLayoutClient>
+        <html lang='en' suppressHydrationWarning>
+            <body className={`${font.className} antialiased`}>
+                <RootLayoutClient>{children}</RootLayoutClient>
+            </body>
+        </html>
     );
 }
