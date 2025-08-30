@@ -198,6 +198,12 @@ export async function writeToTag(
 
     return writePromise.finally(() => {
         isWriting = false;
+
+        if (writeTimeout) {
+            clearTimeout(writeTimeout);
+            writeTimeout = null;
+        }
+
         nfcEvents.emit('WriteStop');
     });
 }

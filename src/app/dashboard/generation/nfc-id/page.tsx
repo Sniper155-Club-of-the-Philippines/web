@@ -18,6 +18,8 @@ import { toast } from 'sonner';
 import { useLogo } from '@/contexts/logo';
 import { useVCard } from '@/hooks/data';
 
+const encoder = new TextEncoder();
+
 export default function NFCID() {
     const logoUrl = useLogo();
     const { data: profiles } = useProfileQuery();
@@ -52,12 +54,12 @@ export default function NFCID() {
                 [
                     {
                         recordType: 'url',
-                        data: profile.url,
+                        data: encoder.encode(profile.url).buffer,
                     },
                     {
                         recordType: 'mime',
                         mediaType: 'text/vcard',
-                        data: vcard.toString(),
+                        data: encoder.encode(vcard.toString()).buffer,
                     },
                 ],
                 { overwrite: true, timeoutInSeconds: 5 }
