@@ -54,7 +54,7 @@ export default function NFCID() {
                 [
                     {
                         recordType: 'url',
-                        data: encoder.encode(profile.url).buffer,
+                        data: profile.url,
                     },
                     {
                         recordType: 'mime',
