@@ -36,7 +36,7 @@ export default function GoogleCallback() {
                         access: data.access,
                         user: data.user,
                     },
-                    new URL(window.opener.location.href).origin
+                    window.location.origin
                 );
             }
 
@@ -47,7 +47,7 @@ export default function GoogleCallback() {
                     {
                         error,
                     },
-                    new URL(window.opener.location.href).origin
+                    window.location.origin
                 );
             }
             window.close();
