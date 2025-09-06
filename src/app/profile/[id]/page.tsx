@@ -40,6 +40,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     } of Sniper 155 Club of the Philippines`;
 
     return {
+        metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
         title: `${name} | Sniper 155 Club of the Philippines`,
         description,
         alternates: {
@@ -159,7 +160,7 @@ export default async function Profile({ params }: Props) {
                             </h2>
                         )}
 
-                        <div className='scale-wrapper h-[620px] md:h-[770px] lg:h-[820px] overflow-hidden'>
+                        <div className='scale-wrapper h-[635px] md:h-[770px] lg:h-[850px] xl:900px overflow-hidden'>
                             <div className='scale-container'>
                                 <section
                                     aria-labelledby='profile-info'
