@@ -128,6 +128,13 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                             />
                         </div>
                         <div className='flex flex-col gap-2'>
+                            <Label htmlFor='yclub_number'>YClub Number</Label>
+                            <Input
+                                {...register('yclub_number')}
+                                id='yclub_number'
+                            />
+                        </div>
+                        <div className='flex flex-col gap-2'>
                             <Label htmlFor='designation'>Designation</Label>
                             <Select
                                 width='w-full'
@@ -138,7 +145,7 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                                 options={designations ?? []}
                             />
                         </div>
-                        <div className='md:col-span-2 flex flex-col gap-2'>
+                        <div className='flex flex-col gap-2'>
                             <Label htmlFor='chapter_id'>Chapter</Label>
                             <Select
                                 width='w-full'

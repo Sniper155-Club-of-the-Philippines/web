@@ -100,6 +100,12 @@ export default function ClubMembers() {
             enableGlobalFilter: true,
         },
         {
+            accessorKey: 'yclub_number',
+            accessorFn: (row) => (row.yclub_number ? row.yclub_number : 'N/A'),
+            header: 'YClub Number',
+            enableGlobalFilter: true,
+        },
+        {
             accessorKey: 'chapter',
             accessorFn: (row) =>
                 row.chapter?.name ? row.chapter?.name : 'N/A',

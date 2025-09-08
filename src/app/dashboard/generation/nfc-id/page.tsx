@@ -3,9 +3,8 @@
 import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { Label } from '@/components/ui/label';
 import { useProfileQuery } from '@/hooks/queries';
-import { useEffect, useRef, useState } from 'react';
+import { RefObject, useEffect, useMemo, useRef, useState } from 'react';
 import { Profile } from '@/types/models/profile';
-import QRCode from 'qr-code-styling';
 import { Button } from '@/components/ui/button';
 import {
     deviceSupportsNFC,
@@ -15,26 +14,28 @@ import {
     writeToTag,
 } from '@/lib/web-nfc';
 import { toast } from 'sonner';
-import { useLogo } from '@/contexts/logo';
 import { useVCard } from '@/hooks/data';
+import CardFront from '@/components/profile/cards/CardFront';
+import { exportAsPNG } from '@/lib/dom';
+import CardRear from '@/components/profile/cards/CardRear';
+import { useQrCode } from '@/hooks/qr';
 
 const encoder = new TextEncoder();
 
 export default function NFCID() {
-    const logoUrl = useLogo();
     const { data: profiles } = useProfileQuery();
     const [profile, setProfile] = useState<Profile | null>();
-    const canvasRef = useRef<HTMLDivElement>(null);
     const [nfcSupported, setNfcSupported] = useState(false);
     const options =
         profiles?.map(({ id, user }) => ({
             label: `${user?.last_name}, ${user?.first_name}`,
             value: id,
         })) ?? [];
-    const qrCodeInstance = useRef<QRCode | null>(null);
     const [writing, setWriting] = useState(false);
-
     const vcard = useVCard(profile);
+    const frontCardRef = useRef<HTMLDivElement>(null);
+    const rearCardRef = useRef<HTMLDivElement>(null);
+    const { qrCodeInstance, canvasRef } = useQrCode(profile);
 
     const writeToNfc = async () => {
         setWriting(true);
@@ -85,26 +86,24 @@ export default function NFCID() {
         });
     };
 
-    useEffect(() => {
-        if (!profile || !canvasRef.current) {
-            return;
+    const name = useMemo(
+        () => `${profile?.user?.first_name} ${profile?.user?.last_name}`,
+        [profile]
+    );
+
+    const downloadCard = (
+        ref: RefObject<HTMLDivElement | null>,
+        title = ''
+    ) => {
+        if (ref.current) {
+            try {
+                exportAsPNG(ref.current, name + title);
+            } catch (error) {
+                console.error(error);
+                toast.error('Unable to export card.');
+            }
         }
-
-        canvasRef.current.innerHTML = '';
-
-        qrCodeInstance.current = new QRCode({
-            width: 300,
-            height: 300,
-            type: 'svg',
-            data: profile.url,
-            image: logoUrl ?? undefined,
-            imageOptions: {
-                crossOrigin: 'anonymous',
-            },
-        });
-
-        qrCodeInstance.current.append(canvasRef.current);
-    }, [profile, logoUrl]);
+    };
 
     const onPermissionGrant = () => {
         toast.info('NFC Permission Granted', {
@@ -164,7 +163,7 @@ export default function NFCID() {
                         <div
                             ref={canvasRef}
                             key={profile?.id}
-                            id='canvas'
+                            id='qr-canvas'
                         ></div>
                     </div>
                     {vcard && (
@@ -196,6 +195,38 @@ export default function NFCID() {
                             </span>
                         </div>
                     </div>
+                )}
+                {profile?.user && name && (
+                    <>
+                        <div className='flex flex-col gap-4'>
+                            <CardFront
+                                ref={frontCardRef}
+                                src={profile.user.photo_url}
+                                name={name}
+                                date={'June 20, 2025'}
+                                yclubNumber={profile.user.yclub_number}
+                            />
+                            <Button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    downloadCard(frontCardRef, '-front');
+                                }}
+                            >
+                                Download
+                            </Button>
+                        </div>
+                        <div className='flex flex-col gap-4'>
+                            <CardRear ref={rearCardRef} profile={profile} />
+                            <Button
+                                onClick={(e) => {
+                                    e.preventDefault();
+                                    downloadCard(rearCardRef, '-rear');
+                                }}
+                            >
+                                Download
+                            </Button>
+                        </div>
+                    </>
                 )}
             </div>
         </div>

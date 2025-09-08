@@ -11,6 +11,7 @@ export interface User extends Model {
     designation: string | null;
     google_id: string | null;
     club_number: string | null;
+    yclub_number: string | null;
     chapter_id: string | null;
     chapter?: Chapter | null;
 }

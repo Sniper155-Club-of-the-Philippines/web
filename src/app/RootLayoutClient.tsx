@@ -18,7 +18,9 @@ export default function RootLayoutClient({
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
             <div
                 className={cn(
-                    pathname.startsWith('/dashboard') && 'overflow-hidden',
+                    pathname.startsWith('/dashboard') &&
+                        !pathname.endsWith('/nfc-id') &&
+                        'overflow-hidden',
                     pathname.startsWith('/profile') && 'overflow-x-hidden'
                 )}
             >
