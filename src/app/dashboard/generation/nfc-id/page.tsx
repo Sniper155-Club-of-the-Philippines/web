@@ -19,6 +19,8 @@ import CardFront from '@/components/profile/cards/CardFront';
 import { exportAsPNG } from '@/lib/dom';
 import CardRear from '@/components/profile/cards/CardRear';
 import { useQrCode } from '@/hooks/qr';
+import { useAtom } from 'jotai';
+import { loadingAtom } from '@/atoms/misc';
 
 const encoder = new TextEncoder();
 
@@ -36,14 +38,14 @@ export default function NFCID() {
     const frontCardRef = useRef<HTMLDivElement>(null);
     const rearCardRef = useRef<HTMLDivElement>(null);
     const { qrCodeInstance, canvasRef } = useQrCode(profile);
+    const [, setLoading] = useAtom(loadingAtom);
 
     const writeToNfc = async () => {
         setWriting(true);
+        setLoading(true);
         try {
             if (!vcard || !profile) {
-                toast.error('No Profile available', {
-                    closeButton: true,
-                });
+                toast.error('No Profile available', { closeButton: true });
                 return;
             }
 
@@ -66,23 +68,32 @@ export default function NFCID() {
                 { overwrite: true, timeoutInSeconds: 5 }
             );
 
-            toast.success('NFC Write Successful', {
-                closeButton: true,
-            });
+            toast.success('NFC Write Successful', { closeButton: true });
         } catch (error) {
             console.error(error);
-            toast.error('NFC Write Error', {
-                closeButton: true,
-            });
+            toast.error('NFC Write Error', { closeButton: true });
         } finally {
             setWriting(false);
+            setLoading(false);
         }
     };
 
     const downloadQrCode = () => {
-        qrCodeInstance.current?.download({
-            name: `${profile?.user?.last_name}, ${profile?.user?.first_name}`,
-            extension: 'png',
+        setLoading(true);
+        requestAnimationFrame(async () => {
+            try {
+                await qrCodeInstance.current?.download({
+                    name: `${profile?.user?.last_name}, ${profile?.user?.first_name}`,
+                    extension: 'png',
+                });
+            } catch (error) {
+                console.error(error);
+                toast.error('Unable to download QR code.', {
+                    closeButton: true,
+                });
+            } finally {
+                setLoading(false);
+            }
         });
     };
 
@@ -91,30 +102,31 @@ export default function NFCID() {
         [profile]
     );
 
-    const downloadCard = (
+    const downloadCard = async (
         ref: RefObject<HTMLDivElement | null>,
         title = ''
     ) => {
         if (ref.current) {
+            setLoading(true);
             try {
-                exportAsPNG(ref.current, name + title);
+                await exportAsPNG(ref.current, name + title);
             } catch (error) {
                 console.error(error);
-                toast.error('Unable to export card.');
+                toast.error('Unable to export card.', {
+                    closeButton: true,
+                });
+            } finally {
+                setLoading(false);
             }
         }
     };
 
     const onPermissionGrant = () => {
-        toast.info('NFC Permission Granted', {
-            closeButton: true,
-        });
+        toast.info('NFC Permission Granted', { closeButton: true });
     };
 
     const onPermissionDenied = () => {
-        toast.warning('NFC Permission Denied', {
-            closeButton: true,
-        });
+        toast.warning('NFC Permission Denied', { closeButton: true });
     };
 
     useEffect(() => {

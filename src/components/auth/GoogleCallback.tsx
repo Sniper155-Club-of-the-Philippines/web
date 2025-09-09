@@ -4,6 +4,7 @@ import { useEffect, useCallback } from 'react';
 import { useSearchParams } from 'next/navigation';
 import axios from 'axios';
 
+import Spinner from '@/components/root/Spinner';
 import { Access } from '@/types/models/auth';
 import { User } from '@/types/models/user';
 
@@ -17,7 +18,18 @@ export default function GoogleCallback() {
 
     const check = useCallback(async () => {
         const accessToken = searchParams.get('access_token');
-        if (!accessToken) return;
+        if (!accessToken) {
+            if (searchParams.get('error') === 'invalid_user' && window.opener) {
+                window.opener.postMessage(
+                    {
+                        error: new Error('User not found.'),
+                    },
+                    window.location.origin
+                );
+            }
+            window.close();
+            return;
+        }
 
         try {
             const { data } = await http.get<{ access: Access; user: User }>(
@@ -58,5 +70,5 @@ export default function GoogleCallback() {
         check();
     }, [check]);
 
-    return <p>Signing you in…</p>;
+    return <Spinner />;
 }

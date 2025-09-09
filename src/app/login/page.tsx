@@ -24,6 +24,7 @@ import { useRouter } from 'next/navigation';
 import { User } from '@/types/models/user';
 import { useHttp } from '@/hooks/http';
 import { isAxiosError } from 'axios';
+import { useRefreshToken } from '@/hooks/auth';
 
 type Inputs = {
     email: string;
@@ -82,6 +83,8 @@ export default function Login() {
             router.replace('/dashboard');
         }
     }, [access, router, user]);
+
+    useRefreshToken();
 
     return (
         <div className='flex min-h-svh w-full items-center justify-center p-6 md:p-10'>
