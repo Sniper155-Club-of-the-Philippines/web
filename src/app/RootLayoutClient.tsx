@@ -19,7 +19,9 @@ export default function RootLayoutClient({
             <div
                 className={cn(
                     pathname.startsWith('/dashboard') &&
-                        !pathname.endsWith('/nfc-id') &&
+                        !['/nfc-id', '/forms/create'].some((path) =>
+                            pathname.endsWith(path)
+                        ) &&
                         'overflow-hidden',
                     pathname.startsWith('/profile') && 'overflow-x-hidden'
                 )}

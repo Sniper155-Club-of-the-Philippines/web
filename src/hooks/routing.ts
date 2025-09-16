@@ -48,7 +48,7 @@ export function useParseBreadcrumbsFromUrl(
                 .split('/')
                 .filter(Boolean)
                 .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-                .join(' / '), // crude title generation
+                .join(' > '), // crude title generation
             url: currentPath,
         },
         routeItem: null,

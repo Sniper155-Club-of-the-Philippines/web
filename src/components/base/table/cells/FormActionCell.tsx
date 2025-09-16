@@ -1,6 +1,6 @@
 'use client';
 
-import { user as api } from '@/api';
+import { form as api } from '@/api';
 import { loadingAtom } from '@/atoms/misc';
 import { Button } from '@/components/ui/button';
 import {
@@ -18,56 +18,38 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useHttp } from '@/hooks/http';
-import { User } from '@/types/models/user';
 import { useAtom } from 'jotai';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { UserFormInputs } from '@/types/form';
-import UserForm from '@/components/base/forms/UserForm';
+import { useRouter } from 'next/navigation';
+import { Form } from '@/types/models/form';
 
 type Props = {
-    user: User;
+    form: Form;
     refetch?: () => void;
 };
 
-const UserActionCell = ({ user, refetch }: Props) => {
+const FormActionCell = ({ form, refetch }: Props) => {
     const http = useHttp();
-    const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [, setLoading] = useAtom(loadingAtom);
+    const router = useRouter();
+
+    const onEdit = () => router.push(`/dashboard/forms/${form.id}/edit`);
 
     const handleDelete = async () => {
         setLoading(true);
         try {
-            await api.remove(http, user.id);
+            await api.remove(http, form.id);
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast.success('Unable to delete member.', {
+            toast.success('Unable to delete form.', {
                 closeButton: true,
             });
         } finally {
             setDeleteOpen(false);
-            setLoading(false);
-        }
-    };
-
-    const handleEdit = async (data: UserFormInputs) => {
-        setLoading(true);
-        try {
-            await api.update(http, data);
-            toast.success('Member updated successfully.', {
-                closeButton: true,
-            });
-            setEditOpen(false);
-            refetch?.();
-        } catch (error) {
-            console.error(error);
-            toast.error('Unable to edit member.', {
-                closeButton: true,
-            });
-        } finally {
             setLoading(false);
         }
     };
@@ -82,7 +64,7 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <DropdownMenuItem onClick={() => onEdit}>
                         Edit
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
@@ -91,24 +73,6 @@ const UserActionCell = ({ user, refetch }: Props) => {
                 </DropdownMenuContent>
             </DropdownMenu>
 
-            {/* Edit Dialog */}
-            <Dialog open={editOpen} onOpenChange={setEditOpen}>
-                <DialogContent className='sm:max-w-[425px] md:max-w-[800px]'>
-                    <DialogHeader>
-                        <DialogTitle>Edit User</DialogTitle>
-                        <DialogDescription>
-                            Make changes to the member profile here. Click save
-                            when you&apos;re done.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <UserForm
-                        defaultValues={user}
-                        onSubmit={handleEdit}
-                        onCancel={() => setEditOpen(false)}
-                    />
-                </DialogContent>
-            </Dialog>
-
             {/* Delete Dialog */}
             <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>
                 <DialogContent className='sm:max-w-[425px]'>
@@ -116,8 +80,8 @@ const UserActionCell = ({ user, refetch }: Props) => {
                         <DialogTitle>Are you absolutely sure?</DialogTitle>
                         <DialogDescription>
                             This action cannot be undone. This will permanently
-                            delete the member &quot;{user?.first_name}{' '}
-                            {user?.last_name}&quot; and remove their data.
+                            delete the form &quot;{form.title}&quot; and remove
+                            their data.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
@@ -140,4 +104,4 @@ const UserActionCell = ({ user, refetch }: Props) => {
     );
 };
 
-export default UserActionCell;
+export default FormActionCell;

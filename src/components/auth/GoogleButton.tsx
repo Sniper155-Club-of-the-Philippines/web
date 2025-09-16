@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button';
 import { Access } from '@/types/models/auth';
 import { User } from '@/types/models/user';
 import type { AxiosError } from 'axios';
+import { useAtom } from 'jotai';
+import { loadingAtom } from '@/atoms/misc';
 
 type GoogleButtonProps = {
     onSuccess?: (access: Access, user: User) => void;
@@ -17,6 +19,8 @@ export default function GoogleButton({
     onSuccess,
     onError,
 }: GoogleButtonProps) {
+    const [, setLoading] = useAtom(loadingAtom);
+
     useEffect(() => {
         const handler = (
             event: MessageEvent<{
@@ -26,9 +30,16 @@ export default function GoogleButton({
             }>
         ) => {
             // Only accept messages from same origin
-            if (event.origin !== window.location.origin) return;
+            if (event.origin !== window.location.origin) {
+                setLoading(false);
+                return;
+            }
 
             const { access, user, error } = event.data || {};
+
+            if ((access && user) || error) {
+                setLoading(false);
+            }
 
             if (access && user) {
                 onSuccess?.(access, user);
@@ -41,9 +52,11 @@ export default function GoogleButton({
         return () => {
             window.removeEventListener('message', handler);
         };
-    }, [onSuccess, onError]);
+    }, [onSuccess, onError, setLoading]);
 
     const login = () => {
+        setLoading(true);
+
         const width = 500;
         const height = 600;
 

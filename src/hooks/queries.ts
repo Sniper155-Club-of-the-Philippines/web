@@ -1,8 +1,9 @@
-import { chapter, event, profile, setting, user } from '@/api';
+import { chapter, event, form, profile, setting, user } from '@/api';
 import { loadingAtom } from '@/atoms/misc';
 import { useAtom } from 'jotai';
 import { useHttp } from '@/hooks/http';
 import { useQuery } from '@tanstack/react-query';
+import type { GetAllParams as FormGetAllParams } from '@/api/form';
 
 export function useUserQuery() {
     const http = useHttp();
@@ -70,5 +71,14 @@ export function useProfileQuery() {
     return useQuery({
         queryKey: ['profiles'],
         queryFn: () => profile.all(http),
+    });
+}
+
+export function useFormQuery(params?: FormGetAllParams) {
+    const http = useHttp();
+
+    return useQuery({
+        queryKey: ['forms', params],
+        queryFn: () => form.all(http, params),
     });
 }

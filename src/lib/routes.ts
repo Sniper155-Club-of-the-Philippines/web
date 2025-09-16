@@ -1,5 +1,10 @@
 import { RouteSection } from '@/types/routes';
-import { IdCard, LayoutDashboard, UsersRound } from 'lucide-react';
+import {
+    IdCard,
+    LayoutDashboard,
+    SquareRadical,
+    UsersRound,
+} from 'lucide-react';
 
 export const main: RouteSection = {
     title: 'Administration',
@@ -41,6 +46,21 @@ export const management: RouteSection = {
                 {
                     title: 'Events',
                     url: '/dashboard/management/events',
+                },
+            ],
+        },
+        {
+            title: 'Forms',
+            url: '/dashboard/forms',
+            icon: SquareRadical,
+            items: [
+                {
+                    title: 'Manage',
+                    url: '/dashboard/forms/manage',
+                },
+                {
+                    title: 'Responses',
+                    url: '/dashboard/forms/responses',
                 },
             ],
         },

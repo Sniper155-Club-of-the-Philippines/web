@@ -70,3 +70,14 @@ export const SOCIAL_LINKS = [
         label: 'S155CP Invitation Form',
     },
 ];
+
+export const FORM_FIELD_TYPES = {
+    TEXT: 'text',
+    PARAGRAPH: 'paragraph',
+    MULTIPLE_CHOICE: 'multiple_choice',
+    CHECKBOXES: 'checkboxes',
+    DROPDOWN: 'dropdown',
+    DATE: 'date',
+    TIME: 'time',
+    DATETIME: 'datetime',
+} as const;

@@ -133,11 +133,8 @@ export function useRefreshToken(config: RefreshConfig = {}) {
             refreshState.current.inProgress = true;
             refreshState.current.lastRefreshAttempt = now;
 
-            // Show loading overlay for user-initiated refreshes or when token is expired
-            if (
-                showLoading ||
-                (access?.token && isTokenExpired(access.token))
-            ) {
+            // Show loading overlay when requested
+            if (showLoading) {
                 setLoading(true);
             }
 
@@ -150,11 +147,9 @@ export function useRefreshToken(config: RefreshConfig = {}) {
 
                 if (!mounted.current) return false;
 
-                // Validate the new token
-                if (!data.access?.token || isTokenExpired(data.access.token)) {
-                    throw new Error(
-                        'Received invalid or expired token from refresh endpoint'
-                    );
+                // Validate the new token exists (don't check expiry since it's fresh)
+                if (!data.access?.token) {
+                    throw new Error('No token received from refresh endpoint');
                 }
 
                 setAccess(data.access);
@@ -172,14 +167,14 @@ export function useRefreshToken(config: RefreshConfig = {}) {
 
                 refreshState.current.retryCount++;
 
-                // If we've exhausted retries or got a 401/403, logout
+                // If we've exhausted retries or got a 401/403 (refresh TTL expired), logout
                 if (
                     refreshState.current.retryCount >= finalConfig.maxRetries ||
                     (error as any)?.response?.status === 401 ||
                     (error as any)?.response?.status === 403
                 ) {
-                    console.error(
-                        'Token refresh failed permanently, logging out'
+                    console.debug(
+                        'Token refresh failed permanently (refresh TTL likely expired), logging out'
                     );
                     logout();
                     return false;
@@ -197,34 +192,24 @@ export function useRefreshToken(config: RefreshConfig = {}) {
                 return false;
             } finally {
                 refreshState.current.inProgress = false;
-                // Always hide loading when done (only if we showed it)
-                if (
-                    showLoading ||
-                    (access?.token && isTokenExpired(access.token))
-                ) {
+                // Hide loading when requested
+                if (showLoading) {
                     setLoading(false);
                 }
             }
         },
-        [
-            http,
-            setAccess,
-            setUser,
-            logout,
-            isTokenExpired,
-            finalConfig,
-            mounted,
-            setLoading,
-            access?.token,
-        ]
+        [http, setAccess, setUser, logout, finalConfig, mounted, setLoading]
     );
 
     const scheduleRefresh = useCallback(
         (token: string) => {
             const expiryTime = getTokenExpiryTime(token);
             if (!expiryTime) {
-                console.warn('Cannot schedule refresh: invalid token');
-                logout();
+                console.warn(
+                    'Cannot schedule refresh: invalid token, attempting refresh anyway'
+                );
+                // Still try to refresh - the token might be valid for refresh even if we can't decode it
+                refreshToken(false, false);
                 return;
             }
 
@@ -238,22 +223,29 @@ export function useRefreshToken(config: RefreshConfig = {}) {
             // Clear any existing timeout
             clearRefreshTimeout();
 
-            // If token should be refreshed immediately
+            // If token should be refreshed immediately (proactive refresh)
             if (shouldRefreshToken(token)) {
-                console.info('Token expires soon, refreshing immediately');
+                console.info(
+                    'Token expires soon, refreshing immediately (proactive)'
+                );
                 refreshToken(false, false); // Background refresh, no loading
                 return;
             }
 
-            // Schedule future refresh
+            // Schedule future refresh (proactive)
             refreshState.current.timeoutId = setTimeout(() => {
                 if (mounted.current && access?.token) {
+                    console.info(
+                        'Scheduled token refresh triggered (proactive)'
+                    );
                     refreshToken(false, false); // Background refresh, no loading
                 }
             }, delay);
 
             console.debug(
-                `Token refresh scheduled in ${Math.round(delay / 1000)}s`
+                `Token refresh scheduled in ${Math.round(
+                    delay / 1000
+                )}s (proactive)`
             );
         },
         [
@@ -261,7 +253,6 @@ export function useRefreshToken(config: RefreshConfig = {}) {
             shouldRefreshToken,
             refreshToken,
             clearRefreshTimeout,
-            logout,
             finalConfig,
             access?.token,
         ]
@@ -274,24 +265,12 @@ export function useRefreshToken(config: RefreshConfig = {}) {
             return;
         }
 
-        // Check if token is already expired
-        if (isTokenExpired(access.token)) {
-            console.warn('Current token is expired, logging out');
-            logout();
-            return;
-        }
-
-        // Schedule refresh based on token expiry
+        // Always schedule refresh rather than logout immediately
+        // Even if token appears expired (access TTL), it might still be valid for refresh (refresh TTL)
         scheduleRefresh(access.token);
 
         return clearRefreshTimeout;
-    }, [
-        access?.token,
-        scheduleRefresh,
-        clearRefreshTimeout,
-        isTokenExpired,
-        logout,
-    ]);
+    }, [access?.token, scheduleRefresh, clearRefreshTimeout]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -303,7 +282,7 @@ export function useRefreshToken(config: RefreshConfig = {}) {
         };
     }, [clearRefreshTimeout]);
 
-    // Manual refresh function (useful for handling 401 responses)
+    // Manual refresh function (useful for handling 401 responses reactively)
     const manualRefresh = useCallback(
         async (showLoading = true): Promise<boolean> => {
             if (!access?.token) {
@@ -311,21 +290,29 @@ export function useRefreshToken(config: RefreshConfig = {}) {
                 return false;
             }
 
+            console.info('Manual token refresh triggered (reactive)');
             return refreshToken(true, showLoading);
         },
         [refreshToken, access?.token]
     );
 
-    // Check if token needs refresh soon
+    // Check if token needs refresh soon (based on access TTL)
     const needsRefresh = useMemo(() => {
         if (!access?.token) return false;
         return shouldRefreshToken(access.token);
     }, [access?.token, shouldRefreshToken]);
 
+    // Check if token is past its access TTL (but might still be valid for refresh)
+    const isAccessExpired = useMemo(() => {
+        if (!access?.token) return false;
+        return isTokenExpired(access.token);
+    }, [access?.token, isTokenExpired]);
+
     return {
         refreshToken: manualRefresh,
         isRefreshing: refreshState.current.inProgress,
         needsRefresh,
+        isAccessExpired, // New: indicates token is past access TTL but might still be refreshable
         retryCount: refreshState.current.retryCount,
         timeUntilExpiry: access?.token
             ? Math.max(0, (getTokenExpiryTime(access.token) ?? 0) - Date.now())
