@@ -1,4 +1,3 @@
-import { Profile } from '@/types/models/profile';
 import { useEffect, useRef } from 'react';
 import QRCode from 'qr-code-styling';
 import { useLogo } from '@/contexts/logo';
@@ -7,14 +6,16 @@ export type Options = {
     height?: number;
     width?: number;
     appendLogo?: boolean;
+    dotsColor?: string;
 };
 
 export function useQrCode(
-    profile?: Profile | null,
+    value?: string | null,
     options: Options = {
         height: 300,
         width: 300,
         appendLogo: true,
+        dotsColor: '#000000',
     }
 ) {
     const logoUrl = useLogo();
@@ -22,7 +23,7 @@ export function useQrCode(
     const qrCodeInstance = useRef<QRCode | null>(null);
 
     useEffect(() => {
-        if (!profile || !canvasRef.current) {
+        if (!value || !canvasRef.current) {
             return;
         }
 
@@ -32,18 +33,19 @@ export function useQrCode(
             width: options.width,
             height: options.height,
             type: 'svg',
-            data: profile.url,
+            data: value,
             image: logoUrl && options.appendLogo ? logoUrl : undefined,
             imageOptions: {
                 crossOrigin: 'anonymous',
             },
             dotsOptions: {
                 roundSize: false,
+                color: options.dotsColor,
             },
         });
 
         qrCodeInstance.current.append(canvasRef.current);
-    }, [profile, logoUrl, options]);
+    }, [value, logoUrl, options]);
 
     return { canvasRef, qrCodeInstance };
 }

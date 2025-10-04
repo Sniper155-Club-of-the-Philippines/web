@@ -5,8 +5,8 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { useEffect } from 'react';
 import { ProfileFormInputs } from '@/types/form';
-import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { useProfileQuery, useUserQuery } from '@/hooks/queries';
+import MultiSelect from '@/components/base/inputs/MultiSelect';
 
 type Props = {
     defaultValues?: Partial<ProfileFormInputs>;
@@ -47,7 +47,7 @@ const ProfileForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                             name='user_id'
                             control={control}
                             render={({ field }) => (
-                                <SelectSearch
+                                <MultiSelect
                                     id='name'
                                     onChange={(e) =>
                                         field.onChange(e.target.value)

@@ -14,4 +14,8 @@ export interface User extends Model {
     yclub_number: string | null;
     chapter_id: string | null;
     chapter?: Chapter | null;
+    blood_type?: string | null;
+    allergy?: string | null;
+    emergency_contact_name?: string | null;
+    emergency_contact_phone?: string | null;
 }

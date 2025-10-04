@@ -36,7 +36,15 @@ export default function MemberProfile() {
     const handleCreate = async (data: ProfileFormInputs) => {
         setLoading(true);
         try {
-            await profile.store(http, data);
+            if (data.user_id) {
+                await Promise.all(
+                    data.user_id.map((user_id) =>
+                        profile.store(http, {
+                            user_id,
+                        })
+                    )
+                );
+            }
             toast.success('Profile created successfully.', {
                 closeButton: true,
             });

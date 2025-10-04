@@ -1,4 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
 'use client';
 
 import { forwardRef } from 'react';
@@ -6,6 +5,7 @@ import national from '@/assets/national.png';
 import yclub from '@/assets/yclub-blue.png';
 import triangle from '@/assets/triangle.png';
 import { Montserrat } from 'next/font/google';
+import { useQrCode } from '@/hooks/qr';
 
 const font = Montserrat({
     subsets: ['latin'],
@@ -20,6 +20,12 @@ export type Props = {
 
 const CardFront = forwardRef<HTMLDivElement, Props>(
     ({ src, name, date, yclubNumber }, ref) => {
+        const { canvasRef } = useQrCode(yclubNumber, {
+            height: 40,
+            width: 40,
+            appendLogo: false,
+        });
+
         return (
             <div
                 ref={ref}
@@ -34,19 +40,24 @@ const CardFront = forwardRef<HTMLDivElement, Props>(
                     <div className='absolute top-6 left-0 px-4'>
                         <img
                             src={yclub.src}
-                            className='w-20 object-cover h-12 rounded-xl'
+                            className='w-24 object-cover h-12 rounded-xl'
                             alt='Logo'
                         />
                     </div>
                     {src && (
-                        <div className='absolute top-20 left-0 px-4'>
+                        <div className='absolute top-18 left-0 px-4'>
                             <img
                                 src={src}
-                                className='w-20 object-cover h-20 rounded-lg'
+                                className='w-[90px] object-cover h-[90px] rounded-lg'
                                 alt='Profile Picture'
                             />
                         </div>
                     )}
+                    <div
+                        ref={canvasRef}
+                        id='front-qr-canvas'
+                        className='absolute top-[42%] right-[36%]'
+                    ></div>
                     <div className='absolute bottom-8 left-0 px-4 text-center'>
                         <h1 className='text-blue-950 text-[0.6rem]'>
                             {yclubNumber}

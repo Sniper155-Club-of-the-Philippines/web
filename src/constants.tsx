@@ -81,3 +81,14 @@ export const FORM_FIELD_TYPES = {
     TIME: 'time',
     DATETIME: 'datetime',
 } as const;
+
+export const BLOOD_TYPES = {
+    A_POS: 'A+',
+    A_NEG: 'A-',
+    B_POS: 'B+',
+    B_NEG: 'B-',
+    AB_POS: 'AB+',
+    AB_NEG: 'AB-',
+    O_POS: 'O+',
+    O_NEG: 'O-',
+} as const;

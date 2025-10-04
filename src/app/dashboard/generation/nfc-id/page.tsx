@@ -37,7 +37,7 @@ export default function NFCID() {
     const vcard = useVCard(profile);
     const frontCardRef = useRef<HTMLDivElement>(null);
     const rearCardRef = useRef<HTMLDivElement>(null);
-    const { qrCodeInstance, canvasRef } = useQrCode(profile);
+    const { qrCodeInstance, canvasRef } = useQrCode(profile?.url);
     const [, setLoading] = useAtom(loadingAtom);
 
     const writeToNfc = async () => {

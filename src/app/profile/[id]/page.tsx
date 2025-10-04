@@ -168,10 +168,9 @@ export default async function Profile({ params }: Props) {
                                 >
                                     {user?.chapter?.photo_url && (
                                         <div className='w-10/24 relative flex items-center justify-center h-60'>
-                                            <Image
+                                            <img
                                                 src={user.chapter.photo_url}
                                                 alt={`${user.chapter.name} Chapter Logo`}
-                                                fill
                                                 className='object-contain bg-no-repeat bg-center h-full w-full'
                                             />
                                         </div>

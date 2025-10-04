@@ -1,6 +1,6 @@
 'use client';
 
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { useQuery } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -13,7 +13,8 @@ import { UserFormInputs } from '@/types/form';
 import { useChapterQuery } from '@/hooks/queries';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
-import SelectSearch from '../inputs/SelectSearch';
+import SelectSearch from '@/components/base/inputs/SelectSearch';
+import { BLOOD_TYPES } from '@/constants';
 
 type Props = {
     defaultValues?: Partial<UserFormInputs>;
@@ -24,7 +25,7 @@ type Props = {
 
 const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
     const http = useHttp();
-    const { register, handleSubmit, watch, setValue, reset } =
+    const { register, handleSubmit, watch, setValue, reset, control } =
         useForm<UserFormInputs>({
             defaultValues,
         });
@@ -137,28 +138,40 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                         </div>
                         <div className='flex flex-col gap-2'>
                             <Label htmlFor='designation'>Designation</Label>
-                            <Select
-                                width='w-full'
-                                onChange={(value) =>
-                                    setValue('designation', value ?? null)
-                                }
-                                value={watch('designation') ?? undefined}
-                                options={designations ?? []}
+                            <Controller
+                                name='designation'
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        width='w-full'
+                                        onChange={(value) =>
+                                            field.onChange(value)
+                                        }
+                                        value={field.value ?? undefined}
+                                        options={designations ?? []}
+                                    />
+                                )}
                             />
                         </div>
                         <div className='flex flex-col gap-2'>
                             <Label htmlFor='chapter_id'>Chapter</Label>
-                            <SelectSearch
-                                onChange={(event) =>
-                                    setValue('chapter_id', event.target.value)
-                                }
-                                value={watch('chapter_id') ?? undefined}
-                                options={
-                                    chapters?.map((c) => ({
-                                        value: c.id,
-                                        label: c.name,
-                                    })) ?? []
-                                }
+                            <Controller
+                                name='chapter_id'
+                                control={control}
+                                render={({ field }) => (
+                                    <SelectSearch
+                                        onChange={(value) =>
+                                            field.onChange(value)
+                                        }
+                                        value={field.value ?? undefined}
+                                        options={
+                                            chapters?.map((c) => ({
+                                                value: c.id,
+                                                label: c.name,
+                                            })) ?? []
+                                        }
+                                    />
+                                )}
                             />
                         </div>
                     </div>
@@ -187,6 +200,67 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                                 />
                             </Avatar>
                         )}
+                    </div>
+                </div>
+
+                {/* Section: Club Info */}
+                <div className='rounded-2xl border p-6 shadow-sm'>
+                    <h3 className='text-lg font-semibold mb-4'>
+                        Emergency Info
+                    </h3>
+                    <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                        {/* Blood Type */}
+                        <div className='flex flex-col gap-2'>
+                            <Label htmlFor='blood_type'>Blood Type</Label>
+                            <Controller
+                                name='blood_type'
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        width='w-full'
+                                        onChange={(value) =>
+                                            field.onChange(value)
+                                        }
+                                        value={field.value ?? undefined}
+                                        options={Object.values(BLOOD_TYPES).map(
+                                            (type) => ({
+                                                label: type,
+                                                value: type,
+                                            })
+                                        )}
+                                    />
+                                )}
+                            />
+                        </div>
+
+                        {/* Allergy */}
+                        <div className='flex flex-col gap-2'>
+                            <Label htmlFor='allergy'>Allergy</Label>
+                            <Input {...register('allergy')} id='allergy' />
+                        </div>
+
+                        {/* Emergency Contact Name */}
+                        <div className='flex flex-col gap-2'>
+                            <Label htmlFor='emergency_contact_name'>
+                                Emergency Contact Name
+                            </Label>
+                            <Input
+                                {...register('emergency_contact_name')}
+                                id='emergency_contact_name'
+                            />
+                        </div>
+
+                        {/* Emergency Contact Phone */}
+                        <div className='flex flex-col gap-2'>
+                            <Label htmlFor='emergency_contact_phone'>
+                                Emergency Contact Phone
+                            </Label>
+                            <Input
+                                {...register('emergency_contact_phone')}
+                                id='emergency_contact_phone'
+                                type='tel'
+                            />
+                        </div>
                     </div>
                 </div>
             </div>
