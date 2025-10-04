@@ -17,7 +17,7 @@ import { Access } from '@/types/models/auth';
 import { useAtom } from 'jotai';
 import { toast } from 'sonner';
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
-import { useEffect, useMemo } from 'react';
+import { Suspense, useEffect, useMemo } from 'react';
 import { loadingAtom } from '@/atoms/misc';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { User } from '@/types/models/user';
@@ -26,13 +26,14 @@ import { isAxiosError } from 'axios';
 import { useRefreshToken } from '@/hooks/auth';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
+import Spinner from '@/components/root/Spinner';
 
 type Inputs = {
     email: string;
     password: string;
 };
 
-export default function Login() {
+function Login() {
     const { register, handleSubmit, control } = useForm<Inputs>();
     const [user, setUser] = useAtom(userAtom);
     const [access, setAccess] = useAtom(accessAtom);
@@ -162,5 +163,13 @@ export default function Login() {
                 </div>
             </div>
         </div>
+    );
+}
+
+export default function Page() {
+    return (
+        <Suspense fallback={<Spinner />}>
+            <Login />
+        </Suspense>
     );
 }
