@@ -3,7 +3,7 @@ import Logo from '@/components/root/Logo';
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { Menu } from 'lucide-react';
-import { DialogTitle } from '@radix-ui/react-dialog';
+import { DialogTitle } from '@/components/ui/dialog';
 
 export default function Header() {
     return (

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { Fragment, useMemo, useState } from 'react';
 import {
     DndContext,
     closestCenter,
@@ -14,63 +14,121 @@ import {
     arrayMove,
 } from '@dnd-kit/sortable';
 
-import { Card, CardHeader } from '@/components/ui/card';
+import {
+    Card,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { CheckedState } from '@radix-ui/react-checkbox';
-import FieldCard from './form-builder/FieldCard';
-import FabMenu from './form-builder/FabMenu';
+import type { CheckedState } from '@radix-ui/react-checkbox';
+import FieldCard from '@/components/base/forms/form-builder/FieldCard';
+import FabMenu from '@/components/base/forms/form-builder/FabMenu';
 import type { FormFieldType } from '@/types/models/form-field';
+import { randomString } from '@/lib/string';
+import { FORM_FIELD_TYPES } from '@/constants';
 
 interface Field {
     id: string;
     label: string;
-    type: FormFieldType | string;
-    options?: { value: string; label: string }[];
+    type: FormFieldType;
+    options?: { value: string; label: string; id: string }[];
 }
 
 interface FormValue {
     id: string;
     value: any;
+    type: FormFieldType;
 }
 
-export default function FormForm() {
-    const [title, setTitle] = useState('Untitled Form');
-    const [description, setDescription] = useState('Form description');
-    const [fields, setFields] = useState<Field[]>([
-        { id: 'textField', label: 'Short Answer Question', type: 'text' },
-    ]);
-    const [formData, setFormData] = useState<FormValue[]>([
-        { id: 'textField', value: '' },
-    ]);
+export type FormSubmitPayload = {
+    title: string;
+    description: string;
+    fields: Field[];
+    formData: FormValue[];
+};
+
+type Props = {
+    onSubmit?: (data: FormSubmitPayload) => void | Promise<void>;
+    initialFields?: Field[];
+    initialData?: FormValue[];
+    initialTitle?: string;
+    initialDescription?: string | null;
+    readonly?: boolean;
+    answer?: boolean;
+};
+
+export default function FormForm({
+    onSubmit,
+    initialFields = [],
+    initialData = [],
+    initialTitle,
+    initialDescription,
+    readonly = false,
+    answer = false,
+}: Props) {
+    const [title, setTitle] = useState(initialTitle ?? 'Untitled Form');
+    const [description, setDescription] = useState(
+        initialDescription ?? 'Form description'
+    );
+    const [fields, setFields] = useState<Field[]>(initialFields);
+    const [formData, setFormData] = useState<FormValue[]>(initialData);
+
+    const formDataMap = useMemo(() => {
+        const map = new Map();
+        formData.forEach((f) => {
+            if (f && f.id !== undefined) {
+                map.set(f.id, f.value);
+            }
+        });
+        return map;
+    }, [formData]);
 
     const handleCheckboxChange = (
         fieldId: string,
         value: string,
         checked: CheckedState
     ) => {
-        setFormData((prev) =>
-            prev.map((f) =>
-                f.id === fieldId
-                    ? {
-                          ...f,
-                          value: checked
-                              ? [...(f.value || []), value]
-                              : (f.value || []).filter(
-                                    (item: string) => item !== value
-                                ),
-                      }
-                    : f
-            )
-        );
+        setFormData((prev) => {
+            const existing = prev.find((f) => f.id === fieldId);
+
+            if (existing) {
+                const updated = prev.map((f) =>
+                    f.id === fieldId
+                        ? {
+                              ...f,
+                              value: checked
+                                  ? [...(f.value || []), value]
+                                  : (f.value || []).filter(
+                                        (item: string) => item !== value
+                                    ),
+                          }
+                        : f
+                );
+
+                return updated;
+            } else {
+                // Create new entry if it doesn't exist
+                const newEntry = {
+                    id: fieldId,
+                    value: checked ? [value] : [],
+                    type: FORM_FIELD_TYPES.CHECKBOXES,
+                };
+                const newFormData = [...prev, newEntry];
+                return newFormData;
+            }
+        });
     };
 
     const addField = (type: FormFieldType) => {
-        const id = type;
+        if (answer) {
+            return;
+        }
 
         const newField: Field = {
-            id,
+            id: randomString(),
             label:
                 type === 'text'
                     ? 'Short Answer Question'
@@ -88,7 +146,9 @@ export default function FormForm() {
                     ? 'Time Question'
                     : 'Date and Time Question',
             type,
-            options: ['radio', 'checkbox', 'dropdown'].includes(type)
+            options: ['multiple_choice', 'checkboxes', 'dropdown'].includes(
+                type
+            )
                 ? []
                 : undefined,
         };
@@ -96,7 +156,7 @@ export default function FormForm() {
         setFields((prev) => [...prev, newField]);
         setFormData((prev) => [
             ...prev,
-            { id, value: type === 'checkboxes' ? [] : '' },
+            { id: newField.id, value: type === 'checkboxes' ? [] : '', type },
         ]);
     };
 
@@ -111,10 +171,15 @@ export default function FormForm() {
         );
     };
 
-    const updateFieldValue = (id: string, value: any) => {
-        setFormData((prev) =>
-            prev.map((f) => (f.id === id ? { ...f, value } : f))
-        );
+    const updateFieldValue = (id: string, value: any, type: FormFieldType) => {
+        setFormData((prev) => {
+            const existing = prev.find((f) => f.id === id);
+            if (existing) {
+                return prev.map((f) => (f.id === id ? { ...f, value } : f));
+            } else {
+                return [...prev, { id, value, type }];
+            }
+        });
     };
 
     const sensors = useSensors(useSensor(PointerSensor));
@@ -135,27 +200,34 @@ export default function FormForm() {
         }
     };
 
-    return (
-        <div className='max-w-2xl mx-auto p-6 bg-gray-50 min-h-screen relative'>
-            {/* Header */}
-            <Card className='mb-6 border-t-4 border-t-blue-600'>
-                <CardHeader>
-                    <Input
-                        value={title}
-                        onChange={(e) => setTitle(e.target.value)}
-                        placeholder='Form title'
-                        className='md:text-3xl font-normal text-gray-800 px-0 border-0 focus:ring-0 focus:border-0'
-                    />
-                    <Textarea
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        placeholder='Form description'
-                        className='mt-2 text-gray-600 border-0 focus:ring-0 px-0 focus:border-0 resize-none'
-                    />
-                </CardHeader>
-            </Card>
+    // Render fields with or without drag and drop
+    const renderFields = () => {
+        const fieldElements = fields.map((field, index) => {
+            const value = formDataMap.get(field.id);
+            return (
+                <FieldCard
+                    key={field.id ?? index}
+                    field={field}
+                    value={value}
+                    setValue={(val) =>
+                        updateFieldValue(field.id, val, field.type)
+                    }
+                    handleCheckboxChange={handleCheckboxChange}
+                    onDelete={() => removeField(field.id)}
+                    onUpdateField={updateField}
+                    readonly={readonly}
+                    answer={answer}
+                />
+            );
+        });
 
-            {/* Fields */}
+        // If in answer mode or readonly, render without drag and drop
+        if (answer || readonly) {
+            return <div>{fieldElements}</div>;
+        }
+
+        // Otherwise, render with drag and drop functionality
+        return (
             <DndContext
                 sensors={sensors}
                 collisionDetection={closestCenter}
@@ -165,46 +237,68 @@ export default function FormForm() {
                     items={fields.map((f) => f.id)}
                     strategy={verticalListSortingStrategy}
                 >
-                    {fields.map((field) => {
-                        const value = formData.find(
-                            (f) => f.id === field.id
-                        )?.value;
-                        return (
-                            <FieldCard
-                                key={field.id}
-                                field={field}
-                                value={value}
-                                setValue={(val) =>
-                                    updateFieldValue(field.id, val)
-                                }
-                                handleCheckboxChange={handleCheckboxChange}
-                                onDelete={() => removeField(field.id)}
-                                onUpdateField={updateField}
-                            />
-                        );
-                    })}
+                    {fieldElements}
                 </SortableContext>
             </DndContext>
+        );
+    };
 
-            {/* Submit */}
-            <div className='flex justify-end mt-8'>
-                <Button
-                    className='bg-blue-600 hover:bg-blue-700 text-white px-8'
-                    onClick={() =>
-                        console.log('Form submitted:', {
-                            title,
-                            description,
-                            fields,
-                            formData,
-                        })
-                    }
-                >
-                    Submit
-                </Button>
-            </div>
+    return (
+        <div className='max-w-2xl mx-auto p-6 bg-gray-50 dark:bg-background shadow-lg border-2 border-bg-primary min-h-screen relative rounded-lg'>
+            {/* Header */}
+            <Card className='mb-6 border-t-4 border-t-blue-600'>
+                <CardHeader>
+                    {answer ? (
+                        <CardTitle>{title}</CardTitle>
+                    ) : (
+                        <Input
+                            value={title ?? ''}
+                            onChange={(e) => setTitle(e.target.value)}
+                            placeholder='Form title'
+                            className='md:text-3xl font-normal px-0 border-0 focus:ring-0 focus:border-0'
+                            disabled={readonly}
+                        />
+                    )}
+                    {answer ? (
+                        <CardDescription>{description}</CardDescription>
+                    ) : (
+                        <Textarea
+                            value={description ?? ''}
+                            onChange={(e) => setDescription(e.target.value)}
+                            placeholder='Form description'
+                            className='mt-2 border-0 focus:ring-0 px-0 focus:border-0 resize-none'
+                            disabled={readonly}
+                        />
+                    )}
+                </CardHeader>
+            </Card>
 
-            {/* Floating Action Menu */}
-            <FabMenu addField={addField} />
+            {/* Fields */}
+            {renderFields()}
+
+            {!readonly && (
+                <Fragment>
+                    {/* Submit */}
+                    <div className='flex justify-end mt-8'>
+                        <Button
+                            className='bg-blue-600 hover:bg-blue-700 text-white px-8'
+                            onClick={() => {
+                                onSubmit?.({
+                                    title,
+                                    description,
+                                    fields,
+                                    formData,
+                                });
+                            }}
+                        >
+                            Submit
+                        </Button>
+                    </div>
+
+                    {/* Floating Action Menu */}
+                    {!answer && <FabMenu addField={addField} />}
+                </Fragment>
+            )}
         </div>
     );
 }

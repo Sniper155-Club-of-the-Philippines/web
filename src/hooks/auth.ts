@@ -19,6 +19,9 @@ type RefreshConfig = {
     minRefreshDelay?: number; // Minimum delay between refresh attempts (ms)
     maxRetries?: number; // Maximum retry attempts on failure
     retryDelay?: number; // Delay between retry attempts (ms)
+    redirectTo?: string | null;
+    requireAuth?: boolean; // Whether to redirect when no token is present
+    initialCheckDelay?: number; // Delay before initial auth check (ms)
 };
 
 const DEFAULT_CONFIG: Required<RefreshConfig> = {
@@ -26,6 +29,9 @@ const DEFAULT_CONFIG: Required<RefreshConfig> = {
     minRefreshDelay: 1000, // 1 second
     maxRetries: 3,
     retryDelay: 2000, // 2 seconds
+    redirectTo: null,
+    requireAuth: true, // Default to requiring authentication
+    initialCheckDelay: 100, // Small delay to allow atoms to initialize
 };
 
 export function useRefreshToken(config: RefreshConfig = {}) {
@@ -44,6 +50,8 @@ export function useRefreshToken(config: RefreshConfig = {}) {
         timeoutId: null as NodeJS.Timeout | null,
         retryCount: 0,
         lastRefreshAttempt: 0,
+        initialCheckDone: false, // Track if initial auth check is complete
+        hasRedirected: false, // Track if we've already redirected to prevent loops
     });
 
     const mounted = useRef(true);
@@ -56,7 +64,10 @@ export function useRefreshToken(config: RefreshConfig = {}) {
     }, []);
 
     const logout = useCallback(() => {
-        if (!mounted.current) return;
+        if (!mounted.current || refreshState.current.hasRedirected) return;
+
+        console.debug('Logging out and redirecting to login');
+        refreshState.current.hasRedirected = true; // Prevent multiple redirects
 
         clearRefreshTimeout();
         refreshState.current = {
@@ -64,14 +75,40 @@ export function useRefreshToken(config: RefreshConfig = {}) {
             timeoutId: null,
             retryCount: 0,
             lastRefreshAttempt: 0,
+            initialCheckDone: true, // Mark as done to prevent loops
+            hasRedirected: true, // Keep the redirect flag
         };
 
         // Hide loading overlay on logout
         setLoading(false);
         setUser(RESET);
         setAccess(RESET);
-        router.push('/login');
-    }, [setAccess, setUser, router, clearRefreshTimeout, setLoading]);
+
+        if (finalConfig.redirectTo) {
+            const params = new URLSearchParams();
+            params.set('return', finalConfig.redirectTo);
+            router.push(`/login?${params.toString()}`);
+        } else {
+            router.push('/login');
+        }
+    }, [
+        setAccess,
+        setUser,
+        router,
+        clearRefreshTimeout,
+        setLoading,
+        finalConfig,
+    ]);
+
+    // Handle no token scenario
+    const handleNoToken = useCallback(() => {
+        if (!finalConfig.requireAuth || !mounted.current) return;
+
+        console.debug(
+            'No token found and auth is required, redirecting to login'
+        );
+        logout();
+    }, [finalConfig.requireAuth, logout]);
 
     const isTokenExpired = useCallback((token: string): boolean => {
         try {
@@ -258,10 +295,48 @@ export function useRefreshToken(config: RefreshConfig = {}) {
         ]
     );
 
+    // Initial authentication check with delay
+    useEffect(() => {
+        if (!finalConfig.requireAuth || refreshState.current.initialCheckDone) {
+            return;
+        }
+
+        const timeoutId = setTimeout(() => {
+            if (!mounted.current) return;
+
+            refreshState.current.initialCheckDone = true;
+
+            if (!access?.token) {
+                console.debug('Initial auth check: no token found');
+                handleNoToken();
+            }
+        }, finalConfig.initialCheckDelay);
+
+        return () => clearTimeout(timeoutId);
+    }, [
+        access?.token,
+        finalConfig.requireAuth,
+        finalConfig.initialCheckDelay,
+        handleNoToken,
+    ]);
+
     // Handle page load and token changes
     useEffect(() => {
-        if (!access?.token || !mounted.current) {
+        if (!mounted.current) {
             clearRefreshTimeout();
+            return;
+        }
+
+        // If no token and auth is required, handle it
+        if (!access?.token) {
+            clearRefreshTimeout();
+            // Only handle no token if initial check is done to avoid race conditions
+            if (
+                refreshState.current.initialCheckDone &&
+                finalConfig.requireAuth
+            ) {
+                handleNoToken();
+            }
             return;
         }
 
@@ -270,7 +345,13 @@ export function useRefreshToken(config: RefreshConfig = {}) {
         scheduleRefresh(access.token);
 
         return clearRefreshTimeout;
-    }, [access?.token, scheduleRefresh, clearRefreshTimeout]);
+    }, [
+        access?.token,
+        scheduleRefresh,
+        clearRefreshTimeout,
+        handleNoToken,
+        finalConfig.requireAuth,
+    ]);
 
     // Cleanup on unmount
     useEffect(() => {
@@ -287,13 +368,16 @@ export function useRefreshToken(config: RefreshConfig = {}) {
         async (showLoading = true): Promise<boolean> => {
             if (!access?.token) {
                 console.warn('No token available for manual refresh');
+                if (finalConfig.requireAuth) {
+                    handleNoToken();
+                }
                 return false;
             }
 
             console.info('Manual token refresh triggered (reactive)');
             return refreshToken(true, showLoading);
         },
-        [refreshToken, access?.token]
+        [refreshToken, access?.token, finalConfig.requireAuth, handleNoToken]
     );
 
     // Check if token needs refresh soon (based on access TTL)
@@ -308,11 +392,17 @@ export function useRefreshToken(config: RefreshConfig = {}) {
         return isTokenExpired(access.token);
     }, [access?.token, isTokenExpired]);
 
+    // Check if user is authenticated (has a valid token)
+    const isAuthenticated = useMemo(() => {
+        return !!access?.token;
+    }, [access?.token]);
+
     return {
         refreshToken: manualRefresh,
         isRefreshing: refreshState.current.inProgress,
         needsRefresh,
-        isAccessExpired, // New: indicates token is past access TTL but might still be refreshable
+        isAccessExpired, // Indicates token is past access TTL but might still be refreshable
+        isAuthenticated, // Indicates if user has a token
         retryCount: refreshState.current.retryCount,
         timeUntilExpiry: access?.token
             ? Math.max(0, (getTokenExpiryTime(access.token) ?? 0) - Date.now())

@@ -14,17 +14,18 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Access } from '@/types/models/auth';
-import { Label } from '@radix-ui/react-label';
 import { useAtom } from 'jotai';
 import { toast } from 'sonner';
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form';
 import { useEffect, useMemo } from 'react';
 import { loadingAtom } from '@/atoms/misc';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { User } from '@/types/models/user';
 import { useHttp } from '@/hooks/http';
 import { isAxiosError } from 'axios';
 import { useRefreshToken } from '@/hooks/auth';
+import Link from 'next/link';
+import { Label } from '@/components/ui/label';
 
 type Inputs = {
     email: string;
@@ -38,6 +39,7 @@ export default function Login() {
     const [, setLoading] = useAtom(loadingAtom);
     const router = useRouter();
     const http = useHttp();
+    const params = useSearchParams();
 
     const onLogin: SubmitHandler<Inputs> = async ({ email, password }) => {
         setLoading(true);
@@ -80,11 +82,17 @@ export default function Login() {
 
     useEffect(() => {
         if (access && user) {
-            router.replace('/dashboard');
+            if (params.has('return')) {
+                router.replace(params.get('return')!);
+            } else {
+                router.replace('/dashboard');
+            }
         }
-    }, [access, router, user]);
+    }, [access, router, user, params]);
 
-    useRefreshToken();
+    useRefreshToken({
+        redirectTo: params.has('return') ? params.get('return') : null,
+    });
 
     return (
         <div className='flex min-h-svh w-full items-center justify-center p-6 md:p-10'>
@@ -117,12 +125,12 @@ export default function Login() {
                                             <Label htmlFor='password'>
                                                 Password
                                             </Label>
-                                            <a
-                                                href='#'
+                                            <Link
+                                                href='/forgot-password/send'
                                                 className='ml-auto inline-block text-sm underline-offset-4 hover:underline'
                                             >
                                                 Forgot your password?
-                                            </a>
+                                            </Link>
                                         </div>
                                         <Input
                                             {...register('password', {

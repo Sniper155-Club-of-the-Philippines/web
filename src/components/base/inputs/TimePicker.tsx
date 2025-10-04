@@ -18,6 +18,7 @@ export default function TimePicker({
     placeholder = 'hh:mm AM',
     formatString = 'hh:mm A',
     className,
+    disabled = false, // ✅ new prop
 }: {
     value?: Date;
     defaultValue?: Date;
@@ -25,6 +26,7 @@ export default function TimePicker({
     placeholder?: string;
     formatString?: string;
     className?: string;
+    disabled?: boolean; // ✅ new prop type
 }) {
     const isControlled = value !== undefined;
     const [internalDate, setInternalDate] = useState<Date | undefined>(
@@ -42,6 +44,7 @@ export default function TimePicker({
         type: 'hour' | 'minute' | 'ampm',
         val: string
     ) => {
+        if (disabled) return; // ✅ prevent updates when disabled
         const base = date ? new Date(date) : new Date();
         const n = new Date(base);
         if (type === 'hour') {
@@ -82,6 +85,7 @@ export default function TimePicker({
             <PopoverTrigger asChild>
                 <Button
                     variant='outline'
+                    disabled={disabled} // ✅ disable trigger button
                     className={cn(
                         'w-full justify-start text-left font-normal',
                         !date && 'text-muted-foreground',
@@ -91,42 +95,52 @@ export default function TimePicker({
                     {display ?? <span>{placeholder}</span>}
                 </Button>
             </PopoverTrigger>
-            <PopoverContent className='w-auto p-0'>
-                <div className='flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x'>
-                    <ScrollArea className='w-64 sm:w-auto'>
-                        <div className='flex sm:flex-col p-2'>
-                            {hours
-                                .slice()
-                                .reverse()
-                                .map((h) => (
-                                    <Button
-                                        key={h}
-                                        size='icon'
-                                        variant={
-                                            isHourSel(h) ? 'default' : 'ghost'
-                                        }
-                                        className='sm:w-full shrink-0 aspect-square'
-                                        onClick={() =>
-                                            handleTimeChange('hour', String(h))
-                                        }
-                                    >
-                                        {h}
-                                    </Button>
-                                ))}
-                        </div>
-                        <ScrollBar
-                            orientation='horizontal'
-                            className='sm:hidden'
-                        />
-                    </ScrollArea>
+            {!disabled && ( // ✅ only render picker if not disabled
+                <PopoverContent className='w-auto p-0'>
+                    <div className='flex flex-col sm:flex-row sm:h-[300px] divide-y sm:divide-y-0 sm:divide-x'>
+                        <ScrollArea className='w-64 sm:w-auto'>
+                            <div className='flex sm:flex-col p-2'>
+                                {hours
+                                    .slice()
+                                    .reverse()
+                                    .map((h) => (
+                                        <Button
+                                            key={h}
+                                            size='icon'
+                                            disabled={disabled} // ✅ inner disabled
+                                            variant={
+                                                isHourSel(h)
+                                                    ? 'default'
+                                                    : 'ghost'
+                                            }
+                                            className='sm:w-full shrink-0 aspect-square'
+                                            onClick={() =>
+                                                handleTimeChange(
+                                                    'hour',
+                                                    String(h)
+                                                )
+                                            }
+                                        >
+                                            {h}
+                                        </Button>
+                                    ))}
+                            </div>
+                            <ScrollBar
+                                orientation='horizontal'
+                                className='sm:hidden'
+                            />
+                        </ScrollArea>
 
-                    <ScrollArea className='w-64 sm:w-auto'>
-                        <div className='flex sm:flex-col p-2'>
-                            {Array.from({ length: 12 }, (_, i) => i * 5).map(
-                                (min) => (
+                        <ScrollArea className='w-64 sm:w-auto'>
+                            <div className='flex sm:flex-col p-2'>
+                                {Array.from(
+                                    { length: 12 },
+                                    (_, i) => i * 5
+                                ).map((min) => (
                                     <Button
                                         key={min}
                                         size='icon'
+                                        disabled={disabled}
                                         variant={
                                             isMinSel(min) ? 'default' : 'ghost'
                                         }
@@ -140,36 +154,39 @@ export default function TimePicker({
                                     >
                                         {String(min).padStart(2, '0')}
                                     </Button>
-                                )
-                            )}
-                        </div>
-                        <ScrollBar
-                            orientation='horizontal'
-                            className='sm:hidden'
-                        />
-                    </ScrollArea>
+                                ))}
+                            </div>
+                            <ScrollBar
+                                orientation='horizontal'
+                                className='sm:hidden'
+                            />
+                        </ScrollArea>
 
-                    <ScrollArea>
-                        <div className='flex sm:flex-col p-2'>
-                            {['AM', 'PM'].map((a) => (
-                                <Button
-                                    key={a}
-                                    size='icon'
-                                    variant={
-                                        (a === 'AM' ? isAm() : !isAm())
-                                            ? 'default'
-                                            : 'ghost'
-                                    }
-                                    className='sm:w-full shrink-0 aspect-square'
-                                    onClick={() => handleTimeChange('ampm', a)}
-                                >
-                                    {a}
-                                </Button>
-                            ))}
-                        </div>
-                    </ScrollArea>
-                </div>
-            </PopoverContent>
+                        <ScrollArea>
+                            <div className='flex sm:flex-col p-2'>
+                                {['AM', 'PM'].map((a) => (
+                                    <Button
+                                        key={a}
+                                        size='icon'
+                                        disabled={disabled}
+                                        variant={
+                                            (a === 'AM' ? isAm() : !isAm())
+                                                ? 'default'
+                                                : 'ghost'
+                                        }
+                                        className='sm:w-full shrink-0 aspect-square'
+                                        onClick={() =>
+                                            handleTimeChange('ampm', a)
+                                        }
+                                    >
+                                        {a}
+                                    </Button>
+                                ))}
+                            </div>
+                        </ScrollArea>
+                    </div>
+                </PopoverContent>
+            )}
         </Popover>
     );
 }

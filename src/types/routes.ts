@@ -3,6 +3,8 @@ import type { LucideIcon } from 'lucide-react';
 export interface RouteItem {
     title: string;
     url: string;
+    hidden?: boolean;
+    items?: RouteItem[];
 }
 
 export interface Route {

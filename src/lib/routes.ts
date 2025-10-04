@@ -57,6 +57,25 @@ export const management: RouteSection = {
                 {
                     title: 'Manage',
                     url: '/dashboard/forms/manage',
+                    items: [
+                        {
+                            title: 'Create',
+                            url: '/dashboard/forms/manage/create',
+                            hidden: true,
+                        },
+                        {
+                            title: '[id]',
+                            url: '/dashboard/forms/manage/[id]',
+                            hidden: true,
+                            items: [
+                                {
+                                    title: 'Edit',
+                                    url: '/dashboard/forms/manage/[id]/edit',
+                                    hidden: true,
+                                },
+                            ],
+                        },
+                    ],
                 },
                 {
                     title: 'Responses',

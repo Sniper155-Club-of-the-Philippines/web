@@ -6,6 +6,7 @@ import Spinner from '@/components/root/Spinner';
 import { Toaster } from '@/components/ui/sonner';
 import QueryProvider from '@/components/base/QueryProvider';
 import { cn } from '@/lib/utils';
+import { minimatch } from 'minimatch';
 
 export default function RootLayoutClient({
     children,
@@ -14,15 +15,20 @@ export default function RootLayoutClient({
 }) {
     const pathname = usePathname();
 
+    const excluded = [
+        '/dashboard/generation/nfc-id',
+        '/dashboard/forms/manage/**',
+    ];
+
+    const shouldHideOverflow =
+        pathname.startsWith('/dashboard') &&
+        !excluded.some((pattern) => minimatch(pathname, pattern));
+
     return (
         <ThemeProvider attribute='class' defaultTheme='system' enableSystem>
             <div
                 className={cn(
-                    pathname.startsWith('/dashboard') &&
-                        !['/nfc-id', '/forms/create'].some((path) =>
-                            pathname.endsWith(path)
-                        ) &&
-                        'overflow-hidden',
+                    shouldHideOverflow && 'overflow-hidden',
                     pathname.startsWith('/profile') && 'overflow-x-hidden'
                 )}
             >

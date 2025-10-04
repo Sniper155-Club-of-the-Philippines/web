@@ -22,21 +22,39 @@ import { useAtom } from 'jotai';
 import { MoreHorizontal } from 'lucide-react';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import { useRouter } from 'next/navigation';
 import { Form } from '@/types/models/form';
+import Link from 'next/link';
 
 type Props = {
     form: Form;
-    refetch?: () => void;
+    refetch?: () => void | Promise<any>;
 };
 
 const FormActionCell = ({ form, refetch }: Props) => {
     const http = useHttp();
     const [deleteOpen, setDeleteOpen] = useState(false);
     const [, setLoading] = useAtom(loadingAtom);
-    const router = useRouter();
 
-    const onEdit = () => router.push(`/dashboard/forms/${form.id}/edit`);
+    const toggleStatus = async () => {
+        setLoading(true);
+        try {
+            await api.toggle(http, form.id, !form.active);
+            await refetch?.();
+            toast.success(
+                `Form is now ${form.active ? 'inactive' : 'active'}.`,
+                {
+                    closeButton: true,
+                }
+            );
+        } catch (error) {
+            console.error(error);
+            toast.success('Unable to update form.', {
+                closeButton: true,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
     const handleDelete = async () => {
         setLoading(true);
@@ -64,8 +82,18 @@ const FormActionCell = ({ form, refetch }: Props) => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <DropdownMenuItem onClick={() => onEdit}>
-                        Edit
+                    <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/forms/manage/${form.id}`}>
+                            View
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                        <Link href={`/dashboard/forms/manage/${form.id}/edit`}>
+                            Edit
+                        </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem onClick={() => toggleStatus()}>
+                        {form.active ? 'Deactivate' : 'Activate'}
                     </DropdownMenuItem>
                     <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
                         Delete

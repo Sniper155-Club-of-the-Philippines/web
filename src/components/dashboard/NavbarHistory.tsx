@@ -24,11 +24,8 @@ export default function NavbarHistory() {
                     if (isLast) {
                         return (
                             <Fragment key={index}>
-                                {routes.length > 1 && (
-                                    <BreadcrumbSeparator className='hidden md:block' />
-                                )}
                                 <BreadcrumbItem>
-                                    <BreadcrumbPage>
+                                    <BreadcrumbPage className='select-none'>
                                         {route.title}
                                     </BreadcrumbPage>
                                 </BreadcrumbItem>
@@ -37,11 +34,19 @@ export default function NavbarHistory() {
                     }
 
                     return (
-                        <BreadcrumbItem key={index} className='hidden md:block'>
-                            <BreadcrumbLink asChild>
-                                <Link href={route.url}>{route.title}</Link>
-                            </BreadcrumbLink>
-                        </BreadcrumbItem>
+                        <Fragment key={index}>
+                            <BreadcrumbItem
+                                key={index}
+                                className='hidden md:block'
+                            >
+                                <BreadcrumbLink asChild>
+                                    <Link href={route.url}>{route.title}</Link>
+                                </BreadcrumbLink>
+                            </BreadcrumbItem>
+                            {routes.length > 1 && (
+                                <BreadcrumbSeparator className='hidden md:block' />
+                            )}
+                        </Fragment>
                     );
                 })}
             </BreadcrumbList>

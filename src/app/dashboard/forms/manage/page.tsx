@@ -1,10 +1,11 @@
 'use client';
 
+import FormActionCell from '@/components/base/table/cells/FormActionCell';
 import TableMenu from '@/components/base/table/TableMenu';
 import { Badge } from '@/components/ui/badge';
 import { DataTable } from '@/components/ui/data-table';
 import { Input } from '@/components/ui/input';
-import { useFormQuery } from '@/hooks/queries';
+import { useFormsQuery } from '@/hooks/queries';
 import type { Form } from '@/types/models/form';
 import type { ColumnDef } from '@tanstack/react-table';
 import dayjs from 'dayjs';
@@ -13,7 +14,7 @@ import { useState } from 'react';
 
 export default function ManageForms() {
     const [search, setSearch] = useState('');
-    const { data: forms, refetch } = useFormQuery();
+    const { data: forms, refetch } = useFormsQuery();
     const router = useRouter();
     const columns: ColumnDef<Form>[] = [
         {
@@ -31,6 +32,19 @@ export default function ManageForms() {
             ),
         },
         {
+            header: 'Link',
+            cell: ({ row }) => (
+                <a
+                    href={`/forms/${row.original.id}`}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    className='text-primary hover:underline'
+                >
+                    {`${location.origin}/forms/${row.original.id}`}
+                </a>
+            ),
+        },
+        {
             header: 'Creator',
             accessorFn: (row) =>
                 row.user
@@ -43,10 +57,16 @@ export default function ManageForms() {
                 dayjs(row.updated_at).format('MMM DD, YYYY hh:mm A'),
             header: 'Last Modified',
         },
+        {
+            id: 'actions',
+            cell: ({ row }) => {
+                return <FormActionCell form={row.original} refetch={refetch} />;
+            },
+        },
     ];
 
     const onCreate = () => {
-        router.push('/dashboard/forms/create');
+        router.push('/dashboard/forms/manage/create');
     };
 
     return (

@@ -1,80 +1,63 @@
-import { routes } from '@/lib/routes';
-import type { RouteSection, BreadcrumbData, Breadcrumb } from '@/types/routes';
-import { usePathname } from 'next/navigation';
+'use client';
 
-export function useParseBreadcrumbsFromUrl(
-    routes: RouteSection[]
-): BreadcrumbData | null {
-    // For App Router
-    const currentPath = usePathname();
+import { usePathname, useParams } from 'next/navigation';
 
-    // Remove /dashboard prefix and clean the path
-    const cleanPath = currentPath.replace('/dashboard', '').split('?')[0];
-
-    // If we're at the dashboard root, return null
-    if (!cleanPath || cleanPath === '/') {
-        return null;
-    }
-
-    // Find matching route and item
-    for (const section of routes) {
-        for (const route of section.routes) {
-            const routeCleanPath = route.url.replace('/dashboard', '');
-
-            if (cleanPath === routeCleanPath) {
-                return {
-                    route,
-                    routeItem: null,
-                };
-            }
-
-            if (route.items) {
-                for (const item of route.items) {
-                    const itemCleanPath = item.url.replace('/dashboard', '');
-                    if (cleanPath === itemCleanPath) {
-                        return {
-                            route,
-                            routeItem: item,
-                        };
-                    }
-                }
-            }
-        }
-    }
-
-    return {
-        route: {
-            title: cleanPath
-                .split('/')
-                .filter(Boolean)
-                .map((s) => s.charAt(0).toUpperCase() + s.slice(1))
-                .join(' > '), // crude title generation
-            url: currentPath,
-        },
-        routeItem: null,
-    };
+interface Breadcrumb {
+    title: string;
+    url: string;
 }
 
 export function useRouteBreadcrumbs(): Breadcrumb[] {
-    const breadcrumbData = useParseBreadcrumbsFromUrl(routes);
+    const pathname = usePathname();
+    const params = useParams();
 
-    if (!breadcrumbData) {
-        return [];
+    if (!pathname) return [];
+
+    // Split path into segments
+    let segments = pathname.split('/').filter(Boolean);
+
+    // Remove leading "dashboard" from breadcrumb labels
+    const hasDashboard = segments[0] === 'dashboard';
+    if (hasDashboard) {
+        segments = segments.slice(1);
     }
 
-    const breadcrumbs: Breadcrumb[] = [
-        {
-            title: breadcrumbData.route.title,
-            url: breadcrumbData.route.url,
-        },
-    ];
+    // Build breadcrumbs
+    const breadcrumbs: Breadcrumb[] = segments.map((segment, index) => {
+        // Replace dynamic segment ([id], [slug], etc.) with actual param value
+        let title = segment;
+        if (title.startsWith('[') && title.endsWith(']')) {
+            const paramKey = title.slice(1, -1);
+            const paramValue = params?.[paramKey];
+            title = paramValue ? String(paramValue) : paramKey;
+        }
 
-    if (breadcrumbData.routeItem) {
-        breadcrumbs.push({
-            title: breadcrumbData.routeItem.title,
-            url: breadcrumbData.routeItem.url,
-        });
-    }
+        // Build URL up to this segment
+        const url =
+            (hasDashboard ? '/dashboard/' : '/') +
+            segments
+                .slice(0, index + 1)
+                .map((s) => {
+                    if (s.startsWith('[') && s.endsWith(']')) {
+                        const paramKey = s.slice(1, -1);
+                        return params?.[paramKey]
+                            ? String(params[paramKey])
+                            : paramKey;
+                    }
+                    return s;
+                })
+                .join('/');
+
+        return {
+            title: formatTitle(title),
+            url,
+        };
+    });
 
     return breadcrumbs;
+}
+
+// Format segment titles into something more readable
+function formatTitle(segment: string): string {
+    return segment.charAt(0).toUpperCase() + segment.slice(1);
 }

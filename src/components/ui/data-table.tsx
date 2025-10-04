@@ -47,6 +47,7 @@ export const DataTable = React.forwardRef<
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         globalFilterFn: 'includesString',
+        getRowId: (row, index) => (typeof row.id === 'string' ? row.id : index),
     });
 
     useEffect(() => setGlobalFilter(search), [search]);
