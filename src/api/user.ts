@@ -8,7 +8,11 @@ export async function all(http: AxiosInstance) {
 }
 
 export async function store(http: AxiosInstance, payload: Partial<User>) {
-    const { data } = await http.post(`/v1/users`, payload);
+    const FormData = await import('@avidian/form-data');
+
+    const formData = new FormData.default(payload);
+
+    const { data } = await http.post(`/v1/users`, formData);
 
     return data;
 }
