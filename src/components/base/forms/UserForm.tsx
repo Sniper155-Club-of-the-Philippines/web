@@ -13,6 +13,7 @@ import { UserFormInputs } from '@/types/form';
 import { useChapterQuery } from '@/hooks/queries';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
+import SelectSearch from '../inputs/SelectSearch';
 
 type Props = {
     defaultValues?: Partial<UserFormInputs>;
@@ -147,10 +148,9 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                         </div>
                         <div className='flex flex-col gap-2'>
                             <Label htmlFor='chapter_id'>Chapter</Label>
-                            <Select
-                                width='w-full'
-                                onChange={(value) =>
-                                    setValue('chapter_id', value ?? null)
+                            <SelectSearch
+                                onChange={(event) =>
+                                    setValue('chapter_id', event.target.value)
                                 }
                                 value={watch('chapter_id') ?? undefined}
                                 options={

@@ -18,6 +18,7 @@ export default function RootLayoutClient({
     const excluded = [
         '/dashboard/generation/nfc-id',
         '/dashboard/forms/manage/**',
+        '/dashboard/forms/responses/**',
     ];
 
     const shouldHideOverflow =

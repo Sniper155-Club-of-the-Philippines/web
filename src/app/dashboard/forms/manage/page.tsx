@@ -23,7 +23,7 @@ export default function ManageForms() {
             enableGlobalFilter: true,
         },
         {
-            header: 'Active',
+            header: 'Status',
             accessorKey: 'active',
             cell: ({ row }) => (
                 <Badge variant={row.original.active ? 'green' : 'destructive'}>

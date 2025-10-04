@@ -22,6 +22,8 @@ import { CheckedState } from '@radix-ui/react-checkbox';
 import SortableField from '@/components/base/forms/form-builder/SortableField';
 import type { FormFieldType } from '@/types/models/form-field';
 import { Label } from '@/components/ui/label';
+import { cn } from '@/lib/utils';
+import { parseTime } from '@/lib/date';
 
 interface FieldOption {
     id: string;
@@ -209,7 +211,12 @@ export default function FieldCard({
                                                 ? opt.id
                                                 : `${field.id}-${opt.value}`
                                         }
-                                        className='cursor-pointer'
+                                        className={cn(
+                                            'cursor-pointer',
+                                            disabled || readonly
+                                                ? 'cursor-not-allowed opacity-50'
+                                                : ''
+                                        )}
                                     >
                                         {opt.label}
                                     </Label>
@@ -290,11 +297,7 @@ export default function FieldCard({
             case 'time':
                 return (
                     <TimePicker
-                        value={
-                            value && dayjs(value).isValid()
-                                ? dayjs(value).toDate()
-                                : undefined
-                        }
+                        value={parseTime(value)}
                         onChange={(e) => setValue(dayjs(e).toJSON())}
                         placeholder='Select Time'
                         disabled={disabled || readonly}

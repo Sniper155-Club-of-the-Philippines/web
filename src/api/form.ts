@@ -1,6 +1,6 @@
-import { FormPayload, GetAllParams } from '@/types/api/form';
+import type { FormPayload, GetAllParams } from '@/types/api/form';
 import type { Form } from '@/types/models/form';
-import { FormResponse } from '@/types/models/form-response';
+import type { FormResponse } from '@/types/models/form-response';
 import type { AxiosInstance } from 'axios';
 
 export async function all(http: AxiosInstance, params?: GetAllParams) {
@@ -54,4 +54,20 @@ export async function answer(
     answers: Record<string, any>
 ) {
     await http.post(`/v1/forms/${id}/answer`, { answers });
+}
+
+export async function answers(http: AxiosInstance, id: string) {
+    const { data } = await http.get<{ data: FormResponse }>(
+        `/v1/forms/${id}/answers`
+    );
+
+    return data.data;
+}
+
+export async function responses(http: AxiosInstance, id: string) {
+    const { data } = await http.get<{ responses: FormResponse[] }>(
+        `/v1/forms/${id}/responses`
+    );
+
+    return data.responses;
 }

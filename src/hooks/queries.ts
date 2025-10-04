@@ -113,3 +113,51 @@ export function useFormQuery(
         ...options,
     });
 }
+
+export function useFormResponsesQuery(id?: string | null, loading = false) {
+    const http = useHttp();
+    const [, setLoading] = useAtom(loadingAtom);
+
+    return useQuery({
+        queryKey: ['form-responses', id],
+        queryFn: async () => {
+            if (!id) {
+                return [];
+            }
+
+            if (loading) {
+                setLoading(true);
+            }
+
+            try {
+                return await form.responses(http, id);
+            } finally {
+                if (loading) {
+                    setLoading(false);
+                }
+            }
+        },
+    });
+}
+
+export function useFormResponseQuery(id: string, loading = false) {
+    const http = useHttp();
+    const [, setLoading] = useAtom(loadingAtom);
+
+    return useQuery({
+        queryKey: ['form-response', id],
+        queryFn: async () => {
+            if (loading) {
+                setLoading(true);
+            }
+
+            try {
+                return await form.answers(http, id);
+            } finally {
+                if (loading) {
+                    setLoading(false);
+                }
+            }
+        },
+    });
+}

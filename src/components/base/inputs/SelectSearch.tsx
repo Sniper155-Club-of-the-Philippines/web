@@ -22,6 +22,7 @@ import {
     CommandGroup,
     CommandItem,
 } from '@/components/ui/command';
+import { cn } from '@/lib/utils';
 
 type Option = {
     label: string;
@@ -32,11 +33,19 @@ interface SelectSearchProps
     extends React.SelectHTMLAttributes<HTMLSelectElement> {
     options?: Option[];
     placeholder?: string;
+    triggerWidth?: string;
 }
 
 const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
     (
-        { options = [], placeholder = 'Select…', value, onChange, ...props },
+        {
+            options = [],
+            placeholder = 'Select…',
+            value,
+            onChange,
+            triggerWidth,
+            ...props
+        },
         ref
     ) => {
         const [open, setOpen] = React.useState(false);
@@ -65,7 +74,7 @@ const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
                 variant='outline'
                 role='combobox'
                 aria-expanded={open}
-                className='w-full justify-between'
+                className={cn('justify-between', triggerWidth ?? 'w-full')}
                 onClick={() => setOpen(true)}
             >
                 {selected ? selected.label : placeholder}
@@ -102,7 +111,13 @@ const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
         return (
             <>
                 {/* hidden real select for form compatibility */}
-                <select ref={ref} value={value} {...props} className='hidden'>
+                <select
+                    ref={ref}
+                    value={value}
+                    onChange={onChange ?? (() => {})}
+                    {...props}
+                    className='hidden'
+                >
                     {options.map((opt) => (
                         <option key={opt.value} value={opt.value}>
                             {opt.label}

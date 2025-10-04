@@ -6,7 +6,7 @@ import { useFormQuery } from '@/hooks/queries';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 
-export default function EditForm() {
+export default function ViewForm() {
     const params = useParams<{ id: string }>();
     const { data } = useFormQuery(params.id);
 
