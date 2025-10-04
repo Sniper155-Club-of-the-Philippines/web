@@ -88,6 +88,11 @@ export default function ClubMembers() {
             enableGlobalFilter: true,
         },
         {
+            accessorKey: 'phone',
+            header: 'Phone',
+            enableGlobalFilter: true,
+        },
+        {
             accessorKey: 'designation',
             accessorFn: (row) => (row.designation ? row.designation : 'N/A'),
             header: 'Designation',
