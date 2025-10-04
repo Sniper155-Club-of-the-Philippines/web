@@ -5,7 +5,6 @@ import { useHttp } from '@/hooks/http';
 import { UndefinedInitialDataOptions, useQuery } from '@tanstack/react-query';
 import type { GetAllParams as FormGetAllParams } from '@/types/api/form';
 import { Form } from '@/types/models/form';
-import { FormResponse } from '@/types/models/form-response';
 
 export function useUserQuery() {
     const http = useHttp();
