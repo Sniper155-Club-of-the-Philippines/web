@@ -208,6 +208,7 @@ export default async function Profile({ params }: Props) {
                                                 <InfoRow
                                                     label='Address'
                                                     value={user.address}
+                                                    center
                                                 />
                                             )}
                                             <InfoRow

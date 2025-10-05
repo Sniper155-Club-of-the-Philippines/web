@@ -5,6 +5,7 @@ type InfoRowProps = {
     value: string | React.ReactNode;
     href?: string;
     useNext?: boolean;
+    center?: boolean;
 };
 
 export default function InfoRow({
@@ -12,25 +13,25 @@ export default function InfoRow({
     value,
     href,
     useNext = false,
+    center = false,
 }: InfoRowProps) {
+    const alignment = center ? 'md:text-center' : 'md:text-left';
+    const contentClassName = `text-[9px] md:text-lg hover:underline text-sky-400 break-all md:break-normal text-center ${alignment}`;
+
     const content = href ? (
         useNext ? (
-            <Link
-                href={href}
-                className='text-[9px] md:text-lg hover:underline text-sky-400 break-all md:break-normal text-center md:text-left'
-            >
+            <Link href={href} className={contentClassName}>
                 {value}
             </Link>
         ) : (
-            <a
-                href={href}
-                className='text-[9px] md:text-lg hover:underline text-sky-400 break-all md:break-normal text-center md:text-left'
-            >
+            <a href={href} className={contentClassName}>
                 {value}
             </a>
         )
     ) : (
-        <span className='text-[9px] md:text-lg break-all md:break-normal text-center md:text-left'>
+        <span
+            className={`text-[9px] md:text-lg break-all md:break-normal text-center ${alignment}`}
+        >
             {value}
         </span>
     );

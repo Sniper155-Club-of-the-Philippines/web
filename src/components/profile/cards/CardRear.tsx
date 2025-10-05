@@ -46,7 +46,7 @@ const CardRear = forwardRef<HTMLDivElement, Props>(({ profile }, ref) => {
                         className='w-18 h-18 z-10 absolute right-[6%] top-[5%]'
                     />
                 )}
-                <div className='z-10 absolute top-[40.7%] left-[3.9%] w-[123px] h-[44px] flex flex-col uppercase text-[0.65rem] leading-[9px] justify-around pl-[2px]'>
+                <div className='z-10 absolute top-[40.7%] left-[3.9%] w-[123px] h-[44px] flex flex-col uppercase text-[0.60rem] leading-[9px] justify-around pl-[2px]'>
                     <div className='flex'>
                         <span className='font-bold'>CHAPTER:</span>
                         {profile.user?.chapter && (
@@ -80,7 +80,7 @@ const CardRear = forwardRef<HTMLDivElement, Props>(({ profile }, ref) => {
                         )}
                     </div>
                 </div>
-                <div className='z-10 absolute top-[40.7%] right-[3.9%] w-[123px] h-[44px] flex flex-col uppercase text-[0.65rem] leading-[9px] justify-between text-right pr-[2px]'>
+                <div className='z-10 absolute top-[40.7%] right-[3.9%] w-[123px] h-[44px] flex flex-col uppercase text-[0.60rem] leading-[9px] justify-between text-right pr-[2px]'>
                     <div className='flex flex-col'>
                         <span className='font-bold mt-1'>
                             EMERGENCY CONTACT DETAILS:
