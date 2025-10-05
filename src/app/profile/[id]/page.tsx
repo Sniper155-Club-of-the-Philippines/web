@@ -140,6 +140,7 @@ export default async function Profile({ params }: Props) {
                             <AvatarImage
                                 src={avatar}
                                 alt={`${name} profile picture`}
+                                className='object-cover'
                             />
                         </Avatar>
                     )}
