@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import '@/app/globals.css';
-import RootLayoutClient from './RootLayoutClient';
+import RootLayoutClient from '@/app/RootLayoutClient';
+import { Analytics } from '@vercel/analytics/next';
 
 const font = Inter({
     subsets: ['latin'],
@@ -43,6 +44,7 @@ export default function RootLayout({
     return (
         <html lang='en' suppressHydrationWarning>
             <body className={`${font.className} antialiased`}>
+                <Analytics />
                 <RootLayoutClient>{children}</RootLayoutClient>
             </body>
         </html>
