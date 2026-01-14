@@ -74,6 +74,23 @@ const MultiSelect = React.forwardRef<HTMLSelectElement, MultiSelectProps>(
             } as unknown as React.ChangeEvent<HTMLSelectElement>);
         };
 
+        const handleSelectAll = () => {
+            const allSelected = options.every((opt) =>
+                value.includes(opt.value)
+            );
+            const newValues = allSelected
+                ? []
+                : options.map((opt) => opt.value);
+
+            onChange?.({
+                target: { value: newValues, name: props.name },
+            } as unknown as React.ChangeEvent<HTMLSelectElement>);
+        };
+
+        const allSelected =
+            options.length > 0 &&
+            options.every((opt) => value.includes(opt.value));
+
         const trigger = (
             <Button
                 variant='outline'
@@ -98,6 +115,15 @@ const MultiSelect = React.forwardRef<HTMLSelectElement, MultiSelectProps>(
                 <CommandList>
                     <CommandEmpty>No results.</CommandEmpty>
                     <CommandGroup>
+                        <CommandItem
+                            onSelect={handleSelectAll}
+                            className='font-medium'
+                        >
+                            Select All
+                            {allSelected && (
+                                <Check className='ml-auto h-4 w-4' />
+                            )}
+                        </CommandItem>
                         {options.map((opt) => (
                             <CommandItem
                                 key={opt.value}
