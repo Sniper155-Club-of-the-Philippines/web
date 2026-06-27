@@ -38,6 +38,18 @@ export async function changePassword(
     return data;
 }
 
+export async function updateProfile(
+    http: AxiosInstance,
+    payload: {
+        rider_nickname?: string | null;
+        obr_nickname?: string | null;
+    },
+) {
+    const { data } = await http.patch<{ user: User }>('/v1/profile', payload);
+
+    return data;
+}
+
 export async function designations(http: AxiosInstance) {
     const { data } = await http.get<{ designations: Record<string, string> }>(
         '/v1/auth/designations',

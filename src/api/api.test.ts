@@ -14,6 +14,7 @@ type Http = AxiosInstance & {
     get: ReturnType<typeof vi.fn>;
     post: ReturnType<typeof vi.fn>;
     put: ReturnType<typeof vi.fn>;
+    patch: ReturnType<typeof vi.fn>;
     delete: ReturnType<typeof vi.fn>;
 };
 
@@ -22,6 +23,7 @@ function makeHttp(): Http {
         get: vi.fn().mockResolvedValue({ data: {} }),
         post: vi.fn().mockResolvedValue({ data: {} }),
         put: vi.fn().mockResolvedValue({ data: {} }),
+        patch: vi.fn().mockResolvedValue({ data: {} }),
         delete: vi.fn().mockResolvedValue({ data: {} }),
     } as unknown as Http;
 }
@@ -61,6 +63,16 @@ describe('auth api', () => {
         const data = await auth.changePassword(http, payload);
         expect(http.post).toHaveBeenCalledWith('/v1/profile/password', payload);
         expect(data.user.force_password_change).toBe(false);
+    });
+
+    it('updateProfile patches the member nickname fields', async () => {
+        http.patch.mockResolvedValue({
+            data: { user: { id: '1', rider_nickname: 'Speedy' } },
+        });
+        const payload = { rider_nickname: 'Speedy', obr_nickname: 'Maverick' };
+        const data = await auth.updateProfile(http, payload);
+        expect(http.patch).toHaveBeenCalledWith('/v1/profile', payload);
+        expect(data.user.rider_nickname).toBe('Speedy');
     });
 
     it('designations maps to label/value options', async () => {

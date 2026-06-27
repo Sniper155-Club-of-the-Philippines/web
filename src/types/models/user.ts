@@ -10,6 +10,9 @@ export interface User extends Model {
     photo_url: string | null;
     designation: string | null;
     region?: string | null;
+    rider_nickname?: string | null;
+    obr_nickname?: string | null;
+    obr_nickname_changed_at?: string | null;
     google_id: string | null;
     club_number: string | null;
     yclub_number: string | null;
