@@ -168,7 +168,7 @@ describe('useRefreshToken — refresh flow', () => {
             useRefreshToken({ requireAuth: false, maxRetries: 1 }),
         );
         await act(async () => {
-            await result.current.refreshToken(true, false);
+            await result.current.refreshToken(false);
         });
         expect(push).toHaveBeenCalledWith('/login');
     });
@@ -236,7 +236,7 @@ describe('useRefreshToken — scheduling', () => {
             useRefreshToken({ requireAuth: false, retryDelay: 10 }),
         );
         await act(async () => {
-            await result.current.refreshToken(true, false);
+            await result.current.refreshToken(false);
         });
         await act(async () => {
             await vi.advanceTimersByTimeAsync(20);

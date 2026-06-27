@@ -1,13 +1,23 @@
 import { User } from '@/types/models/user';
 import { AxiosInstance } from 'axios';
 
+/**
+ * Admin user create/update payload. `password` is write-only (not part of the
+ * `User` model) and `photo` is the uploaded file; both are sent as form data.
+ */
+export type UserPayload = Partial<User> & {
+    password?: string;
+    password_confirmation?: string;
+    photo?: File;
+};
+
 export async function all(http: AxiosInstance) {
     const { data } = await http.get<{ users: User[] }>('/v1/users');
 
     return data.users;
 }
 
-export async function store(http: AxiosInstance, payload: Partial<User>) {
+export async function store(http: AxiosInstance, payload: UserPayload) {
     const FormData = await import('@avidian/form-data');
 
     const formData = new FormData.default(payload);
@@ -17,7 +27,7 @@ export async function store(http: AxiosInstance, payload: Partial<User>) {
     return data;
 }
 
-export async function update(http: AxiosInstance, payload: Partial<User>) {
+export async function update(http: AxiosInstance, payload: UserPayload) {
     const FormData = await import('@avidian/form-data');
 
     if ('password' in payload && !payload.password) {
