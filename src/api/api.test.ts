@@ -7,7 +7,9 @@ import * as forgotPassword from './forgot-password';
 import * as form from './form';
 import * as profile from './profile';
 import * as role from './role';
+import * as cart from './cart';
 import * as setting from './setting';
+import * as store from './store';
 import * as user from './user';
 
 type Http = AxiosInstance & {
@@ -364,5 +366,76 @@ describe('forgot-password api', () => {
             '/v1/auth/forgot-password/finalize',
             expect.objectContaining({ forgot_password_id: 'fp1' }),
         );
+    });
+});
+
+describe('store api', () => {
+    it('status returns the open state and active batch', async () => {
+        http.get.mockResolvedValue({
+            data: { open: true, batch: { id: 'b1' } },
+        });
+        expect(await store.status(http)).toEqual({
+            open: true,
+            batch: { id: 'b1' },
+        });
+        expect(http.get).toHaveBeenCalledWith('/v1/store/status');
+    });
+
+    it('products returns the storefront list', async () => {
+        http.get.mockResolvedValue({ data: { products: [{ id: 'p1' }] } });
+        expect(await store.products(http)).toEqual([{ id: 'p1' }]);
+        expect(http.get).toHaveBeenCalledWith('/v1/store/products');
+    });
+
+    it('settings reads the store-enabled flag', async () => {
+        http.get.mockResolvedValue({ data: { store_enabled: true } });
+        expect(await store.settings(http)).toEqual({ store_enabled: true });
+        expect(http.get).toHaveBeenCalledWith('/v1/store/settings');
+    });
+
+    it('updateSettings puts the store-enabled flag', async () => {
+        http.put.mockResolvedValue({ data: { store_enabled: false } });
+        expect(await store.updateSettings(http, false)).toEqual({
+            store_enabled: false,
+        });
+        expect(http.put).toHaveBeenCalledWith('/v1/store/settings', {
+            store_enabled: false,
+        });
+    });
+});
+
+describe('cart api', () => {
+    it('list returns the cart lines and total', async () => {
+        http.get.mockResolvedValue({
+            data: { cart: [{ id: 'c1' }], total: 1250 },
+        });
+        expect(await cart.list(http)).toEqual({
+            cart: [{ id: 'c1' }],
+            total: 1250,
+        });
+        expect(http.get).toHaveBeenCalledWith('/v1/cart');
+    });
+
+    it('add posts the payload and returns the item', async () => {
+        http.post.mockResolvedValue({ data: { item: { id: 'c1' } } });
+        const payload = {
+            product_id: 'p1',
+            recipient_type: 'rider' as const,
+            size: 'M',
+            quantity: 1,
+        };
+        expect(await cart.add(http, payload)).toEqual({ id: 'c1' });
+        expect(http.post).toHaveBeenCalledWith('/v1/cart', payload);
+    });
+
+    it('update patches the item', async () => {
+        http.patch.mockResolvedValue({ data: { item: { id: 'c1' } } });
+        await cart.update(http, 'c1', { quantity: 2 });
+        expect(http.patch).toHaveBeenCalledWith('/v1/cart/c1', { quantity: 2 });
+    });
+
+    it('remove deletes by id', async () => {
+        await cart.remove(http, 'c1');
+        expect(http.delete).toHaveBeenCalledWith('/v1/cart/c1');
     });
 });

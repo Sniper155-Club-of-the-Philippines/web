@@ -1,5 +1,6 @@
 export * as auth from '@/api/auth';
 export * as batch from '@/api/batch';
+export * as cart from '@/api/cart';
 export * as chapter from '@/api/chapter';
 export * as event from '@/api/event';
 export * as forgotPassword from '@/api/forgot-password';

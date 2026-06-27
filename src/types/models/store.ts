@@ -47,3 +47,24 @@ export interface PaymentMethod extends Model {
     is_active: boolean;
     sort_order: number;
 }
+
+/** A product of the active batch, flattened with its per-batch override. */
+export interface StoreProduct {
+    id: string;
+    batch_product_id: string;
+    name: string;
+    slug: string;
+    description: string | null;
+    images: ProductImage[];
+    price: number;
+    available_sizes: string[];
+    rider_allowed: boolean;
+    obr_allowed: boolean;
+    rider_limit: number;
+    obr_limit: number;
+}
+
+export interface StoreStatus {
+    open: boolean;
+    batch: Batch | null;
+}
