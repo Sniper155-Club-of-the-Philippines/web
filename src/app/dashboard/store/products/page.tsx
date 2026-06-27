@@ -34,10 +34,19 @@ import type { Product, ProductImage } from '@/types/models/store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArrowDown, ArrowUp, Trash2, Upload } from 'lucide-react';
 import Image from 'next/image';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-const empty = {
+type ProductInputs = {
+    name: string;
+    slug: string;
+    description: string;
+    is_active: boolean;
+    sort_order: number;
+};
+
+const empty: ProductInputs = {
     name: '',
     slug: '',
     description: '',
@@ -50,7 +59,9 @@ export default function ProductsPage() {
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<Product | null>(null);
-    const [form, setForm] = useState(empty);
+    const { register, handleSubmit, reset, watch, setValue } =
+        useForm<ProductInputs>({ defaultValues: empty });
+    const form = watch();
     const query = useQuery({
         queryKey: ['products'],
         queryFn: () => product.all(http),
@@ -58,16 +69,15 @@ export default function ProductsPage() {
     const refresh = () =>
         queryClient.invalidateQueries({ queryKey: ['products'] });
     const save = useMutation({
-        mutationFn: () =>
-            editing
-                ? product.update(http, editing.id, {
-                      ...form,
-                      description: form.description || null,
-                  })
-                : product.store(http, {
-                      ...form,
-                      description: form.description || null,
-                  }),
+        mutationFn: (values: ProductInputs) => {
+            const payload = {
+                ...values,
+                description: values.description || null,
+            };
+            return editing
+                ? product.update(http, editing.id, payload)
+                : product.store(http, payload);
+        },
         onSuccess: () => {
             toast.success(editing ? 'Product updated.' : 'Product created.');
             setOpen(false);
@@ -87,7 +97,7 @@ export default function ProductsPage() {
     });
     const startEdit = (item: Product) => {
         setEditing(item);
-        setForm({
+        reset({
             name: item.name,
             slug: item.slug,
             description: item.description ?? '',
@@ -96,10 +106,7 @@ export default function ProductsPage() {
         });
         setOpen(true);
     };
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
-        save.mutate();
-    };
+    const submit = handleSubmit((values) => save.mutate(values));
     const upload = async (file?: File) => {
         if (!editing || !file) return;
         try {
@@ -156,7 +163,7 @@ export default function ProductsPage() {
                 <Button
                     onClick={() => {
                         setEditing(null);
-                        setForm({
+                        reset({
                             ...empty,
                             sort_order: query.data?.length ?? 0,
                         });
@@ -251,65 +258,35 @@ export default function ProductsPage() {
                             <label className='grid gap-2 text-sm font-medium'>
                                 Name
                                 <Input
-                                    required
-                                    value={form.name}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            name: e.target.value,
-                                        })
-                                    }
+                                    {...register('name', { required: true })}
                                 />
                             </label>
                             <label className='grid gap-2 text-sm font-medium'>
                                 Slug
-                                <Input
-                                    value={form.slug}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            slug: e.target.value,
-                                        })
-                                    }
-                                />
+                                <Input {...register('slug')} />
                             </label>
                             <label className='grid gap-2 text-sm font-medium'>
                                 Sort order
                                 <Input
                                     min={0}
                                     type='number'
-                                    value={form.sort_order}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            sort_order: Number(e.target.value),
-                                        })
-                                    }
+                                    {...register('sort_order', {
+                                        valueAsNumber: true,
+                                    })}
                                 />
                             </label>
                             <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
                                 <Checkbox
                                     checked={form.is_active}
                                     onCheckedChange={(v) =>
-                                        setForm({
-                                            ...form,
-                                            is_active: v === true,
-                                        })
+                                        setValue('is_active', v === true)
                                     }
                                 />{' '}
                                 Active product
                             </label>
                             <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
                                 Description
-                                <Textarea
-                                    value={form.description}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            description: e.target.value,
-                                        })
-                                    }
-                                />
+                                <Textarea {...register('description')} />
                             </label>
                         </div>
                         {editing && (

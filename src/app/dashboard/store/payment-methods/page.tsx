@@ -40,12 +40,24 @@ import { apiError } from '@/lib/api-error';
 import type { PaymentMethod } from '@/types/models/store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Image from 'next/image';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-const empty = {
+type PaymentMethodInputs = {
+    label: string;
+    type: PaymentMethod['type'];
+    account_name: string;
+    account_number: string;
+    instructions: string;
+    is_active: boolean;
+    sort_order: number;
+    qr_image?: File;
+};
+
+const empty: PaymentMethodInputs = {
     label: '',
-    type: 'gcash' as PaymentMethod['type'],
+    type: 'gcash',
     account_name: '',
     account_number: '',
     instructions: '',
@@ -58,8 +70,9 @@ export default function PaymentMethodsPage() {
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<PaymentMethod | null>(null);
-    const [qrImage, setQrImage] = useState<File>();
-    const [form, setForm] = useState(empty);
+    const { register, handleSubmit, reset, watch, setValue } =
+        useForm<PaymentMethodInputs>({ defaultValues: empty });
+    const form = watch();
     const query = useQuery({
         queryKey: ['payment-methods'],
         queryFn: () => paymentMethod.all(http),
@@ -67,11 +80,10 @@ export default function PaymentMethodsPage() {
     const refresh = () =>
         queryClient.invalidateQueries({ queryKey: ['payment-methods'] });
     const save = useMutation({
-        mutationFn: () => {
+        mutationFn: (values: PaymentMethodInputs) => {
             const payload = {
-                ...form,
-                instructions: form.instructions || null,
-                qr_image: qrImage,
+                ...values,
+                instructions: values.instructions || null,
             };
             return editing
                 ? paymentMethod.update(http, editing.id, payload)
@@ -98,14 +110,12 @@ export default function PaymentMethodsPage() {
     });
     const startCreate = () => {
         setEditing(null);
-        setQrImage(undefined);
-        setForm({ ...empty, sort_order: query.data?.length ?? 0 });
+        reset({ ...empty, sort_order: query.data?.length ?? 0 });
         setOpen(true);
     };
     const startEdit = (item: PaymentMethod) => {
         setEditing(item);
-        setQrImage(undefined);
-        setForm({
+        reset({
             label: item.label,
             type: item.type,
             account_name: item.account_name,
@@ -113,13 +123,11 @@ export default function PaymentMethodsPage() {
             instructions: item.instructions ?? '',
             is_active: item.is_active,
             sort_order: item.sort_order,
+            qr_image: undefined,
         });
         setOpen(true);
     };
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
-        save.mutate();
-    };
+    const submit = handleSubmit((values) => save.mutate(values));
 
     return (
         <AdminPage
@@ -231,14 +239,7 @@ export default function PaymentMethodsPage() {
                             <label className='grid gap-2 text-sm font-medium'>
                                 Label
                                 <Input
-                                    required
-                                    value={form.label}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            label: e.target.value,
-                                        })
-                                    }
+                                    {...register('label', { required: true })}
                                 />
                             </label>
                             <label className='grid gap-2 text-sm font-medium'>
@@ -247,7 +248,7 @@ export default function PaymentMethodsPage() {
                                     value={form.type}
                                     onValueChange={(
                                         type: PaymentMethod['type'],
-                                    ) => setForm({ ...form, type })}
+                                    ) => setValue('type', type)}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
@@ -268,27 +269,17 @@ export default function PaymentMethodsPage() {
                             <label className='grid gap-2 text-sm font-medium'>
                                 Account name
                                 <Input
-                                    required
-                                    value={form.account_name}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            account_name: e.target.value,
-                                        })
-                                    }
+                                    {...register('account_name', {
+                                        required: true,
+                                    })}
                                 />
                             </label>
                             <label className='grid gap-2 text-sm font-medium'>
                                 Account number
                                 <Input
-                                    required
-                                    value={form.account_number}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            account_number: e.target.value,
-                                        })
-                                    }
+                                    {...register('account_number', {
+                                        required: true,
+                                    })}
                                 />
                             </label>
                             <label className='grid gap-2 text-sm font-medium'>
@@ -296,38 +287,23 @@ export default function PaymentMethodsPage() {
                                 <Input
                                     min={0}
                                     type='number'
-                                    value={form.sort_order}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            sort_order: Number(e.target.value),
-                                        })
-                                    }
+                                    {...register('sort_order', {
+                                        valueAsNumber: true,
+                                    })}
                                 />
                             </label>
                             <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
                                 <Checkbox
                                     checked={form.is_active}
                                     onCheckedChange={(v) =>
-                                        setForm({
-                                            ...form,
-                                            is_active: v === true,
-                                        })
+                                        setValue('is_active', v === true)
                                     }
                                 />{' '}
                                 Active method
                             </label>
                             <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
                                 Instructions
-                                <Textarea
-                                    value={form.instructions}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            instructions: e.target.value,
-                                        })
-                                    }
-                                />
+                                <Textarea {...register('instructions')} />
                             </label>
                             <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
                                 QR image
@@ -335,11 +311,14 @@ export default function PaymentMethodsPage() {
                                     type='file'
                                     accept='image/jpeg,image/png,image/webp'
                                     onChange={(e) =>
-                                        setQrImage(e.target.files?.[0])
+                                        setValue(
+                                            'qr_image',
+                                            e.target.files?.[0],
+                                        )
                                     }
                                 />
                                 <span className='text-xs font-normal text-muted-foreground'>
-                                    {editing?.qr_image_url && !qrImage
+                                    {editing?.qr_image_url && !form.qr_image
                                         ? 'Current image will be kept.'
                                         : 'JPG, PNG, or WebP up to 10 MB.'}
                                 </span>

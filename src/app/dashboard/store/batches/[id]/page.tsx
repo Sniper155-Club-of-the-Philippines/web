@@ -13,10 +13,20 @@ import type { BatchProduct, Product } from '@/types/models/store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+
+type OverrideInputs = {
+    price: string;
+    available_sizes: string[];
+    rider_allowed: boolean;
+    obr_allowed: boolean;
+    rider_limit: number;
+    obr_limit: number;
+    is_active: boolean;
+};
 
 function ProductOverride({
     product: item,
@@ -29,29 +39,33 @@ function ProductOverride({
 }) {
     const http = useHttp();
     const queryClient = useQueryClient();
-    const [price, setPrice] = useState(
-        override ? centavosToPesos(override.price) : '0.00',
+    const { register, handleSubmit, watch, setValue } = useForm<OverrideInputs>(
+        {
+            defaultValues: {
+                price: override ? centavosToPesos(override.price) : '0.00',
+                available_sizes: override?.available_sizes ?? sizes,
+                rider_allowed: override?.rider_allowed ?? true,
+                obr_allowed: override?.obr_allowed ?? true,
+                rider_limit: override?.rider_limit ?? 1,
+                obr_limit: override?.obr_limit ?? 1,
+                is_active: override?.is_active ?? true,
+            },
+        },
     );
-    const [selectedSizes, setSelectedSizes] = useState(
-        override?.available_sizes ?? sizes,
-    );
-    const [riderAllowed, setRiderAllowed] = useState(
-        override?.rider_allowed ?? true,
-    );
-    const [obrAllowed, setObrAllowed] = useState(override?.obr_allowed ?? true);
-    const [riderLimit, setRiderLimit] = useState(override?.rider_limit ?? 1);
-    const [obrLimit, setObrLimit] = useState(override?.obr_limit ?? 1);
-    const [active, setActive] = useState(override?.is_active ?? true);
+    const selectedSizes = watch('available_sizes');
+    const riderAllowed = watch('rider_allowed');
+    const obrAllowed = watch('obr_allowed');
+    const active = watch('is_active');
     const save = useMutation({
-        mutationFn: () =>
+        mutationFn: (values: OverrideInputs) =>
             batch.updateProduct(http, batchId, item.id, {
-                price: pesosToCentavos(price),
-                available_sizes: selectedSizes,
-                rider_allowed: riderAllowed,
-                obr_allowed: obrAllowed,
-                rider_limit: riderLimit,
-                obr_limit: obrLimit,
-                is_active: active,
+                price: pesosToCentavos(values.price),
+                available_sizes: values.available_sizes,
+                rider_allowed: values.rider_allowed,
+                obr_allowed: values.obr_allowed,
+                rider_limit: values.rider_limit,
+                obr_limit: values.obr_limit,
+                is_active: values.is_active,
             }),
         onSuccess: () => {
             toast.success(`${item.name} saved.`);
@@ -61,22 +75,22 @@ function ProductOverride({
             toast.error(apiError(error, 'Unable to save product settings.')),
     });
     const toggleSize = (size: string, checked: boolean) =>
-        setSelectedSizes(
+        setValue(
+            'available_sizes',
             checked
                 ? [...selectedSizes, size]
                 : selectedSizes.filter((value) => value !== size),
         );
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
-        if (!selectedSizes.length)
+    const submit = handleSubmit((values) => {
+        if (!values.available_sizes.length)
             return toast.error('Select at least one size.');
         try {
-            pesosToCentavos(price);
+            pesosToCentavos(values.price);
         } catch (error) {
             return toast.error((error as Error).message);
         }
-        save.mutate();
-    };
+        save.mutate(values);
+    });
 
     return (
         <form
@@ -97,19 +111,14 @@ function ProductOverride({
             <div className='grid gap-4 lg:grid-cols-4'>
                 <label className='grid gap-2 text-sm font-medium'>
                     Price (PHP)
-                    <Input
-                        inputMode='decimal'
-                        value={price}
-                        onChange={(e) => setPrice(e.target.value)}
-                    />
+                    <Input inputMode='decimal' {...register('price')} />
                 </label>
                 <label className='grid gap-2 text-sm font-medium'>
                     Rider limit
                     <Input
                         min={1}
                         type='number'
-                        value={riderLimit}
-                        onChange={(e) => setRiderLimit(Number(e.target.value))}
+                        {...register('rider_limit', { valueAsNumber: true })}
                     />
                 </label>
                 <label className='grid gap-2 text-sm font-medium'>
@@ -117,29 +126,34 @@ function ProductOverride({
                     <Input
                         min={1}
                         type='number'
-                        value={obrLimit}
-                        onChange={(e) => setObrLimit(Number(e.target.value))}
+                        {...register('obr_limit', { valueAsNumber: true })}
                     />
                 </label>
                 <div className='flex flex-wrap items-end gap-4 pb-2 text-sm'>
                     <label className='flex items-center gap-2'>
                         <Checkbox
                             checked={riderAllowed}
-                            onCheckedChange={(v) => setRiderAllowed(v === true)}
+                            onCheckedChange={(v) =>
+                                setValue('rider_allowed', v === true)
+                            }
                         />{' '}
                         Rider
                     </label>
                     <label className='flex items-center gap-2'>
                         <Checkbox
                             checked={obrAllowed}
-                            onCheckedChange={(v) => setObrAllowed(v === true)}
+                            onCheckedChange={(v) =>
+                                setValue('obr_allowed', v === true)
+                            }
                         />{' '}
                         OBR
                     </label>
                     <label className='flex items-center gap-2'>
                         <Checkbox
                             checked={active}
-                            onCheckedChange={(v) => setActive(v === true)}
+                            onCheckedChange={(v) =>
+                                setValue('is_active', v === true)
+                            }
                         />{' '}
                         Active
                     </label>

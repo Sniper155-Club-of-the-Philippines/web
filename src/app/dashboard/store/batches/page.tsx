@@ -34,10 +34,20 @@ import type { Batch } from '@/types/models/store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import Link from 'next/link';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-const empty = {
+type BatchInputs = {
+    name: string;
+    sequence: number;
+    ordering_start_at: string;
+    ordering_end_at: string;
+    is_active: boolean;
+    notes: string;
+};
+
+const empty: BatchInputs = {
     name: '',
     sequence: 1,
     ordering_start_at: '',
@@ -51,7 +61,9 @@ export default function BatchesPage() {
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<Batch | null>(null);
-    const [form, setForm] = useState(empty);
+    const { register, handleSubmit, reset, watch, setValue } =
+        useForm<BatchInputs>({ defaultValues: empty });
+    const form = watch();
     const query = useQuery({
         queryKey: ['batches'],
         queryFn: () => batch.all(http),
@@ -59,18 +71,12 @@ export default function BatchesPage() {
     const refresh = () =>
         queryClient.invalidateQueries({ queryKey: ['batches'] });
     const save = useMutation({
-        mutationFn: () =>
-            editing
-                ? batch.update(http, editing.id, {
-                      ...form,
-                      sequence: Number(form.sequence),
-                      notes: form.notes || null,
-                  })
-                : batch.store(http, {
-                      ...form,
-                      sequence: Number(form.sequence),
-                      notes: form.notes || null,
-                  }),
+        mutationFn: (values: BatchInputs) => {
+            const payload = { ...values, notes: values.notes || null };
+            return editing
+                ? batch.update(http, editing.id, payload)
+                : batch.store(http, payload);
+        },
         onSuccess: () => {
             toast.success(editing ? 'Batch updated.' : 'Batch created.');
             setOpen(false);
@@ -90,12 +96,12 @@ export default function BatchesPage() {
     });
     const startCreate = () => {
         setEditing(null);
-        setForm({ ...empty, sequence: (query.data?.[0]?.sequence ?? 0) + 1 });
+        reset({ ...empty, sequence: (query.data?.[0]?.sequence ?? 0) + 1 });
         setOpen(true);
     };
     const startEdit = (item: Batch) => {
         setEditing(item);
-        setForm({
+        reset({
             name: item.name,
             sequence: item.sequence,
             ordering_start_at: dayjs(item.ordering_start_at).format(
@@ -109,10 +115,7 @@ export default function BatchesPage() {
         });
         setOpen(true);
     };
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
-        save.mutate();
-    };
+    const submit = handleSubmit((values) => save.mutate(values));
 
     return (
         <AdminPage
@@ -219,39 +222,25 @@ export default function BatchesPage() {
                             <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
                                 Name
                                 <Input
-                                    required
-                                    value={form.name}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            name: e.target.value,
-                                        })
-                                    }
+                                    {...register('name', { required: true })}
                                 />
                             </label>
                             <label className='grid gap-2 text-sm font-medium'>
                                 Sequence
                                 <Input
-                                    required
                                     min={1}
                                     type='number'
-                                    value={form.sequence}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            sequence: Number(e.target.value),
-                                        })
-                                    }
+                                    {...register('sequence', {
+                                        required: true,
+                                        valueAsNumber: true,
+                                    })}
                                 />
                             </label>
                             <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
                                 <Checkbox
                                     checked={form.is_active}
                                     onCheckedChange={(v) =>
-                                        setForm({
-                                            ...form,
-                                            is_active: v === true,
-                                        })
+                                        setValue('is_active', v === true)
                                     }
                                 />{' '}
                                 Active batch
@@ -261,13 +250,7 @@ export default function BatchesPage() {
                                 <Input
                                     required
                                     type='datetime-local'
-                                    value={form.ordering_start_at}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            ordering_start_at: e.target.value,
-                                        })
-                                    }
+                                    {...register('ordering_start_at')}
                                 />
                             </label>
                             <label className='grid gap-2 text-sm font-medium'>
@@ -275,26 +258,12 @@ export default function BatchesPage() {
                                 <Input
                                     required
                                     type='datetime-local'
-                                    value={form.ordering_end_at}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            ordering_end_at: e.target.value,
-                                        })
-                                    }
+                                    {...register('ordering_end_at')}
                                 />
                             </label>
                             <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
                                 Notes
-                                <Textarea
-                                    value={form.notes}
-                                    onChange={(e) =>
-                                        setForm({
-                                            ...form,
-                                            notes: e.target.value,
-                                        })
-                                    }
-                                />
+                                <Textarea {...register('notes')} />
                             </label>
                         </div>
                         <DialogFooter>

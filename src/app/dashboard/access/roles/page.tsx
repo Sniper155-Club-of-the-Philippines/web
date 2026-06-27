@@ -39,18 +39,25 @@ import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
 import type { Permission, Role } from '@/types/models/role';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import { FormEvent, useState } from 'react';
+import { useState } from 'react';
+import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+
+type RoleInputs = {
+    name: string;
+    permissions: string[];
+};
 
 export default function RolesPage() {
     const http = useHttp();
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<Role | null>(null);
-    const [name, setName] = useState('');
-    const [selectedPermissions, setSelectedPermissions] = useState<string[]>(
-        [],
-    );
+    const { register, handleSubmit, reset, watch, setValue } =
+        useForm<RoleInputs>({
+            defaultValues: { name: '', permissions: [] },
+        });
+    const selectedPermissions = watch('permissions');
     const [selectedUserId, setSelectedUserId] = useState('');
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
     const rolesQuery = useQuery({
@@ -75,13 +82,10 @@ export default function RolesPage() {
     const refreshRoles = () =>
         queryClient.invalidateQueries({ queryKey: ['roles'] });
     const save = useMutation({
-        mutationFn: () =>
+        mutationFn: (values: RoleInputs) =>
             editing
-                ? role.update(http, editing.id, {
-                      name,
-                      permissions: selectedPermissions,
-                  })
-                : role.store(http, { name, permissions: selectedPermissions }),
+                ? role.update(http, editing.id, values)
+                : role.store(http, values),
         onSuccess: () => {
             toast.success(editing ? 'Role updated.' : 'Role created.');
             setOpen(false);
@@ -110,20 +114,20 @@ export default function RolesPage() {
     });
     const startCreate = () => {
         setEditing(null);
-        setName('');
-        setSelectedPermissions([]);
+        reset({ name: '', permissions: [] });
         setOpen(true);
     };
     const startEdit = (item: Role) => {
         setEditing(item);
-        setName(item.name);
-        setSelectedPermissions(
-            item.permissions?.map((value) => value.name) ?? [],
-        );
+        reset({
+            name: item.name,
+            permissions: item.permissions?.map((value) => value.name) ?? [],
+        });
         setOpen(true);
     };
     const togglePermission = (value: string, checked: boolean) =>
-        setSelectedPermissions(
+        setValue(
+            'permissions',
             checked
                 ? [...selectedPermissions, value]
                 : selectedPermissions.filter((item) => item !== value),
@@ -140,10 +144,7 @@ export default function RolesPage() {
             usersQuery.data?.find((item) => item.id === id)?.roles ?? [],
         );
     };
-    const submit = (event: FormEvent) => {
-        event.preventDefault();
-        save.mutate();
-    };
+    const submit = handleSubmit((values) => save.mutate(values));
 
     return (
         <AdminPage
@@ -327,9 +328,7 @@ export default function RolesPage() {
                         <label className='grid gap-2 text-sm font-medium'>
                             Role name
                             <Input
-                                required
                                 pattern='[a-z0-9]+(?:-[a-z0-9]+)*'
-                                value={name}
                                 disabled={
                                     editing
                                         ? ['admin', 'member'].includes(
@@ -337,7 +336,7 @@ export default function RolesPage() {
                                           )
                                         : false
                                 }
-                                onChange={(e) => setName(e.target.value)}
+                                {...register('name', { required: true })}
                             />
                         </label>
                         <div className='grid gap-5 sm:grid-cols-2'>
