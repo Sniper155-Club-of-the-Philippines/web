@@ -5,10 +5,11 @@ import { useQuery } from '@tanstack/react-query';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { auth } from '@/api';
+import { auth, role } from '@/api';
 import { useHttp } from '@/hooks/http';
 import { useEffect } from 'react';
 import Select from '@/components/base/inputs/Select';
+import MultiSelect from '@/components/base/inputs/MultiSelect';
 import { UserFormInputs } from '@/types/form';
 import { useChapterQuery } from '@/hooks/queries';
 import { Avatar, AvatarImage } from '@/components/ui/avatar';
@@ -39,6 +40,16 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
         queryFn: () => auth.designations(http),
     });
 
+    const { data: regions } = useQuery({
+        queryKey: ['regions'],
+        queryFn: () => auth.regions(http),
+    });
+
+    const { data: roles } = useQuery({
+        queryKey: ['roles'],
+        queryFn: () => role.all(http),
+    });
+
     const { data: chapters } = useChapterQuery(false);
 
     return (
@@ -46,7 +57,7 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
             <div
                 className={cn(
                     'space-y-2 py-6 max-h-[60vh] overflow-y-auto',
-                    className
+                    className,
                 )}
             >
                 {/* Section: Basic Info */}
@@ -93,26 +104,50 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                     </div>
                 </div>
 
-                {/* Section: Credentials */}
+                {/* Section: Access */}
                 <div className='rounded-2xl border p-6 shadow-sm'>
-                    <h3 className='text-lg font-semibold mb-4'>Credentials</h3>
+                    <h3 className='text-lg font-semibold mb-4'>Access</h3>
+                    <p className='text-sm text-muted-foreground mb-4'>
+                        A temporary password is generated and emailed to the
+                        member on creation; they set their own on first login.
+                    </p>
                     <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
                         <div className='flex flex-col gap-2'>
-                            <Label htmlFor='password'>Password</Label>
-                            <Input
-                                {...register('password')}
-                                id='password'
-                                type='password'
+                            <Label htmlFor='region'>Region</Label>
+                            <Controller
+                                name='region'
+                                control={control}
+                                render={({ field }) => (
+                                    <Select
+                                        width='w-full'
+                                        onChange={(value) =>
+                                            field.onChange(value)
+                                        }
+                                        value={field.value ?? undefined}
+                                        options={regions ?? []}
+                                    />
+                                )}
                             />
                         </div>
                         <div className='flex flex-col gap-2'>
-                            <Label htmlFor='password_confirmation'>
-                                Confirm Password
-                            </Label>
-                            <Input
-                                {...register('password_confirmation')}
-                                id='password_confirmation'
-                                type='password'
+                            <Label htmlFor='roles'>Roles</Label>
+                            <Controller
+                                name='roles'
+                                control={control}
+                                render={({ field }) => (
+                                    <MultiSelect
+                                        value={field.value ?? []}
+                                        onChange={(e) =>
+                                            field.onChange(e.target.value)
+                                        }
+                                        options={
+                                            roles?.map((r) => ({
+                                                value: r.name,
+                                                label: r.name,
+                                            })) ?? []
+                                        }
+                                    />
+                                )}
                             />
                         </div>
                     </div>
@@ -226,7 +261,7 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                                             (type) => ({
                                                 label: type,
                                                 value: type,
-                                            })
+                                            }),
                                         )}
                                     />
                                 )}

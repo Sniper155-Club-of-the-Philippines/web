@@ -9,6 +9,7 @@ export interface User extends Model {
     phone: string | null;
     photo_url: string | null;
     designation: string | null;
+    region?: string | null;
     google_id: string | null;
     club_number: string | null;
     yclub_number: string | null;

@@ -33,6 +33,18 @@ export async function update(http: AxiosInstance, payload: Partial<User>) {
     return data;
 }
 
+export async function assignRoles(
+    http: AxiosInstance,
+    id: string,
+    roles: string[],
+) {
+    const { data } = await http.post<{ user: User }>(`/v1/users/${id}/roles`, {
+        roles,
+    });
+
+    return data;
+}
+
 export async function remove(http: AxiosInstance, id: string) {
     await http.delete(`/v1/users/${id}`);
 }

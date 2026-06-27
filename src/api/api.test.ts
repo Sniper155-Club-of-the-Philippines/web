@@ -6,6 +6,7 @@ import * as event from './event';
 import * as forgotPassword from './forgot-password';
 import * as form from './form';
 import * as profile from './profile';
+import * as role from './role';
 import * as setting from './setting';
 import * as user from './user';
 
@@ -72,6 +73,28 @@ describe('auth api', () => {
             { label: 'Alpha', value: 'Alpha' },
             { label: 'Bravo', value: 'Bravo' },
         ]);
+    });
+
+    it('regions maps to label/value options', async () => {
+        http.get.mockResolvedValue({
+            data: { regions: { NCR: 'NCR', VIS: 'Visayas' } },
+        });
+        const opts = await auth.regions(http);
+        expect(http.get).toHaveBeenCalledWith('/v1/auth/regions');
+        expect(opts).toEqual([
+            { label: 'NCR', value: 'NCR' },
+            { label: 'Visayas', value: 'Visayas' },
+        ]);
+    });
+});
+
+describe('role api', () => {
+    it('all returns the roles array', async () => {
+        http.get.mockResolvedValue({
+            data: { roles: [{ id: 'r1', name: 'member' }] },
+        });
+        expect(await role.all(http)).toEqual([{ id: 'r1', name: 'member' }]);
+        expect(http.get).toHaveBeenCalledWith('/v1/roles');
     });
 });
 
@@ -270,6 +293,14 @@ describe('user api', () => {
         await user.update(http, { id: 'u1', password: 'secret' });
         const body = http.post.mock.calls[0][1] as FormData;
         expect(body.get('password')).toBe('secret');
+    });
+
+    it('assignRoles posts the role list to the roles endpoint', async () => {
+        http.post.mockResolvedValue({ data: { user: { id: 'u1' } } });
+        await user.assignRoles(http, 'u1', ['member', 'store-manager']);
+        expect(http.post).toHaveBeenCalledWith('/v1/users/u1/roles', {
+            roles: ['member', 'store-manager'],
+        });
     });
 
     it('remove deletes by id', async () => {

@@ -48,3 +48,14 @@ export async function designations(http: AxiosInstance) {
         value,
     }));
 }
+
+export async function regions(http: AxiosInstance) {
+    const { data } = await http.get<{ regions: Record<string, string> }>(
+        '/v1/auth/regions',
+    );
+
+    return Object.values(data.regions).map((value) => ({
+        label: value,
+        value,
+    }));
+}

@@ -4,5 +4,6 @@ export * as event from '@/api/event';
 export * as forgotPassword from '@/api/forgot-password';
 export * as form from '@/api/form';
 export * as profile from '@/api/profile';
+export * as role from '@/api/role';
 export * as setting from '@/api/setting';
 export * as user from '@/api/user';
