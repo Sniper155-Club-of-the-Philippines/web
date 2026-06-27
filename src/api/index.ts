@@ -1,9 +1,14 @@
 export * as auth from '@/api/auth';
+export * as batch from '@/api/batch';
 export * as chapter from '@/api/chapter';
 export * as event from '@/api/event';
 export * as forgotPassword from '@/api/forgot-password';
 export * as form from '@/api/form';
+export * as paymentMethod from '@/api/payment-method';
+export * as permission from '@/api/permission';
+export * as product from '@/api/product';
 export * as profile from '@/api/profile';
 export * as role from '@/api/role';
 export * as setting from '@/api/setting';
+export * as store from '@/api/store';
 export * as user from '@/api/user';

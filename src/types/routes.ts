@@ -4,6 +4,7 @@ export interface RouteItem {
     title: string;
     url: string;
     hidden?: boolean;
+    permission?: string;
     items?: RouteItem[];
 }
 
@@ -11,6 +12,7 @@ export interface Route {
     title: string;
     url: string;
     icon?: LucideIcon;
+    permission?: string;
     items?: RouteItem[];
 }
 

@@ -17,10 +17,16 @@ import Logo from '@/components/root/Logo';
 import SidebarUser from '@/components/dashboard/SidebarUser';
 import Link from 'next/link';
 import { routes } from '@/lib/routes';
+import { userAtom } from '@/atoms/auth';
+import { filterRoutes } from '@/lib/permissions';
+import { useAtomValue } from 'jotai';
 
 export default function Sidebar({
     ...props
 }: React.ComponentProps<typeof BaseSidebar>) {
+    const user = useAtomValue(userAtom);
+    const visibleRoutes = filterRoutes(routes, user);
+
     return (
         <BaseSidebar collapsible='icon' {...props}>
             <SidebarHeader>
@@ -42,9 +48,9 @@ export default function Sidebar({
                 </SidebarMenu>
             </SidebarHeader>
             <SidebarContent>
-                {routes.map((route, index) => (
+                {visibleRoutes.map((route) => (
                     <Navbar
-                        key={index}
+                        key={route.title}
                         title={route.title}
                         items={route.routes}
                     />

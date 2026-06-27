@@ -1,12 +1,27 @@
 import { describe, expect, it } from 'vitest';
-import { identification, main, management, routes } from './routes';
+import {
+    access,
+    identification,
+    main,
+    management,
+    routes,
+    store,
+} from './routes';
 
 describe('route sections', () => {
-    it('exposes the three sections in order', () => {
-        expect(routes).toEqual([main, management, identification]);
+    it('exposes the dashboard sections in order', () => {
+        expect(routes).toEqual([
+            main,
+            management,
+            store,
+            access,
+            identification,
+        ]);
         expect(routes.map((s) => s.title)).toEqual([
             'Administration',
             'Management',
+            'Store',
+            'Access',
             'Identification',
         ]);
     });
