@@ -7,6 +7,7 @@ import { Toaster } from '@/components/ui/sonner';
 import QueryProvider from '@/components/base/QueryProvider';
 import { cn } from '@/lib/utils';
 import { minimatch } from 'minimatch';
+import ForcedPasswordGuard from '@/components/auth/ForcedPasswordGuard';
 
 export default function RootLayoutClient({
     children,
@@ -35,7 +36,9 @@ export default function RootLayoutClient({
             >
                 <Spinner />
                 <Toaster />
-                <QueryProvider>{children}</QueryProvider>
+                <QueryProvider>
+                    <ForcedPasswordGuard>{children}</ForcedPasswordGuard>
+                </QueryProvider>
             </div>
         </ThemeProvider>
     );

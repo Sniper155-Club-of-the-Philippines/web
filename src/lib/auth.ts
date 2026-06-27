@@ -15,7 +15,10 @@ export const AUTH_ROUTES = {
     dashboard: '/dashboard',
     member: '/member',
     changePassword: '/change-password',
+    login: '/login',
 } as const;
+
+export type PortalKind = 'dashboard' | 'member';
 
 type RoleAware =
     | Pick<User, 'roles' | 'force_password_change'>
@@ -71,4 +74,26 @@ export function landingPath(user: RoleAware): string {
     }
 
     return AUTH_ROUTES.dashboard;
+}
+
+/** Return the redirect required to enter a portal, or null when allowed. */
+export function portalRedirect(
+    user: RoleAware,
+    portal: PortalKind,
+): string | null {
+    if (mustChangePassword(user)) {
+        return AUTH_ROUTES.changePassword;
+    }
+
+    if (portal === 'dashboard' && !hasAdminSideRole(user)) {
+        return isMember(user) ? AUTH_ROUTES.member : AUTH_ROUTES.login;
+    }
+
+    if (portal === 'member' && !canAccessStore(user)) {
+        return hasAdminSideRole(user)
+            ? AUTH_ROUTES.dashboard
+            : AUTH_ROUTES.login;
+    }
+
+    return null;
 }

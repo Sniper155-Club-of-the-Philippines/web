@@ -35,8 +35,9 @@ function wrapper() {
     const client = new QueryClient({
         defaultOptions: { queries: { retry: false } },
     });
-    return ({ children }: { children: ReactNode }) =>
-        createElement(QueryClientProvider, { client }, children);
+    return function TestQueryProvider({ children }: { children: ReactNode }) {
+        return createElement(QueryClientProvider, { client }, children);
+    };
 }
 
 beforeEach(() => {

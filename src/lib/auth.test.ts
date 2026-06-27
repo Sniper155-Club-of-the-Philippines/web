@@ -6,6 +6,7 @@ import {
     isMember,
     landingPath,
     mustChangePassword,
+    portalRedirect,
 } from './auth';
 import type { User } from '@/types/models/user';
 
@@ -90,5 +91,43 @@ describe('landingPath', () => {
     it('falls back to the dashboard for a roleless user', () => {
         expect(landingPath(make({ roles: [] }))).toBe(AUTH_ROUTES.dashboard);
         expect(landingPath(null)).toBe(AUTH_ROUTES.dashboard);
+    });
+});
+
+describe('portalRedirect', () => {
+    it('allows members into the member portal', () => {
+        expect(
+            portalRedirect(make({ roles: ['member'] }), 'member'),
+        ).toBeNull();
+    });
+
+    it('returns member-only users to the member portal', () => {
+        expect(portalRedirect(make({ roles: ['member'] }), 'dashboard')).toBe(
+            AUTH_ROUTES.member,
+        );
+    });
+
+    it('allows admin-side users into the dashboard', () => {
+        expect(
+            portalRedirect(make({ roles: ['order-manager'] }), 'dashboard'),
+        ).toBeNull();
+    });
+
+    it('returns non-member admins to the dashboard', () => {
+        expect(portalRedirect(make({ roles: ['admin'] }), 'member')).toBe(
+            AUTH_ROUTES.dashboard,
+        );
+    });
+
+    it('forces password changes before either portal', () => {
+        const user = make({
+            roles: ['member', 'admin'],
+            force_password_change: true,
+        });
+
+        expect(portalRedirect(user, 'member')).toBe(AUTH_ROUTES.changePassword);
+        expect(portalRedirect(user, 'dashboard')).toBe(
+            AUTH_ROUTES.changePassword,
+        );
     });
 });

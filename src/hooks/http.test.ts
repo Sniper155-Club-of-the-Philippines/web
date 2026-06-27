@@ -6,8 +6,9 @@ import { useHttp } from './http';
 import { accessAtom } from '@/atoms/auth';
 
 function wrapper(store: ReturnType<typeof createStore>) {
-    return ({ children }: { children: ReactNode }) =>
-        createElement(Provider, { store }, children);
+    return function TestProvider({ children }: { children: ReactNode }) {
+        return createElement(Provider, { store }, children);
+    };
 }
 
 describe('useHttp', () => {

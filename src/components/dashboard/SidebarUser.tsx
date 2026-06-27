@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronsUpDown, LogOut, Settings } from 'lucide-react';
+import { ChevronsUpDown, LogOut, Settings, ShoppingBag } from 'lucide-react';
 
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import {
@@ -26,6 +26,7 @@ import { RESET } from 'jotai/utils';
 import { useRouter } from 'next/navigation';
 import { useMemo } from 'react';
 import Link from 'next/link';
+import { canAccessStore } from '@/lib/auth';
 
 export default function SidebarUser() {
     const { isMobile } = useSidebar();
@@ -70,7 +71,7 @@ export default function SidebarUser() {
                             size='lg'
                             className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
                         >
-                            <Avatar className='h-8 w-8 rounded-lg'>
+                            <Avatar className='size-8 rounded-lg'>
                                 {picture && (
                                     <AvatarImage src={picture} alt={name} />
                                 )}
@@ -86,7 +87,7 @@ export default function SidebarUser() {
                                     {email}
                                 </span>
                             </div>
-                            <ChevronsUpDown className='ml-auto size-4' />
+                            <ChevronsUpDown className='ml-auto' />
                         </SidebarMenuButton>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent
@@ -97,7 +98,7 @@ export default function SidebarUser() {
                     >
                         <DropdownMenuLabel className='p-0 font-normal'>
                             <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
-                                <Avatar className='h-8 w-8 rounded-lg'>
+                                <Avatar className='size-8 rounded-lg'>
                                     {picture && (
                                         <AvatarImage src={picture} alt={name} />
                                     )}
@@ -116,14 +117,21 @@ export default function SidebarUser() {
                             </div>
                         </DropdownMenuLabel>
                         <DropdownMenuSeparator />
-                        <DropdownMenuSeparator />
                         <DropdownMenuGroup>
-                            <Link href='/dashboard/settings'>
-                                <DropdownMenuItem>
+                            {canAccessStore(user) && (
+                                <DropdownMenuItem asChild>
+                                    <Link href='/member'>
+                                        <ShoppingBag />
+                                        Go to Store
+                                    </Link>
+                                </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem asChild>
+                                <Link href='/dashboard/settings'>
                                     <Settings />
                                     Settings
-                                </DropdownMenuItem>
-                            </Link>
+                                </Link>
+                            </DropdownMenuItem>
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={logout}>
