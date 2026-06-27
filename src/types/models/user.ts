@@ -18,4 +18,7 @@ export interface User extends Model {
     allergy?: string | null;
     emergency_contact_name?: string | null;
     emergency_contact_phone?: string | null;
+    roles?: string[];
+    permissions?: string[];
+    force_password_change?: boolean;
 }

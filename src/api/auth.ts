@@ -5,14 +5,14 @@ import { AxiosInstance } from 'axios';
 export async function login(
     http: AxiosInstance,
     email: string,
-    password: string
+    password: string,
 ) {
     const { data } = await http.post<{ user: User; access: Access }>(
         '/v1/auth/login',
         {
             email,
             password,
-        }
+        },
     );
 
     return data;
@@ -22,9 +22,25 @@ export async function logout(http: AxiosInstance) {
     await http.get('/v1/auth/logout');
 }
 
+export async function changePassword(
+    http: AxiosInstance,
+    payload: {
+        current_password: string;
+        password: string;
+        password_confirmation: string;
+    },
+) {
+    const { data } = await http.post<{ user: User }>(
+        '/v1/profile/password',
+        payload,
+    );
+
+    return data;
+}
+
 export async function designations(http: AxiosInstance) {
     const { data } = await http.get<{ designations: Record<string, string> }>(
-        '/v1/auth/designations'
+        '/v1/auth/designations',
     );
 
     return Object.values(data.designations).map((value) => ({

@@ -24,6 +24,7 @@ import { User } from '@/types/models/user';
 import { useHttp } from '@/hooks/http';
 import { isAxiosError } from 'axios';
 import { useRefreshToken } from '@/hooks/auth';
+import { AUTH_ROUTES, landingPath, mustChangePassword } from '@/lib/auth';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
 import Spinner from '@/components/root/Spinner';
@@ -83,10 +84,13 @@ function Login() {
 
     useEffect(() => {
         if (access && user) {
-            if (params.has('return')) {
+            // A forced password reset gates everything, including a return URL.
+            if (mustChangePassword(user)) {
+                router.replace(AUTH_ROUTES.changePassword);
+            } else if (params.has('return')) {
                 router.replace(params.get('return')!);
             } else {
-                router.replace('/dashboard');
+                router.replace(landingPath(user));
             }
         }
     }, [access, router, user, params]);

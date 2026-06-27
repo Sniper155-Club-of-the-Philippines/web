@@ -48,6 +48,20 @@ describe('auth api', () => {
         expect(http.get).toHaveBeenCalledWith('/v1/auth/logout');
     });
 
+    it('changePassword posts the payload and returns the user', async () => {
+        http.post.mockResolvedValue({
+            data: { user: { id: '1', force_password_change: false } },
+        });
+        const payload = {
+            current_password: 'old',
+            password: 'new',
+            password_confirmation: 'new',
+        };
+        const data = await auth.changePassword(http, payload);
+        expect(http.post).toHaveBeenCalledWith('/v1/profile/password', payload);
+        expect(data.user.force_password_change).toBe(false);
+    });
+
     it('designations maps to label/value options', async () => {
         http.get.mockResolvedValue({
             data: { designations: { a: 'Alpha', b: 'Bravo' } },
