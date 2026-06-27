@@ -1,7 +1,6 @@
 'use client';
 
-import { auth } from '@/api';
-import { accessAtom, userAtom } from '@/atoms/auth';
+import { userAtom } from '@/atoms/auth';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
 import {
@@ -13,37 +12,21 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { useHttp } from '@/hooks/http';
+import { useLogout } from '@/hooks/useLogout';
 import { hasAdminSideRole } from '@/lib/auth';
-import { useAtom } from 'jotai';
-import { RESET } from 'jotai/utils';
+import { useAtomValue } from 'jotai';
 import { LayoutDashboard, LogOut, UserRound } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 
 export default function MemberAccountMenu() {
-    const [user, setUser] = useAtom(userAtom);
-    const [, setAccess] = useAtom(accessAtom);
-    const http = useHttp();
-    const router = useRouter();
+    const user = useAtomValue(userAtom);
+    const logout = useLogout();
     const name = [user?.first_name, user?.last_name].filter(Boolean).join(' ');
     const initials = [user?.first_name, user?.last_name]
         .filter(Boolean)
         .map((part) => part?.charAt(0))
         .join('')
         .toUpperCase();
-
-    const logout = async () => {
-        try {
-            await auth.logout(http);
-        } catch (error) {
-            console.error(error);
-        } finally {
-            setUser(RESET);
-            setAccess(RESET);
-            router.push('/login');
-        }
-    };
 
     return (
         <DropdownMenu>

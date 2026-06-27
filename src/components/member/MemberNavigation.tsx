@@ -2,7 +2,13 @@
 
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
-import { House, ReceiptText, ShoppingBag, UserRound } from 'lucide-react';
+import {
+    House,
+    ReceiptText,
+    Settings,
+    ShoppingBag,
+    UserRound,
+} from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
@@ -11,6 +17,7 @@ const memberRoutes = [
     { label: 'Cart', href: '/member/cart', icon: ShoppingBag },
     { label: 'Orders', href: '/member/orders', icon: ReceiptText },
     { label: 'Profile', href: '/member/profile', icon: UserRound },
+    { label: 'Settings', href: '/member/settings', icon: Settings },
 ] as const;
 
 export default function MemberNavigation({

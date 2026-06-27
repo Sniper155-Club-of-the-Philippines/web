@@ -1,4 +1,3 @@
-import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
 import MemberIdentity from '@/components/member/MemberIdentity';
 import MemberPageHeader from '@/components/member/MemberPageHeader';
 import MemberProfileForm from '@/components/member/MemberProfileForm';
@@ -15,15 +14,16 @@ export default function MemberProfilePage() {
         <>
             <MemberPageHeader
                 title='Profile'
-                description='Manage store recipient names and account security.'
+                description='Your membership details and the names printed on your merchandise.'
             />
 
             <div className='grid items-start gap-6 lg:grid-cols-2'>
                 <Card>
                     <CardHeader>
-                        <CardTitle>Member identity</CardTitle>
+                        <CardTitle>Membership</CardTitle>
                         <CardDescription>
-                            Club records are managed by an administrator.
+                            Managed by club administrators. Contact them to
+                            correct anything here.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -33,9 +33,10 @@ export default function MemberProfilePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Store recipients</CardTitle>
+                        <CardTitle>Order nicknames</CardTitle>
                         <CardDescription>
-                            These names are copied into cart and order records.
+                            The rider and OBR names printed on the items you
+                            order.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>
@@ -43,18 +44,6 @@ export default function MemberProfilePage() {
                     </CardContent>
                 </Card>
             </div>
-
-            <Card className='max-w-2xl'>
-                <CardHeader>
-                    <CardTitle>Password</CardTitle>
-                    <CardDescription>
-                        Change your password after confirming the current one.
-                    </CardDescription>
-                </CardHeader>
-                <CardContent>
-                    <ChangePasswordForm />
-                </CardContent>
-            </Card>
         </>
     );
 }
