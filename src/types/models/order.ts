@@ -12,6 +12,18 @@ export type OrderStatus =
     | 'ready_for_shipment'
     | 'completed';
 
+export type OrderHistoryType = 'order_status' | 'payment_status' | 'void';
+
+export interface OrderStatusHistory {
+    id: string;
+    type: OrderHistoryType;
+    admin_id: string | null;
+    old_value: string | null;
+    new_value: string | null;
+    remarks: string | null;
+    created_at: string | null;
+}
+
 export interface OrderItem {
     id: string;
     product_id: string | null;
@@ -36,7 +48,11 @@ export interface Order {
     payment_ref_no: string | null;
     paid_amount: number | null;
     proof_submitted_at: string | null;
+    reject_reason: string | null;
+    voided_at: string | null;
+    created_at: string | null;
     items?: OrderItem[];
+    histories?: OrderStatusHistory[];
 }
 
 export interface ProofPayload {
