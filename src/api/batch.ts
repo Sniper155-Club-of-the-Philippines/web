@@ -57,3 +57,10 @@ export async function updateProduct(
     );
     return data.batch_product;
 }
+
+export async function exportBatch(http: AxiosInstance, id: string) {
+    const { data } = await http.get<Blob>(`/v1/batches/${id}/export`, {
+        responseType: 'blob',
+    });
+    return data;
+}

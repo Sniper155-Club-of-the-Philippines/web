@@ -1,6 +1,7 @@
 'use client';
 
 import { batch, product } from '@/api';
+import { userAtom } from '@/atoms/auth';
 import { AdminPage } from '@/components/admin/AdminPage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -9,8 +10,11 @@ import { Input } from '@/components/ui/input';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
 import { centavosToPesos, pesosToCentavos } from '@/lib/money';
+import { hasPermission } from '@/lib/permissions';
 import type { BatchProduct, Product } from '@/types/models/store';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { useAtomValue } from 'jotai';
+import { Download, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
@@ -192,6 +196,7 @@ function ProductOverride({
 export default function BatchProductsPage() {
     const { id } = useParams<{ id: string }>();
     const http = useHttp();
+    const user = useAtomValue(userAtom);
     const batchQuery = useQuery({
         queryKey: ['batch', id],
         queryFn: () => batch.show(http, id),
@@ -200,6 +205,22 @@ export default function BatchProductsPage() {
         queryKey: ['products'],
         queryFn: () => product.all(http),
     });
+    const exportOrders = useMutation({
+        mutationFn: () => batch.exportBatch(http, id),
+        onSuccess: (blob) => {
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `batch-${batchQuery.data?.sequence ?? id}-orders.xlsx`;
+            document.body.append(link);
+            link.click();
+            link.remove();
+            window.setTimeout(() => URL.revokeObjectURL(url), 0);
+        },
+        onError: (error) =>
+            toast.error(apiError(error, 'Could not export this batch.')),
+    });
+    const canExport = hasPermission(user, 'exports.run');
     const overrides = new Map(
         batchQuery.data?.batch_products?.map((item) => [item.product_id, item]),
     );
@@ -209,9 +230,32 @@ export default function BatchProductsPage() {
             title={batchQuery.data?.name ?? 'Batch products'}
             description='Set the price, sizes, eligibility, and limits for each catalog product in this batch.'
             action={
-                <Button asChild variant='outline'>
-                    <Link href='/dashboard/store/batches'>Back to batches</Link>
-                </Button>
+                <div className='flex flex-wrap gap-2'>
+                    {canExport && (
+                        <Button
+                            variant='outline'
+                            disabled={exportOrders.isPending}
+                            onClick={() => exportOrders.mutate()}
+                        >
+                            {exportOrders.isPending ? (
+                                <LoaderCircle
+                                    data-icon='inline-start'
+                                    className='animate-spin motion-reduce:animate-none'
+                                />
+                            ) : (
+                                <Download data-icon='inline-start' />
+                            )}
+                            {exportOrders.isPending
+                                ? 'Exporting…'
+                                : 'Export orders'}
+                        </Button>
+                    )}
+                    <Button asChild variant='outline'>
+                        <Link href='/dashboard/store/batches'>
+                            Back to batches
+                        </Link>
+                    </Button>
+                </div>
             }
         >
             <div className='overflow-hidden rounded-lg border'>

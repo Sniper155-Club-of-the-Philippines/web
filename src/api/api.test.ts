@@ -2,6 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AxiosInstance } from 'axios';
 import * as adminOrder from './admin-order';
 import * as auth from './auth';
+import * as batch from './batch';
 import * as chapter from './chapter';
 import * as event from './event';
 import * as forgotPassword from './forgot-password';
@@ -534,7 +535,9 @@ describe('order api', () => {
 
 describe('admin order api', () => {
     it('list passes filters and returns the paginated payload', async () => {
-        http.get.mockResolvedValue({ data: { data: [{ id: 'o1' }], total: 1 } });
+        http.get.mockResolvedValue({
+            data: { data: [{ id: 'o1' }], total: 1 },
+        });
         const page = await adminOrder.list(http, { search: 'Maverick' });
         expect(page).toEqual({ data: [{ id: 'o1' }], total: 1 });
         expect(http.get).toHaveBeenCalledWith('/v1/admin/orders', {
@@ -558,7 +561,11 @@ describe('admin order api', () => {
 
     it('bulkStatus posts ids and returns the changed count', async () => {
         http.post.mockResolvedValue({ data: { changed: 2 } });
-        const changed = await adminOrder.bulkStatus(http, ['o1', 'o2'], 'completed');
+        const changed = await adminOrder.bulkStatus(
+            http,
+            ['o1', 'o2'],
+            'completed',
+        );
         expect(changed).toBe(2);
         expect(http.post).toHaveBeenCalledWith('/v1/admin/orders/bulk-status', {
             order_ids: ['o1', 'o2'],
@@ -585,6 +592,18 @@ describe('admin order api', () => {
         await adminOrder.updateItems(http, 'o1', [{ id: 'i1', quantity: 2 }]);
         expect(http.patch).toHaveBeenCalledWith('/v1/admin/orders/o1/items', {
             items: [{ id: 'i1', quantity: 2 }],
+        });
+    });
+});
+
+describe('batch export', () => {
+    it('exportBatch fetches the workbook as a blob', async () => {
+        const blob = new Blob(['xlsx']);
+        http.get.mockResolvedValue({ data: blob });
+
+        expect(await batch.exportBatch(http, 'b1')).toBe(blob);
+        expect(http.get).toHaveBeenCalledWith('/v1/batches/b1/export', {
+            responseType: 'blob',
         });
     });
 });
