@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 export default function MemberHeader() {
     return (
-        <header className='bg-background sticky top-0 border-b'>
+        <header className='bg-background sticky top-0 z-40 border-b'>
             <div className='mx-auto flex h-16 w-full max-w-6xl items-center gap-4 px-4 sm:px-6'>
                 <Link
                     href='/member'
