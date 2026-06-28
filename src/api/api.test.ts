@@ -506,4 +506,27 @@ describe('order api', () => {
         expect(await order.proofUrl(http, 'o1')).toBe('https://signed');
         expect(http.get).toHaveBeenCalledWith('/v1/orders/o1/proof');
     });
+
+    it('approvePayment posts to the approve route', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        expect(await order.approvePayment(http, 'o1')).toEqual({ id: 'o1' });
+        expect(http.post).toHaveBeenCalledWith('/v1/orders/o1/payment/approve');
+    });
+
+    it('rejectPayment posts the reason when given', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        await order.rejectPayment(http, 'o1', 'Blurry');
+        expect(http.post).toHaveBeenCalledWith('/v1/orders/o1/payment/reject', {
+            reject_reason: 'Blurry',
+        });
+    });
+
+    it('rejectPayment posts an empty body without a reason', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        await order.rejectPayment(http, 'o1');
+        expect(http.post).toHaveBeenCalledWith(
+            '/v1/orders/o1/payment/reject',
+            {},
+        );
+    });
 });

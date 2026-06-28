@@ -47,3 +47,22 @@ export async function proofUrl(http: AxiosInstance, id: string) {
     const { data } = await http.get<{ url: string }>(`/v1/orders/${id}/proof`);
     return data.url;
 }
+
+export async function approvePayment(http: AxiosInstance, id: string) {
+    const { data } = await http.post<{ order: Order }>(
+        `/v1/orders/${id}/payment/approve`,
+    );
+    return data.order;
+}
+
+export async function rejectPayment(
+    http: AxiosInstance,
+    id: string,
+    rejectReason?: string,
+) {
+    const { data } = await http.post<{ order: Order }>(
+        `/v1/orders/${id}/payment/reject`,
+        rejectReason ? { reject_reason: rejectReason } : {},
+    );
+    return data.order;
+}
