@@ -13,8 +13,8 @@ export interface OrderItemEdit {
  * client-side, so there are no query params and no pagination.
  */
 export async function list(http: AxiosInstance) {
-    const { data } = await http.get<{ orders: Order[] }>('/v1/admin/orders');
-    return data.orders;
+    const { data } = await http.get<{ orders?: Order[] }>('/v1/admin/orders');
+    return data.orders ?? [];
 }
 
 export async function get(http: AxiosInstance, id: string) {

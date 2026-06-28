@@ -541,6 +541,12 @@ describe('admin order api', () => {
         expect(http.get).toHaveBeenCalledWith('/v1/admin/orders');
     });
 
+    it('list returns an empty array when orders are absent', async () => {
+        http.get.mockResolvedValue({ data: {} });
+
+        expect(await adminOrder.list(http)).toEqual([]);
+    });
+
     it('get returns a single order', async () => {
         http.get.mockResolvedValue({ data: { order: { id: 'o1' } } });
         expect(await adminOrder.get(http, 'o1')).toEqual({ id: 'o1' });
