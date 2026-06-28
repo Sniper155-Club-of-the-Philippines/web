@@ -4,6 +4,12 @@ import { adminOrder, order as orderApi } from '@/api';
 import { AdminPage } from '@/components/admin/AdminPage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import {
+    Dialog,
+    DialogContent,
+    DialogHeader,
+    DialogTitle,
+} from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import {
     Select,
@@ -31,6 +37,7 @@ import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
+import dayjs from 'dayjs';
 
 export default function AdminOrderDetailPage() {
     const http = useHttp();
@@ -40,6 +47,7 @@ export default function AdminOrderDetailPage() {
     const [rejectReason, setRejectReason] = useState('');
     const [status, setStatus] = useState<string>('');
     const [edits, setEdits] = useState<Record<string, OrderItemEdit>>({});
+    const [proofUrl, setProofUrl] = useState<string | null>(null);
 
     const query = useQuery({
         queryKey: ['admin-order', id],
@@ -62,7 +70,8 @@ export default function AdminOrderDetailPage() {
     });
 
     const reject = useMutation({
-        mutationFn: () => orderApi.rejectPayment(http, id, rejectReason || undefined),
+        mutationFn: () =>
+            orderApi.rejectPayment(http, id, rejectReason || undefined),
         onSuccess: async () => {
             await refresh();
             setRejectReason('');
@@ -72,12 +81,14 @@ export default function AdminOrderDetailPage() {
     });
 
     const setOrderStatus = useMutation({
-        mutationFn: () => adminOrder.updateStatus(http, id, status as OrderStatus),
+        mutationFn: () =>
+            adminOrder.updateStatus(http, id, status as OrderStatus),
         onSuccess: async () => {
             await refresh();
             toast.success('Status updated');
         },
-        onError: (error) => toast.error(apiError(error, 'Could not update status')),
+        onError: (error) =>
+            toast.error(apiError(error, 'Could not update status')),
     });
 
     const voidOrder = useMutation({
@@ -90,19 +101,21 @@ export default function AdminOrderDetailPage() {
     });
 
     const saveLines = useMutation({
-        mutationFn: () => adminOrder.updateItems(http, id, Object.values(edits)),
+        mutationFn: () =>
+            adminOrder.updateItems(http, id, Object.values(edits)),
         onSuccess: async () => {
             await refresh();
             setEdits({});
             toast.success('Lines updated');
         },
-        onError: (error) => toast.error(apiError(error, 'Could not update lines')),
+        onError: (error) =>
+            toast.error(apiError(error, 'Could not update lines')),
     });
 
     const viewProof = async () => {
         try {
             const url = await orderApi.proofUrl(http, id);
-            window.open(url, '_blank', 'noopener');
+            setProofUrl(url);
         } catch (error) {
             toast.error(apiError(error, 'No proof to view'));
         }
@@ -116,7 +129,10 @@ export default function AdminOrderDetailPage() {
 
     if (query.isLoading || !current) {
         return (
-            <AdminPage title='Order' description='Review and manage this order.'>
+            <AdminPage
+                title='Order'
+                description='Review and manage this order.'
+            >
                 <Skeleton className='h-64 w-full' />
             </AdminPage>
         );
@@ -171,7 +187,10 @@ export default function AdminOrderDetailPage() {
                 <div className='flex flex-wrap gap-3'>
                     <Button
                         onClick={() => approve.mutate()}
-                        disabled={approve.isPending || current.payment_status === 'approved'}
+                        disabled={
+                            approve.isPending ||
+                            current.payment_status === 'approved'
+                        }
                     >
                         Approve payment
                     </Button>
@@ -181,7 +200,9 @@ export default function AdminOrderDetailPage() {
                         <Textarea
                             placeholder='Reason (optional) shown to the member'
                             value={rejectReason}
-                            onChange={(event) => setRejectReason(event.target.value)}
+                            onChange={(event) =>
+                                setRejectReason(event.target.value)
+                            }
                         />
                         <Button
                             variant='destructive'
@@ -206,12 +227,16 @@ export default function AdminOrderDetailPage() {
                             key={item.id}
                             className='grid items-center gap-2 sm:grid-cols-[1fr_5rem_6rem_auto]'
                         >
-                            <span className='font-medium'>{item.product_name}</span>
+                            <span className='font-medium'>
+                                {item.product_name}
+                            </span>
                             <Input
                                 defaultValue={item.size}
                                 aria-label='Size'
                                 onChange={(event) =>
-                                    editItem(item.id, { size: event.target.value })
+                                    editItem(item.id, {
+                                        size: event.target.value,
+                                    })
                                 }
                             />
                             <Input
@@ -240,7 +265,9 @@ export default function AdminOrderDetailPage() {
                 <Button
                     className='w-fit'
                     variant='outline'
-                    disabled={Object.keys(edits).length === 0 || saveLines.isPending}
+                    disabled={
+                        Object.keys(edits).length === 0 || saveLines.isPending
+                    }
                     onClick={() => saveLines.mutate()}
                 >
                     Save line changes
@@ -250,14 +277,19 @@ export default function AdminOrderDetailPage() {
             {/* Status + void */}
             <section className='bg-card flex flex-wrap items-end gap-3 rounded-lg border p-5'>
                 <div className='flex flex-col gap-2'>
-                    <span className='text-sm font-medium'>Fulfillment status</span>
+                    <span className='text-sm font-medium'>
+                        Fulfillment status
+                    </span>
                     <Select value={status} onValueChange={setStatus}>
                         <SelectTrigger className='w-56'>
                             <SelectValue placeholder='Set status…' />
                         </SelectTrigger>
                         <SelectContent>
                             {orderStatuses.map((option) => (
-                                <SelectItem key={option.value} value={option.value}>
+                                <SelectItem
+                                    key={option.value}
+                                    value={option.value}
+                                >
                                     {option.label}
                                 </SelectItem>
                             ))}
@@ -296,7 +328,9 @@ export default function AdminOrderDetailPage() {
                                     </span>
                                     {entry.created_at && (
                                         <span className='text-muted-foreground text-xs'>
-                                            {new Date(entry.created_at).toLocaleString()}
+                                            {dayjs(entry.created_at).format(
+                                                'MM/DD/YYYY hh:mm A',
+                                            )}
                                         </span>
                                     )}
                                 </div>
@@ -305,6 +339,27 @@ export default function AdminOrderDetailPage() {
                     </ol>
                 </section>
             )}
+
+            <Dialog
+                open={proofUrl !== null}
+                onOpenChange={(open) => !open && setProofUrl(null)}
+            >
+                <DialogContent className='sm:max-w-2xl'>
+                    <DialogHeader>
+                        <DialogTitle>Payment proof</DialogTitle>
+                    </DialogHeader>
+                    {proofUrl && (
+                        // Signed, short-lived URL from a private disk; a plain
+                        // img avoids next/image remote-host configuration.
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                            src={proofUrl}
+                            alt='Payment proof'
+                            className='max-h-[70vh] w-full rounded-md object-contain'
+                        />
+                    )}
+                </DialogContent>
+            </Dialog>
         </AdminPage>
     );
 }
