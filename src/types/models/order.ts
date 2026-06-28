@@ -58,6 +58,11 @@ export interface Order {
         first_name: string;
         last_name: string;
         club_number: string | null;
+        chapter_id: string | null;
+        chapter?: {
+            id: string;
+            name: string;
+        } | null;
     };
 }
 

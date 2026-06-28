@@ -8,6 +8,7 @@ import {
 } from '@/components/admin/AdminPage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import MultiSelect from '@/components/base/inputs/MultiSelect';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import {
@@ -59,6 +60,7 @@ export default function AdminOrdersPage() {
     const [paymentStatus, setPaymentStatus] = useState<string>(ALL);
     const [orderStatus, setOrderStatus] = useState<string>(ALL);
     const [batchId, setBatchId] = useState<string>(ALL);
+    const [chapterIds, setChapterIds] = useState<string[]>([]);
     const [selected, setSelected] = useState<string[]>([]);
     const [bulkStatus, setBulkStatus] = useState<string>('');
 
@@ -75,6 +77,19 @@ export default function AdminOrdersPage() {
     // Only active batches in the filter so it does not get cluttered with
     // long-closed ordering periods.
     const activeBatches = (batchesQuery.data ?? []).filter((b) => b.is_active);
+
+    // Chapters are derived from the loaded orders so managers can bulk-update a
+    // chapter or group of chapters without another request.
+    const chapterOptions = useMemo(() => {
+        const seen = new Map<string, string>();
+        for (const order of orders) {
+            const chapter = order.user?.chapter;
+            if (chapter) seen.set(chapter.id, chapter.name);
+        }
+        return [...seen.entries()]
+            .map(([value, label]) => ({ value, label }))
+            .sort((a, b) => a.label.localeCompare(b.label));
+    }, [orders]);
 
     // Client-side fuzzy search keeps the order list to a single API request.
     const fuse = useMemo(
@@ -103,9 +118,12 @@ export default function AdminOrdersPage() {
                 (paymentStatus === ALL ||
                     order.payment_status === paymentStatus) &&
                 (orderStatus === ALL || order.order_status === orderStatus) &&
-                (batchId === ALL || order.batch_id === batchId),
+                (batchId === ALL || order.batch_id === batchId) &&
+                (chapterIds.length === 0 ||
+                    (order.user?.chapter_id != null &&
+                        chapterIds.includes(order.user.chapter_id))),
         );
-    }, [orders, fuse, search, paymentStatus, orderStatus, batchId]);
+    }, [orders, fuse, search, paymentStatus, orderStatus, batchId, chapterIds]);
 
     const invalidate = () =>
         queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
@@ -207,6 +225,21 @@ export default function AdminOrdersPage() {
                             ))}
                         </SelectContent>
                     </Select>
+                    {chapterOptions.length > 0 && (
+                        <div className='w-full md:w-56'>
+                            <MultiSelect
+                                value={chapterIds}
+                                onChange={(event) => {
+                                    const value = event.target.value;
+                                    setChapterIds(
+                                        Array.isArray(value) ? value : [value],
+                                    );
+                                }}
+                                options={chapterOptions}
+                                placeholder='All chapters'
+                            />
+                        </div>
+                    )}
                 </div>
 
                 {selected.length > 0 && (
