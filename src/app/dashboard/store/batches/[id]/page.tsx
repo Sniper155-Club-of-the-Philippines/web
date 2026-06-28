@@ -20,7 +20,7 @@ import { useParams } from 'next/navigation';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
-const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL'];
+const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
 
 type OverrideInputs = {
     price: string;
