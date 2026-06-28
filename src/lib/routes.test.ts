@@ -26,11 +26,14 @@ describe('route sections', () => {
         ]);
     });
 
-    it('exposes the merchandise sub-routes starting with orders', () => {
-        const config = store.routes[0];
-        expect(config.url).toBe('/dashboard/store');
+    it('separates orders from configuration in the merchandise menu', () => {
+        const orders = store.routes[0];
+        expect(orders.title).toBe('Orders');
+        expect(orders.url).toBe('/dashboard/store/orders');
+
+        const config = store.routes[1];
+        expect(config.title).toBe('Configuration');
         expect(config.items?.map((i) => i.url)).toEqual([
-            '/dashboard/store/orders',
             '/dashboard/store/settings',
             '/dashboard/store/batches',
             '/dashboard/store/products',

@@ -1,6 +1,7 @@
 import { RouteSection } from '@/types/routes';
 import {
     BadgeCheck,
+    ClipboardList,
     IdCard,
     LayoutDashboard,
     ShoppingBag,
@@ -122,15 +123,22 @@ export const store: RouteSection = {
     title: 'Merchandise',
     routes: [
         {
+            title: 'Orders',
+            url: '/dashboard/store/orders',
+            icon: ClipboardList,
+            items: [
+                {
+                    title: 'All Orders',
+                    url: '/dashboard/store/orders',
+                    permission: 'orders.viewAny',
+                },
+            ],
+        },
+        {
             title: 'Configuration',
             url: '/dashboard/store',
             icon: ShoppingBag,
             items: [
-                {
-                    title: 'Orders',
-                    url: '/dashboard/store/orders',
-                    permission: 'orders.viewAny',
-                },
                 {
                     title: 'Settings',
                     url: '/dashboard/store/settings',
