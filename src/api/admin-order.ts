@@ -1,18 +1,5 @@
 import type { AxiosInstance } from 'axios';
 import type { Order, OrderStatus } from '@/types/models/order';
-import type { Paginated } from '@/types/pagination';
-
-export interface OrderListParams {
-    order_status?: OrderStatus;
-    payment_status?: string;
-    batch_id?: string;
-    product_id?: string;
-    search?: string;
-    sort?: string;
-    direction?: 'asc' | 'desc';
-    per_page?: number;
-    page?: number;
-}
 
 export interface OrderItemEdit {
     id: string;
@@ -21,11 +8,13 @@ export interface OrderItemEdit {
     quantity?: number;
 }
 
-export async function list(http: AxiosInstance, params: OrderListParams = {}) {
-    const { data } = await http.get<Paginated<Order>>('/v1/admin/orders', {
-        params,
-    });
-    return data;
+/**
+ * Every order in one request. Search, status, and batch filtering all happen
+ * client-side, so there are no query params and no pagination.
+ */
+export async function list(http: AxiosInstance) {
+    const { data } = await http.get<{ orders: Order[] }>('/v1/admin/orders');
+    return data.orders;
 }
 
 export async function get(http: AxiosInstance, id: string) {
