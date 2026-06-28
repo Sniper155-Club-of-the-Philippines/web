@@ -150,17 +150,18 @@ export default function AdminOrdersPage() {
             description='Search, review, and update member orders.'
         >
             <div className='flex flex-col gap-3'>
-                <div className='grid gap-2 sm:grid-cols-2 lg:grid-cols-4'>
+                <div className='grid gap-2 grid-cols-2 lg:grid-cols-4 md:flex'>
                     <Input
                         placeholder='Search order #, member, nickname…'
                         value={search}
                         onChange={(event) => setSearch(event.target.value)}
+                        className='w-full md:w-96'
                     />
                     <Select
                         value={paymentStatus}
                         onValueChange={setPaymentStatus}
                     >
-                        <SelectTrigger>
+                        <SelectTrigger className='w-full md:w-48'>
                             <SelectValue placeholder='Payment' />
                         </SelectTrigger>
                         <SelectContent>
@@ -176,7 +177,7 @@ export default function AdminOrdersPage() {
                         </SelectContent>
                     </Select>
                     <Select value={orderStatus} onValueChange={setOrderStatus}>
-                        <SelectTrigger>
+                        <SelectTrigger className='w-full md:w-48'>
                             <SelectValue placeholder='Status' />
                         </SelectTrigger>
                         <SelectContent>
@@ -192,7 +193,7 @@ export default function AdminOrdersPage() {
                         </SelectContent>
                     </Select>
                     <Select value={batchId} onValueChange={setBatchId}>
-                        <SelectTrigger>
+                        <SelectTrigger className='w-full md:w-48'>
                             <SelectValue placeholder='Batch' />
                         </SelectTrigger>
                         <SelectContent>
