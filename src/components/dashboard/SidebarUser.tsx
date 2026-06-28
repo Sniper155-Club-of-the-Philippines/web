@@ -122,7 +122,7 @@ export default function SidebarUser() {
                                 <DropdownMenuItem asChild>
                                     <Link href='/member'>
                                         <ShoppingBag />
-                                        Go to Store
+                                        Go to Member Portal
                                     </Link>
                                 </DropdownMenuItem>
                             )}

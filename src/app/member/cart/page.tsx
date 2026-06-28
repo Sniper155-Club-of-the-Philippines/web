@@ -97,9 +97,11 @@ export default function MemberCartPage() {
                     <Store />
                     <AlertTitle>Your cart is empty</AlertTitle>
                     <AlertDescription>
-                        <span>Browse the store to add merchandise.</span>
+                        <span>Browse merchandise to add items.</span>
                         <Button asChild size='sm' className='mt-2 w-fit'>
-                            <Link href='/member'>Go to store</Link>
+                            <Link href='/member/merchandise'>
+                                Browse merchandise
+                            </Link>
                         </Button>
                     </AlertDescription>
                 </Alert>

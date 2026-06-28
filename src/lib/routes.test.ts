@@ -20,9 +20,21 @@ describe('route sections', () => {
         expect(routes.map((s) => s.title)).toEqual([
             'Administration',
             'Management',
-            'Store',
+            'Merchandise',
             'Access',
             'Identification',
+        ]);
+    });
+
+    it('exposes the merchandise sub-routes starting with orders', () => {
+        const config = store.routes[0];
+        expect(config.url).toBe('/dashboard/store');
+        expect(config.items?.map((i) => i.url)).toEqual([
+            '/dashboard/store/orders',
+            '/dashboard/store/settings',
+            '/dashboard/store/batches',
+            '/dashboard/store/products',
+            '/dashboard/store/payment-methods',
         ]);
     });
 

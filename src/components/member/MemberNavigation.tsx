@@ -7,13 +7,15 @@ import {
     ReceiptText,
     Settings,
     ShoppingBag,
+    Store,
     UserRound,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 
 const memberRoutes = [
-    { label: 'Store', href: '/member', icon: House, exact: true },
+    { label: 'Home', href: '/member', icon: House, exact: true },
+    { label: 'Merchandise', href: '/member/merchandise', icon: Store },
     { label: 'Cart', href: '/member/cart', icon: ShoppingBag },
     { label: 'Orders', href: '/member/orders', icon: ReceiptText },
     { label: 'Profile', href: '/member/profile', icon: UserRound },

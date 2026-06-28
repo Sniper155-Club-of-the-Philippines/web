@@ -13,7 +13,7 @@ export default function MemberHeader() {
                 >
                     <Logo />
                     <span className='truncate font-semibold'>
-                        S155CP Merchandise
+                        S155CP Member Portal
                     </span>
                 </Link>
                 <div className='ml-auto hidden md:block'>

@@ -119,13 +119,18 @@ export const identification: RouteSection = {
 };
 
 export const store: RouteSection = {
-    title: 'Store',
+    title: 'Merchandise',
     routes: [
         {
             title: 'Configuration',
             url: '/dashboard/store',
             icon: ShoppingBag,
             items: [
+                {
+                    title: 'Orders',
+                    url: '/dashboard/store/orders',
+                    permission: 'orders.viewAny',
+                },
                 {
                     title: 'Settings',
                     url: '/dashboard/store/settings',
