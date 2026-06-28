@@ -18,31 +18,41 @@ export interface DateTimePickerProps {
     value?: Date; // Controlled value
     defaultValue?: Date; // Uncontrolled initial value
     onChange?: (date: Date | undefined) => void; // Change callback
+    onBlur?: () => void;
     placeholder?: string;
     formatString?: string; // e.g. "MM/DD/YYYY hh:mm A"
     className?: string; // for custom styling
     disabled?: boolean;
+    id?: string;
+    name?: string;
+    'aria-invalid'?: boolean;
 }
 
-export default function DateTimePicker({
-    value,
-    defaultValue,
-    onChange,
-    placeholder = 'Select Date and Time',
-    formatString = 'MM/DD/YYYY hh:mm A',
-    className,
-    disabled = false,
-}: DateTimePickerProps) {
+export default function DateTimePicker(props: DateTimePickerProps) {
+    const {
+        value,
+        defaultValue,
+        onChange,
+        onBlur,
+        placeholder = 'Select Date and Time',
+        formatString = 'MM/DD/YYYY hh:mm A',
+        className,
+        disabled = false,
+        id,
+        name,
+        'aria-invalid': ariaInvalid,
+    } = props;
     const [internalDate, setInternalDate] = useState<Date | undefined>(
         defaultValue
     );
     const [isOpen, setIsOpen] = useState(false);
+    const isControlled = Object.prototype.hasOwnProperty.call(props, 'value');
 
-    const date = value ?? internalDate; // controlled if value provided
+    const date = isControlled ? value : internalDate;
 
     const updateDate = (newDate: Date | undefined) => {
         if (disabled) return;
-        if (!value) {
+        if (!isControlled) {
             setInternalDate(newDate);
         }
         onChange?.(newDate);
@@ -103,8 +113,13 @@ export default function DateTimePicker({
         <Popover open={isOpen} onOpenChange={setIsOpen}>
             <PopoverTrigger asChild>
                 <Button
+                    id={id}
+                    name={name}
+                    type='button'
                     variant='outline'
                     disabled={disabled}
+                    aria-invalid={ariaInvalid}
+                    onBlur={onBlur}
                     className={cn(
                         'w-full justify-start text-left font-normal',
                         !date && 'text-muted-foreground',
@@ -134,6 +149,7 @@ export default function DateTimePicker({
                                         .map((hour) => (
                                             <Button
                                                 key={hour}
+                                                type='button'
                                                 size='icon'
                                                 disabled={disabled}
                                                 variant={
@@ -170,6 +186,7 @@ export default function DateTimePicker({
                                     ).map((minute) => (
                                         <Button
                                             key={minute}
+                                            type='button'
                                             size='icon'
                                             disabled={disabled}
                                             variant={
@@ -202,6 +219,7 @@ export default function DateTimePicker({
                                     {['AM', 'PM'].map((ampm) => (
                                         <Button
                                             key={ampm}
+                                            type='button'
                                             size='icon'
                                             disabled={disabled}
                                             variant={

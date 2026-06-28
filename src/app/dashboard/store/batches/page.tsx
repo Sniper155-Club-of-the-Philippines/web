@@ -7,6 +7,7 @@ import {
     TableLoading,
 } from '@/components/admin/AdminPage';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
+import DateTimePicker from '@/components/base/inputs/DateTimePicker';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -18,6 +19,12 @@ import {
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import {
+    Field,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import {
     Table,
@@ -35,7 +42,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import dayjs from 'dayjs';
 import Link from 'next/link';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
 
 type BatchInputs = {
@@ -61,7 +68,7 @@ export default function BatchesPage() {
     const queryClient = useQueryClient();
     const [open, setOpen] = useState(false);
     const [editing, setEditing] = useState<Batch | null>(null);
-    const { register, handleSubmit, reset, watch, setValue } =
+    const { control, register, handleSubmit, reset, watch, setValue } =
         useForm<BatchInputs>({ defaultValues: empty });
     const form = watch();
     const query = useQuery({
@@ -111,12 +118,8 @@ export default function BatchesPage() {
         reset({
             name: item.name,
             sequence: item.sequence,
-            ordering_start_at: dayjs(item.ordering_start_at).format(
-                'YYYY-MM-DDTHH:mm',
-            ),
-            ordering_end_at: dayjs(item.ordering_end_at).format(
-                'YYYY-MM-DDTHH:mm',
-            ),
+            ordering_start_at: item.ordering_start_at,
+            ordering_end_at: item.ordering_end_at,
             is_active: item.is_active,
             notes: item.notes ?? '',
         });
@@ -226,16 +229,22 @@ export default function BatchesPage() {
                                 UTC.
                             </DialogDescription>
                         </DialogHeader>
-                        <div className='grid gap-4 sm:grid-cols-2'>
-                            <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
-                                Name
+                        <FieldGroup className='grid gap-4 sm:grid-cols-2'>
+                            <Field className='sm:col-span-2'>
+                                <FieldLabel htmlFor='batch-name'>
+                                    Name
+                                </FieldLabel>
                                 <Input
+                                    id='batch-name'
                                     {...register('name', { required: true })}
                                 />
-                            </label>
-                            <label className='grid gap-2 text-sm font-medium'>
-                                Sequence
+                            </Field>
+                            <Field>
+                                <FieldLabel htmlFor='batch-sequence'>
+                                    Sequence
+                                </FieldLabel>
                                 <Input
+                                    id='batch-sequence'
                                     min={1}
                                     type='number'
                                     {...register('sequence', {
@@ -243,37 +252,100 @@ export default function BatchesPage() {
                                         valueAsNumber: true,
                                     })}
                                 />
-                            </label>
-                            <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
+                            </Field>
+                            <Field
+                                orientation='horizontal'
+                                className='items-end pb-2'
+                            >
                                 <Checkbox
+                                    id='batch-active'
                                     checked={form.is_active}
                                     onCheckedChange={(v) =>
                                         setValue('is_active', v === true)
                                     }
-                                />{' '}
-                                Active batch
-                            </label>
-                            <label className='grid gap-2 text-sm font-medium'>
-                                Ordering starts
-                                <Input
-                                    required
-                                    type='datetime-local'
-                                    {...register('ordering_start_at')}
                                 />
-                            </label>
-                            <label className='grid gap-2 text-sm font-medium'>
-                                Ordering ends
-                                <Input
-                                    required
-                                    type='datetime-local'
-                                    {...register('ordering_end_at')}
+                                <FieldLabel htmlFor='batch-active'>
+                                    Active batch
+                                </FieldLabel>
+                            </Field>
+                            <Controller
+                                control={control}
+                                name='ordering_start_at'
+                                rules={{
+                                    required: 'Select an ordering start.',
+                                }}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel htmlFor='batch-ordering-start'>
+                                            Ordering starts
+                                        </FieldLabel>
+                                        <DateTimePicker
+                                            id='batch-ordering-start'
+                                            name={field.name}
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : undefined
+                                            }
+                                            onChange={(value) =>
+                                                field.onChange(
+                                                    value?.toISOString() ?? '',
+                                                )
+                                            }
+                                            onBlur={field.onBlur}
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder='Select start date and time'
+                                        />
+                                        <FieldError
+                                            errors={[fieldState.error]}
+                                        />
+                                    </Field>
+                                )}
+                            />
+                            <Controller
+                                control={control}
+                                name='ordering_end_at'
+                                rules={{
+                                    required: 'Select an ordering end.',
+                                }}
+                                render={({ field, fieldState }) => (
+                                    <Field data-invalid={fieldState.invalid}>
+                                        <FieldLabel htmlFor='batch-ordering-end'>
+                                            Ordering ends
+                                        </FieldLabel>
+                                        <DateTimePicker
+                                            id='batch-ordering-end'
+                                            name={field.name}
+                                            value={
+                                                field.value
+                                                    ? new Date(field.value)
+                                                    : undefined
+                                            }
+                                            onChange={(value) =>
+                                                field.onChange(
+                                                    value?.toISOString() ?? '',
+                                                )
+                                            }
+                                            onBlur={field.onBlur}
+                                            aria-invalid={fieldState.invalid}
+                                            placeholder='Select end date and time'
+                                        />
+                                        <FieldError
+                                            errors={[fieldState.error]}
+                                        />
+                                    </Field>
+                                )}
+                            />
+                            <Field className='sm:col-span-2'>
+                                <FieldLabel htmlFor='batch-notes'>
+                                    Notes
+                                </FieldLabel>
+                                <Textarea
+                                    id='batch-notes'
+                                    {...register('notes')}
                                 />
-                            </label>
-                            <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
-                                Notes
-                                <Textarea {...register('notes')} />
-                            </label>
-                        </div>
+                            </Field>
+                        </FieldGroup>
                         <DialogFooter>
                             <Button
                                 type='button'
