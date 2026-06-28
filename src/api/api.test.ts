@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AxiosInstance } from 'axios';
+import * as adminOrder from './admin-order';
 import * as auth from './auth';
 import * as chapter from './chapter';
 import * as event from './event';
@@ -528,5 +529,62 @@ describe('order api', () => {
             '/v1/orders/o1/payment/reject',
             {},
         );
+    });
+});
+
+describe('admin order api', () => {
+    it('list passes filters and returns the paginated payload', async () => {
+        http.get.mockResolvedValue({ data: { data: [{ id: 'o1' }], total: 1 } });
+        const page = await adminOrder.list(http, { search: 'Maverick' });
+        expect(page).toEqual({ data: [{ id: 'o1' }], total: 1 });
+        expect(http.get).toHaveBeenCalledWith('/v1/admin/orders', {
+            params: { search: 'Maverick' },
+        });
+    });
+
+    it('get returns a single order', async () => {
+        http.get.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        expect(await adminOrder.get(http, 'o1')).toEqual({ id: 'o1' });
+        expect(http.get).toHaveBeenCalledWith('/v1/admin/orders/o1');
+    });
+
+    it('updateStatus patches the status route', async () => {
+        http.patch.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        await adminOrder.updateStatus(http, 'o1', 'completed');
+        expect(http.patch).toHaveBeenCalledWith('/v1/admin/orders/o1/status', {
+            order_status: 'completed',
+        });
+    });
+
+    it('bulkStatus posts ids and returns the changed count', async () => {
+        http.post.mockResolvedValue({ data: { changed: 2 } });
+        const changed = await adminOrder.bulkStatus(http, ['o1', 'o2'], 'completed');
+        expect(changed).toBe(2);
+        expect(http.post).toHaveBeenCalledWith('/v1/admin/orders/bulk-status', {
+            order_ids: ['o1', 'o2'],
+            order_status: 'completed',
+        });
+    });
+
+    it('voidOrder posts the reason when given', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        await adminOrder.voidOrder(http, 'o1', 'Duplicate');
+        expect(http.post).toHaveBeenCalledWith('/v1/admin/orders/o1/void', {
+            void_reason: 'Duplicate',
+        });
+    });
+
+    it('voidOrder posts an empty body without a reason', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        await adminOrder.voidOrder(http, 'o1');
+        expect(http.post).toHaveBeenCalledWith('/v1/admin/orders/o1/void', {});
+    });
+
+    it('updateItems patches the items route', async () => {
+        http.patch.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        await adminOrder.updateItems(http, 'o1', [{ id: 'i1', quantity: 2 }]);
+        expect(http.patch).toHaveBeenCalledWith('/v1/admin/orders/o1/items', {
+            items: [{ id: 'i1', quantity: 2 }],
+        });
     });
 });

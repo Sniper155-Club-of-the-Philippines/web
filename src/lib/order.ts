@@ -53,6 +53,11 @@ export function paymentStatusVariant(status: PaymentStatus): BadgeVariant {
     return paymentVariants[status];
 }
 
+/** The pipeline stages, in fulfillment order, for admin status controls. */
+export const orderStatuses: { value: OrderStatus; label: string }[] = (
+    Object.keys(orderStatusLabels) as OrderStatus[]
+).map((value) => ({ value, label: orderStatusLabels[value] }));
+
 export function orderStatusLabel(status: OrderStatus | null): string {
     return status ? orderStatusLabels[status] : 'Awaiting payment';
 }

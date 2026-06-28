@@ -1,3 +1,4 @@
+export * as adminOrder from '@/api/admin-order';
 export * as auth from '@/api/auth';
 export * as batch from '@/api/batch';
 export * as cart from '@/api/cart';

@@ -53,6 +53,12 @@ export interface Order {
     created_at: string | null;
     items?: OrderItem[];
     histories?: OrderStatusHistory[];
+    user?: {
+        id: string;
+        first_name: string;
+        last_name: string;
+        club_number: string | null;
+    };
 }
 
 export interface ProofPayload {

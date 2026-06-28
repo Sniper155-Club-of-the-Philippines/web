@@ -4,6 +4,7 @@ import {
     canSubmitProof,
     canVoid,
     orderStatusLabel,
+    orderStatuses,
     orderTab,
     paymentStatusLabel,
     paymentStatusVariant,
@@ -64,6 +65,15 @@ describe('status labels', () => {
 
     it('labels a null order status as awaiting payment', () => {
         expect(orderStatusLabel(null)).toBe('Awaiting payment');
+    });
+
+    it('exposes the seven pipeline stages in order', () => {
+        expect(orderStatuses).toHaveLength(7);
+        expect(orderStatuses[0]).toEqual({
+            value: 'order_received',
+            label: 'Order received',
+        });
+        expect(orderStatuses[6].value).toBe('completed');
     });
 
     it('labels a known order status', () => {
