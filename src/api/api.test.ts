@@ -465,4 +465,45 @@ describe('order api', () => {
         expect(await order.voidOrder(http, 'o1')).toEqual({ id: 'o1' });
         expect(http.post).toHaveBeenCalledWith('/v1/orders/o1/void');
     });
+
+    it('submitProof posts multipart and returns the order', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        const proof = new File(['x'], 'proof.jpg', { type: 'image/jpeg' });
+
+        const result = await order.submitProof(http, 'o1', {
+            payment_method_id: 'pm1',
+            payment_ref_no: 'REF-9',
+            paid_amount: 12345,
+            proof,
+        });
+
+        expect(result).toEqual({ id: 'o1' });
+        const [url, body] = http.post.mock.calls[0];
+        expect(url).toBe('/v1/orders/o1/proof');
+        expect(body).toBeInstanceOf(FormData);
+        expect(body.get('payment_method_id')).toBe('pm1');
+        expect(body.get('payment_ref_no')).toBe('REF-9');
+        expect(body.get('paid_amount')).toBe('12345');
+        expect(body.get('proof')).toBe(proof);
+    });
+
+    it('submitProof omits optional fields when absent', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        const proof = new File(['x'], 'proof.jpg', { type: 'image/jpeg' });
+
+        await order.submitProof(http, 'o1', {
+            payment_method_id: 'pm1',
+            proof,
+        });
+
+        const body = http.post.mock.calls[0][1];
+        expect(body.has('payment_ref_no')).toBe(false);
+        expect(body.has('paid_amount')).toBe(false);
+    });
+
+    it('proofUrl fetches a signed url for the order', async () => {
+        http.get.mockResolvedValue({ data: { url: 'https://signed' } });
+        expect(await order.proofUrl(http, 'o1')).toBe('https://signed');
+        expect(http.get).toHaveBeenCalledWith('/v1/orders/o1/proof');
+    });
 });

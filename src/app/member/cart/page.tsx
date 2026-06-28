@@ -73,7 +73,7 @@ export default function MemberCartPage() {
             await queryClient.invalidateQueries({ queryKey: ['cart'] });
             await queryClient.invalidateQueries({ queryKey: ['orders'] });
             toast.success(`Order ${placed.order_number} placed`);
-            router.push('/member/orders');
+            router.push('/member/checkout');
         } catch (error) {
             toast.error(errorMessage(error, 'Could not place your order'));
         }

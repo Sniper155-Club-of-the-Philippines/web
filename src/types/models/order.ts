@@ -32,5 +32,16 @@ export interface Order {
     order_status: OrderStatus | null;
     payment_status: PaymentStatus;
     subtotal: number;
+    payment_method_id: string | null;
+    payment_ref_no: string | null;
+    paid_amount: number | null;
+    proof_submitted_at: string | null;
     items?: OrderItem[];
+}
+
+export interface ProofPayload {
+    payment_method_id: string;
+    payment_ref_no?: string;
+    paid_amount?: number;
+    proof: File;
 }
