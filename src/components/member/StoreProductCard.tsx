@@ -23,7 +23,7 @@ export default function StoreProductCard({
     const cover = product.images[0];
 
     return (
-        <Card className='overflow-hidden pt-0'>
+        <Card className='overflow-hidden pt-0 gap-3 md:gap-6 pb-3 md:pb-6'>
             <div className='bg-muted relative flex aspect-square items-center justify-center'>
                 {cover ? (
                     <Image
@@ -38,20 +38,20 @@ export default function StoreProductCard({
                     <ImageOff className='text-muted-foreground size-10' />
                 )}
             </div>
-            <CardHeader>
+            <CardHeader className='px-2 md:px-6'>
                 <CardTitle className='text-base'>{product.name}</CardTitle>
                 <p className='text-lg font-semibold'>
                     {formatPesos(product.price)}
                 </p>
             </CardHeader>
-            <CardContent className='flex flex-wrap gap-1'>
+            <CardContent className='px-2 md:px-6 flex flex-wrap gap-1'>
                 {product.available_sizes.map((size) => (
                     <Badge key={size} variant='secondary'>
                         {size}
                     </Badge>
                 ))}
             </CardContent>
-            <CardFooter>
+            <CardFooter className='px-2 md:px-6'>
                 <StoreProductDialog product={product}>
                     <Button className='w-full'>Order</Button>
                 </StoreProductDialog>
