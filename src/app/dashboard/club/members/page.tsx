@@ -24,6 +24,8 @@ import {
 import UserForm from '@/components/base/forms/UserForm';
 import { UserFormInputs } from '@/types/form';
 import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
+import { Copy } from 'lucide-react';
 import { useUserQuery } from '@/hooks/queries';
 import { userAtom } from '@/atoms/auth';
 
@@ -32,6 +34,10 @@ export default function ClubMembers() {
     const [, setLoading] = useAtom(loadingAtom);
     const printRef = useRef<HTMLDivElement>(null);
     const [createOpen, setCreateOpen] = useState(false);
+    const [credentials, setCredentials] = useState<{
+        email: string;
+        password: string;
+    } | null>(null);
     const [search, setSearch] = useState('');
     const { data: users, refetch } = useUserQuery();
     const [me] = useAtom(userAtom);
@@ -39,11 +45,20 @@ export default function ClubMembers() {
     const handleCreate = async (data: UserFormInputs) => {
         setLoading(true);
         try {
-            await user.store(http, data);
+            const result = (await user.store(http, data)) as {
+                user: { email: string };
+                temp_password: string;
+            };
             toast.success('Member created successfully.', {
                 closeButton: true,
             });
             setCreateOpen(false);
+            // No email is sent: surface the temporary password once so the admin
+            // can write it down and hand it to the member with their physical ID.
+            setCredentials({
+                email: result.user.email,
+                password: result.temp_password,
+            });
             refetch();
         } catch (error) {
             console.error(error);
@@ -176,6 +191,57 @@ export default function ClubMembers() {
                                 onSubmit={handleCreate}
                                 onCancel={() => setCreateOpen(false)}
                             />
+                        </DialogContent>
+                    </Dialog>
+                    {/* Temporary password — shown once, no email is sent */}
+                    <Dialog
+                        open={credentials !== null}
+                        onOpenChange={(open) => !open && setCredentials(null)}
+                    >
+                        <DialogContent className='sm:max-w-[480px]'>
+                            <DialogHeader>
+                                <DialogTitle>Member created</DialogTitle>
+                                <DialogDescription>
+                                    No email is sent. Write down this temporary
+                                    password and send it to the member on paper
+                                    together with their physical ID. It cannot
+                                    be shown again.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className='grid gap-3'>
+                                <label className='grid gap-1 text-sm font-medium'>
+                                    Email
+                                    <Input
+                                        readOnly
+                                        value={credentials?.email ?? ''}
+                                    />
+                                </label>
+                                <label className='grid gap-1 text-sm font-medium'>
+                                    Temporary password
+                                    <div className='flex gap-2'>
+                                        <Input
+                                            readOnly
+                                            className='font-mono'
+                                            value={credentials?.password ?? ''}
+                                        />
+                                        <Button
+                                            type='button'
+                                            variant='outline'
+                                            size='icon'
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(
+                                                    credentials?.password ?? '',
+                                                );
+                                                toast.success(
+                                                    'Password copied.',
+                                                );
+                                            }}
+                                        >
+                                            <Copy />
+                                        </Button>
+                                    </div>
+                                </label>
+                            </div>
                         </DialogContent>
                     </Dialog>
                 </div>
