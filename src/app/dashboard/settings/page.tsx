@@ -3,7 +3,15 @@
 import { user as api } from '@/api';
 import { userAtom } from '@/atoms/auth';
 import { loadingAtom } from '@/atoms/misc';
+import ChangePasswordForm from '@/components/auth/ChangePasswordForm';
 import UserForm from '@/components/base/forms/UserForm';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { useHttp } from '@/hooks/http';
 import { UserFormInputs } from '@/types/form';
 import { useAtom } from 'jotai';
@@ -32,10 +40,34 @@ export default function Settings() {
     };
 
     return (
-        <UserForm
-            onSubmit={onSubmit}
-            defaultValues={user ?? {}}
-            className='max-h-[80vh]'
-        />
+        <div className='mx-auto grid w-full max-w-4xl gap-6 pb-10'>
+            <Card>
+                <CardHeader>
+                    <CardTitle>Account</CardTitle>
+                    <CardDescription>
+                        Update your personal, club, and emergency details.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <UserForm
+                        onSubmit={onSubmit}
+                        defaultValues={user ?? {}}
+                        hideAccess
+                    />
+                </CardContent>
+            </Card>
+
+            <Card>
+                <CardHeader>
+                    <CardTitle>Password</CardTitle>
+                    <CardDescription>
+                        Choose a strong password you do not use anywhere else.
+                    </CardDescription>
+                </CardHeader>
+                <CardContent>
+                    <ChangePasswordForm />
+                </CardContent>
+            </Card>
+        </div>
     );
 }

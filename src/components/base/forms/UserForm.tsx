@@ -22,9 +22,18 @@ type Props = {
     onSubmit: (data: UserFormInputs) => void | Promise<void>;
     onCancel?: () => void;
     className?: string;
+    // Region and role assignment are admin-only. The self-service settings
+    // screen hides them so members cannot edit their own access.
+    hideAccess?: boolean;
 };
 
-const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
+const UserForm = ({
+    defaultValues,
+    onSubmit,
+    onCancel,
+    className,
+    hideAccess = false,
+}: Props) => {
     const http = useHttp();
     const { register, handleSubmit, watch, setValue, reset, control } =
         useForm<UserFormInputs>({
@@ -105,53 +114,57 @@ const UserForm = ({ defaultValues, onSubmit, onCancel, className }: Props) => {
                 </div>
 
                 {/* Section: Access */}
-                <div className='rounded-2xl border p-6 shadow-sm'>
-                    <h3 className='text-lg font-semibold mb-4'>Access</h3>
-                    <p className='text-sm text-muted-foreground mb-4'>
-                        A temporary password is generated and emailed to the
-                        member on creation; they set their own on first login.
-                    </p>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
-                        <div className='flex flex-col gap-2'>
-                            <Label htmlFor='region'>Region</Label>
-                            <Controller
-                                name='region'
-                                control={control}
-                                render={({ field }) => (
-                                    <Select
-                                        width='w-full'
-                                        onChange={(value) =>
-                                            field.onChange(value)
-                                        }
-                                        value={field.value ?? undefined}
-                                        options={regions ?? []}
-                                    />
-                                )}
-                            />
-                        </div>
-                        <div className='flex flex-col gap-2'>
-                            <Label htmlFor='roles'>Roles</Label>
-                            <Controller
-                                name='roles'
-                                control={control}
-                                render={({ field }) => (
-                                    <MultiSelect
-                                        value={field.value ?? []}
-                                        onChange={(e) =>
-                                            field.onChange(e.target.value)
-                                        }
-                                        options={
-                                            roles?.map((r) => ({
-                                                value: r.name,
-                                                label: r.name,
-                                            })) ?? []
-                                        }
-                                    />
-                                )}
-                            />
+                {!hideAccess && (
+                    <div className='rounded-2xl border p-6 shadow-sm'>
+                        <h3 className='text-lg font-semibold mb-4'>Access</h3>
+                        <p className='text-sm text-muted-foreground mb-4'>
+                            A temporary password is generated and shown once on
+                            creation; write it down and hand it to the member
+                            with their physical ID. They set their own on first
+                            login.
+                        </p>
+                        <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                            <div className='flex flex-col gap-2'>
+                                <Label htmlFor='region'>Region</Label>
+                                <Controller
+                                    name='region'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <Select
+                                            width='w-full'
+                                            onChange={(value) =>
+                                                field.onChange(value)
+                                            }
+                                            value={field.value ?? undefined}
+                                            options={regions ?? []}
+                                        />
+                                    )}
+                                />
+                            </div>
+                            <div className='flex flex-col gap-2'>
+                                <Label htmlFor='roles'>Roles</Label>
+                                <Controller
+                                    name='roles'
+                                    control={control}
+                                    render={({ field }) => (
+                                        <MultiSelect
+                                            value={field.value ?? []}
+                                            onChange={(e) =>
+                                                field.onChange(e.target.value)
+                                            }
+                                            options={
+                                                roles?.map((r) => ({
+                                                    value: r.name,
+                                                    label: r.name,
+                                                })) ?? []
+                                            }
+                                        />
+                                    )}
+                                />
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
                 {/* Section: Club Info */}
                 <div className='rounded-2xl border p-6 shadow-sm'>
