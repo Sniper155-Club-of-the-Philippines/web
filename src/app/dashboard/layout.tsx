@@ -21,7 +21,7 @@ export default function DashboardLayout({
         <PortalGuard portal='dashboard'>
             <SidebarProvider>
                 <Sidebar />
-                <SidebarInset className='flex flex-col h-screen'>
+                <SidebarInset className='h-screen min-w-0 flex-col'>
                     <header className='flex h-16 shrink-0 items-center gap-2 border-b px-4'>
                         <SidebarTrigger className='-ml-1 block md:hidden' />
                         <Separator
@@ -31,8 +31,11 @@ export default function DashboardLayout({
                         <NavbarHistory />
                     </header>
 
-                    <ScrollArea className='min-h-0 flex-1'>
-                        <div className='p-6 md:max-w-[calc(100vw-255px)]'>
+                    <ScrollArea
+                        className='min-h-0 w-full flex-1'
+                        viewportClassName='[&>div]:!block [&>div]:!min-w-0 [&>div]:!w-full'
+                    >
+                        <div className='min-w-0 w-full p-4 sm:p-6'>
                             {children}
                         </div>
                     </ScrollArea>
