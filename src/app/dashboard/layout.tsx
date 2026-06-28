@@ -2,6 +2,7 @@
 
 import NavbarHistory from '@/components/dashboard/NavbarHistory';
 import Sidebar from '@/components/dashboard/Sidebar';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
 import {
     SidebarInset,
@@ -30,9 +31,11 @@ export default function DashboardLayout({
                         <NavbarHistory />
                     </header>
 
-                    <div className='flex-1 p-6 md:max-w-[calc(100vw-255px)]'>
-                        {children}
-                    </div>
+                    <ScrollArea className='min-h-0 flex-1'>
+                        <div className='p-6 md:max-w-[calc(100vw-255px)]'>
+                            {children}
+                        </div>
+                    </ScrollArea>
                 </SidebarInset>
             </SidebarProvider>
         </PortalGuard>
