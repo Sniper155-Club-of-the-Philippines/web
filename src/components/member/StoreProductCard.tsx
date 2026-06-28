@@ -30,7 +30,7 @@ export default function StoreProductCard({
                         src={cover.image_url}
                         alt={product.name}
                         fill
-                        sizes='(min-width: 768px) 33vw, 100vw'
+                        sizes='(min-width: 768px) 33vw, 50vw'
                         className='object-cover'
                         unoptimized
                     />
