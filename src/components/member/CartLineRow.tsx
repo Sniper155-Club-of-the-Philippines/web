@@ -39,7 +39,7 @@ export default function CartLineRow({
     const locked = disabled || busy;
 
     return (
-        <div className='flex gap-4 py-5 first:pt-0 last:pb-0'>
+        <div className='flex gap-4 py-5'>
             <div className='bg-muted relative size-20 shrink-0 overflow-hidden rounded-md'>
                 {thumb ? (
                     <Image
@@ -97,7 +97,10 @@ export default function CartLineRow({
                             disabled={locked || line.quantity <= 1}
                             onClick={() =>
                                 run(() =>
-                                    onChangeQuantity(line.id, line.quantity - 1),
+                                    onChangeQuantity(
+                                        line.id,
+                                        line.quantity - 1,
+                                    ),
                                 )
                             }
                         >
@@ -118,7 +121,10 @@ export default function CartLineRow({
                             disabled={locked}
                             onClick={() =>
                                 run(() =>
-                                    onChangeQuantity(line.id, line.quantity + 1),
+                                    onChangeQuantity(
+                                        line.id,
+                                        line.quantity + 1,
+                                    ),
                                 )
                             }
                         >
