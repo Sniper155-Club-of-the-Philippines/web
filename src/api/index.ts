@@ -5,6 +5,7 @@ export * as chapter from '@/api/chapter';
 export * as event from '@/api/event';
 export * as forgotPassword from '@/api/forgot-password';
 export * as form from '@/api/form';
+export * as order from '@/api/order';
 export * as paymentMethod from '@/api/payment-method';
 export * as permission from '@/api/permission';
 export * as product from '@/api/product';

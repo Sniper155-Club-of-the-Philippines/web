@@ -5,6 +5,7 @@ import * as chapter from './chapter';
 import * as event from './event';
 import * as forgotPassword from './forgot-password';
 import * as form from './form';
+import * as order from './order';
 import * as profile from './profile';
 import * as role from './role';
 import * as cart from './cart';
@@ -437,5 +438,31 @@ describe('cart api', () => {
     it('remove deletes by id', async () => {
         await cart.remove(http, 'c1');
         expect(http.delete).toHaveBeenCalledWith('/v1/cart/c1');
+    });
+});
+
+describe('order api', () => {
+    it('list returns the orders', async () => {
+        http.get.mockResolvedValue({ data: { orders: [{ id: 'o1' }] } });
+        expect(await order.list(http)).toEqual([{ id: 'o1' }]);
+        expect(http.get).toHaveBeenCalledWith('/v1/orders');
+    });
+
+    it('get returns a single order by id', async () => {
+        http.get.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        expect(await order.get(http, 'o1')).toEqual({ id: 'o1' });
+        expect(http.get).toHaveBeenCalledWith('/v1/orders/o1');
+    });
+
+    it('checkout posts and returns the placed order', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        expect(await order.checkout(http)).toEqual({ id: 'o1' });
+        expect(http.post).toHaveBeenCalledWith('/v1/checkout');
+    });
+
+    it('voidOrder posts to the void route and returns the order', async () => {
+        http.post.mockResolvedValue({ data: { order: { id: 'o1' } } });
+        expect(await order.voidOrder(http, 'o1')).toEqual({ id: 'o1' });
+        expect(http.post).toHaveBeenCalledWith('/v1/orders/o1/void');
     });
 });

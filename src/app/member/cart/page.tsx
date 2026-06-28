@@ -1,6 +1,6 @@
 'use client';
 
-import { cart, store } from '@/api';
+import { cart, order, store } from '@/api';
 import CartLineRow from '@/components/member/CartLineRow';
 import CartSummary from '@/components/member/CartSummary';
 import MemberPageHeader from '@/components/member/MemberPageHeader';
@@ -12,6 +12,7 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { isAxiosError } from 'axios';
 import { Store } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 
 type ValidationResponse = {
@@ -32,6 +33,7 @@ function errorMessage(error: unknown, fallback: string): string {
 export default function MemberCartPage() {
     const http = useHttp();
     const queryClient = useQueryClient();
+    const router = useRouter();
 
     const cartQuery = useQuery({
         queryKey: ['cart'],
@@ -65,8 +67,16 @@ export default function MemberCartPage() {
         }
     };
 
-    const checkout = () => {
-        toast.info('Checkout opens with the next update.');
+    const checkout = async () => {
+        try {
+            const placed = await order.checkout(http);
+            await queryClient.invalidateQueries({ queryKey: ['cart'] });
+            await queryClient.invalidateQueries({ queryKey: ['orders'] });
+            toast.success(`Order ${placed.order_number} placed`);
+            router.push('/member/orders');
+        } catch (error) {
+            toast.error(errorMessage(error, 'Could not place your order'));
+        }
     };
 
     return (
