@@ -1,10 +1,10 @@
+import dayjs from 'dayjs';
+
 /**
  * Number of days an OBR nickname is locked after a change. Mirrors the
  * server-side rule (the API is the source of truth; this is for UX messaging).
  */
 export const OBR_LOCK_DAYS = 90;
-
-const DAY_MS = 24 * 60 * 60 * 1000;
 
 export type ObrLockState = {
     /** Whether the OBR nickname is currently locked from changes. */
@@ -30,17 +30,17 @@ export function obrNicknameLock(
         return { locked: false, daysRemaining: 0, unlockAt: null };
     }
 
-    const changed = changedAt instanceof Date ? changedAt : new Date(changedAt);
-    const unlockAt = new Date(changed.getTime() + OBR_LOCK_DAYS * DAY_MS);
-    const remainingMs = unlockAt.getTime() - now.getTime();
+    const unlock = dayjs(changedAt).add(OBR_LOCK_DAYS, 'day');
+    const unlockAt = unlock.toDate();
+    const remainingDays = unlock.diff(now, 'day', true);
 
-    if (remainingMs <= 0) {
+    if (remainingDays <= 0) {
         return { locked: false, daysRemaining: 0, unlockAt };
     }
 
     return {
         locked: true,
-        daysRemaining: Math.ceil(remainingMs / DAY_MS),
+        daysRemaining: Math.ceil(remainingDays),
         unlockAt,
     };
 }
