@@ -72,7 +72,14 @@ export default function BatchesPage() {
         queryClient.invalidateQueries({ queryKey: ['batches'] });
     const save = useMutation({
         mutationFn: (values: BatchInputs) => {
-            const payload = { ...values, notes: values.notes || null };
+            const payload = {
+                ...values,
+                ordering_start_at: new Date(
+                    values.ordering_start_at,
+                ).toISOString(),
+                ordering_end_at: new Date(values.ordering_end_at).toISOString(),
+                notes: values.notes || null,
+            };
             return editing
                 ? batch.update(http, editing.id, payload)
                 : batch.store(http, payload);
@@ -215,7 +222,8 @@ export default function BatchesPage() {
                                 {editing ? 'Edit batch' : 'New batch'}
                             </DialogTitle>
                             <DialogDescription>
-                                Times are interpreted in Philippine time.
+                                Times use your device timezone and are stored in
+                                UTC.
                             </DialogDescription>
                         </DialogHeader>
                         <div className='grid gap-4 sm:grid-cols-2'>
