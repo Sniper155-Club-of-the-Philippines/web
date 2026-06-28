@@ -28,7 +28,7 @@ export default function MemberStorePage() {
     return (
         <>
             <MemberPageHeader
-                title='Member Store'
+                title='Member Merchandise'
                 description='Official S155CP merchandise for active ordering periods.'
             />
 
@@ -41,7 +41,7 @@ export default function MemberStorePage() {
             ) : !open ? (
                 <Alert>
                     <Store />
-                    <AlertTitle>Store closed</AlertTitle>
+                    <AlertTitle>Merchandise closed</AlertTitle>
                     <AlertDescription>
                         Ordering is not open right now. Check back during the
                         next ordering period.

@@ -12,7 +12,9 @@ export default function MemberHeader() {
                     className='flex min-w-0 items-center gap-3'
                 >
                     <Logo />
-                    <span className='truncate font-semibold'>S155CP Store</span>
+                    <span className='truncate font-semibold'>
+                        S155CP Merchandise
+                    </span>
                 </Link>
                 <div className='ml-auto hidden md:block'>
                     <MemberNavigation />
