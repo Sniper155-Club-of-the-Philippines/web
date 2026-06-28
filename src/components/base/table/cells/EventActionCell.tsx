@@ -57,7 +57,7 @@ const EventActionCell = ({ event, refetch, onPreview }: Props) => {
     const handleEdit = async (data: EventFormInputs) => {
         setLoading(true);
         try {
-            await api.update(http, data);
+            await api.update(http, event.id, data);
             toast.success('Event updated successfully.', {
                 closeButton: true,
             });
@@ -84,14 +84,26 @@ const EventActionCell = ({ event, refetch, onPreview }: Props) => {
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
                     {onPreview && (
-                        <DropdownMenuItem onClick={() => onPreview()}>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                onPreview();
+                            }}
+                        >
                             Preview
                         </DropdownMenuItem>
                     )}
-                    <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setEditOpen(true);
+                        }}
+                    >
                         Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setDeleteOpen(true);
+                        }}
+                    >
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -110,7 +122,9 @@ const EventActionCell = ({ event, refetch, onPreview }: Props) => {
                     <EventForm
                         defaultValues={event}
                         onSubmit={handleEdit}
-                        onCancel={() => setEditOpen(false)}
+                        onCancel={() => {
+                            setEditOpen(false);
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -127,7 +141,9 @@ const EventActionCell = ({ event, refetch, onPreview }: Props) => {
                     <DialogFooter>
                         <Button
                             variant='outline'
-                            onClick={() => setDeleteOpen(false)}
+                            onClick={() => {
+                                setDeleteOpen(false);
+                            }}
                         >
                             Cancel
                         </Button>

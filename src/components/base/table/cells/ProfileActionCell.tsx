@@ -60,7 +60,11 @@ const ProfileActionCell = ({ profile, refetch }: Props) => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setDeleteOpen(true);
+                        }}
+                    >
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -79,7 +83,9 @@ const ProfileActionCell = ({ profile, refetch }: Props) => {
                     <DialogFooter>
                         <Button
                             variant='outline'
-                            onClick={() => setDeleteOpen(false)}
+                            onClick={() => {
+                                setDeleteOpen(false);
+                            }}
                         >
                             Cancel
                         </Button>

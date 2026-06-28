@@ -74,7 +74,9 @@ export default function FabMenu({
                     <Tooltip key={btn.type}>
                         <TooltipTrigger asChild>
                             <Button
-                                onClick={() => addField(btn.type)}
+                                onClick={() => {
+                                    addField(btn.type);
+                                }}
                                 className='rounded-full w-12 h-12 p-0 shadow-md bg-blue-600 hover:bg-blue-700'
                             >
                                 {btn.icon}

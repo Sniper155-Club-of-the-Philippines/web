@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-asserted-optional-chain */
 'use client';
 
 import FormForm from '@/components/base/forms/FormForm';
@@ -33,11 +32,17 @@ export default function ViewFormResponse() {
                 initialTitle={form.title}
                 initialDescription={form.description}
                 initialFields={form.fields}
-                initialData={answers?.map((answer) => ({
-                    id: answer.field?.id!,
-                    value: answer.answer,
-                    type: answer.field?.type ?? 'text',
-                }))}
+                initialData={answers?.flatMap((answer) =>
+                    answer.field
+                        ? [
+                              {
+                                  id: answer.field.id,
+                                  value: answer.answer,
+                                  type: answer.field.type,
+                              },
+                          ]
+                        : [],
+                )}
             />
         </div>
     );

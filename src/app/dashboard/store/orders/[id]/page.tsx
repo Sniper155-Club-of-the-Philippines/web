@@ -121,11 +121,12 @@ export default function AdminOrderDetailPage() {
         }
     };
 
-    const editItem = (itemId: string, patch: Partial<OrderItemEdit>) =>
+    const editItem = (itemId: string, patch: Partial<OrderItemEdit>) => {
         setEdits((current) => ({
             ...current,
             [itemId]: { ...current[itemId], ...patch, id: itemId },
         }));
+    };
 
     if (query.isLoading || !current) {
         return (
@@ -186,7 +187,9 @@ export default function AdminOrderDetailPage() {
                 </div>
                 <div className='flex flex-wrap gap-3'>
                     <Button
-                        onClick={() => approve.mutate()}
+                        onClick={() => {
+                            approve.mutate();
+                        }}
                         disabled={
                             approve.isPending ||
                             current.payment_status === 'approved'
@@ -200,14 +203,16 @@ export default function AdminOrderDetailPage() {
                         <Textarea
                             placeholder='Reason (optional) shown to the member'
                             value={rejectReason}
-                            onChange={(event) =>
-                                setRejectReason(event.target.value)
-                            }
+                            onChange={(event) => {
+                                setRejectReason(event.target.value);
+                            }}
                         />
                         <Button
                             variant='destructive'
                             className='w-fit'
-                            onClick={() => reject.mutate()}
+                            onClick={() => {
+                                reject.mutate();
+                            }}
                             disabled={reject.isPending}
                         >
                             {current.payment_status === 'approved'
@@ -233,31 +238,31 @@ export default function AdminOrderDetailPage() {
                             <Input
                                 defaultValue={item.size}
                                 aria-label='Size'
-                                onChange={(event) =>
+                                onChange={(event) => {
                                     editItem(item.id, {
                                         size: event.target.value,
-                                    })
-                                }
+                                    });
+                                }}
                             />
                             <Input
                                 type='number'
                                 min={1}
                                 defaultValue={item.quantity}
                                 aria-label='Quantity'
-                                onChange={(event) =>
+                                onChange={(event) => {
                                     editItem(item.id, {
                                         quantity: Number(event.target.value),
-                                    })
-                                }
+                                    });
+                                }}
                             />
                             <Input
                                 defaultValue={item.recipient_nickname}
                                 aria-label='Recipient nickname'
-                                onChange={(event) =>
+                                onChange={(event) => {
                                     editItem(item.id, {
                                         recipient_nickname: event.target.value,
-                                    })
-                                }
+                                    });
+                                }}
                             />
                         </div>
                     ))}
@@ -268,7 +273,9 @@ export default function AdminOrderDetailPage() {
                     disabled={
                         Object.keys(edits).length === 0 || saveLines.isPending
                     }
-                    onClick={() => saveLines.mutate()}
+                    onClick={() => {
+                        saveLines.mutate();
+                    }}
                 >
                     Save line changes
                 </Button>
@@ -298,7 +305,9 @@ export default function AdminOrderDetailPage() {
                 </div>
                 <Button
                     disabled={!status || setOrderStatus.isPending}
-                    onClick={() => setOrderStatus.mutate()}
+                    onClick={() => {
+                        setOrderStatus.mutate();
+                    }}
                 >
                     Update status
                 </Button>
@@ -306,7 +315,9 @@ export default function AdminOrderDetailPage() {
                     <Button
                         variant='ghost'
                         className='ml-auto'
-                        onClick={() => voidOrder.mutate()}
+                        onClick={() => {
+                            voidOrder.mutate();
+                        }}
                         disabled={voidOrder.isPending}
                     >
                         Void order

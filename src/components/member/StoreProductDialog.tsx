@@ -151,14 +151,14 @@ export default function StoreProductDialog({
                                 min={1}
                                 max={recipient?.limit ?? 1}
                                 value={quantity}
-                                onChange={(event) =>
+                                onChange={(event) => {
                                     setQuantity(
                                         Math.max(
                                             1,
                                             Number(event.target.value) || 1,
                                         ),
-                                    )
-                                }
+                                    );
+                                }}
                             />
                         </div>
                     </div>

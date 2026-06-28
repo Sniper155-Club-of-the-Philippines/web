@@ -60,6 +60,7 @@ const UserForm = ({
     });
 
     const { data: chapters } = useChapterQuery(false);
+    const photo = watch('photo');
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -132,9 +133,9 @@ const UserForm = ({
                                     render={({ field }) => (
                                         <Select
                                             width='w-full'
-                                            onChange={(value) =>
-                                                field.onChange(value)
-                                            }
+                                            onChange={(value) => {
+                                                field.onChange(value);
+                                            }}
                                             value={field.value ?? undefined}
                                             options={regions ?? []}
                                         />
@@ -149,9 +150,9 @@ const UserForm = ({
                                     render={({ field }) => (
                                         <MultiSelect
                                             value={field.value ?? []}
-                                            onChange={(e) =>
-                                                field.onChange(e.target.value)
-                                            }
+                                            onChange={(e) => {
+                                                field.onChange(e.target.value);
+                                            }}
                                             options={
                                                 roles?.map((r) => ({
                                                     value: r.name,
@@ -192,9 +193,9 @@ const UserForm = ({
                                 render={({ field }) => (
                                     <Select
                                         width='w-full'
-                                        onChange={(value) =>
-                                            field.onChange(value)
-                                        }
+                                        onChange={(value) => {
+                                            field.onChange(value);
+                                        }}
                                         value={field.value ?? undefined}
                                         options={designations ?? []}
                                     />
@@ -208,9 +209,9 @@ const UserForm = ({
                                 control={control}
                                 render={({ field }) => (
                                     <SelectSearch
-                                        onChange={(value) =>
-                                            field.onChange(value)
-                                        }
+                                        onChange={(value) => {
+                                            field.onChange(value);
+                                        }}
                                         value={field.value ?? undefined}
                                         options={
                                             chapters?.map((c) => ({
@@ -240,10 +241,10 @@ const UserForm = ({
                                 setValue('photo', file);
                             }}
                         />
-                        {watch('photo') && (
+                        {photo && (
                             <Avatar className='w-16 h-16'>
                                 <AvatarImage
-                                    src={URL.createObjectURL(watch('photo')!)}
+                                    src={URL.createObjectURL(photo)}
                                     alt='Preview'
                                 />
                             </Avatar>
@@ -266,9 +267,9 @@ const UserForm = ({
                                 render={({ field }) => (
                                     <Select
                                         width='w-full'
-                                        onChange={(value) =>
-                                            field.onChange(value)
-                                        }
+                                        onChange={(value) => {
+                                            field.onChange(value);
+                                        }}
                                         value={field.value ?? undefined}
                                         options={Object.values(BLOOD_TYPES).map(
                                             (type) => ({

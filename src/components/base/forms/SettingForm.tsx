@@ -50,12 +50,12 @@ export default function SettingForm<T extends Record<string, any>>({
     useEffect(() => {
         if (!settings) return;
 
-        const values: Record<string, any> = { ...defaults };
+        const values: Record<string, any> = Object.assign({}, defaults);
         const promises: Promise<void>[] = [];
 
         for (const field of fields) {
             const s = settings.find(
-                (x) => x.key === field.key && x.type === field.type
+                (x) => x.key === field.key && x.type === field.type,
             );
 
             if (!s) continue;
@@ -66,16 +66,18 @@ export default function SettingForm<T extends Record<string, any>>({
                         .then((file) => {
                             values[field.key] = file;
                         })
-                        .catch((e) =>
-                            console.error('Failed to convert photo URL:', e)
-                        )
+                        .catch((e: unknown) => {
+                            console.error('Failed to convert photo URL:', e);
+                        }),
                 );
             } else {
                 values[field.key] = s.value;
             }
         }
 
-        Promise.all(promises).then(() => reset(values as T));
+        void Promise.all(promises).then(() => {
+            reset(values as T);
+        });
     }, [settings, reset, fields, defaults]);
 
     const onSubmit = async (payload: T) => {
@@ -100,13 +102,13 @@ export default function SettingForm<T extends Record<string, any>>({
                                     lastModified: file.lastModified,
                                     type: file.type,
                                 },
-                            })
+                            }),
                         );
                     } else {
                         const id = settings?.find(
                             ({ key, type }) =>
                                 key === field.key &&
-                                type === SETTING_TYPES.IMAGE
+                                type === SETTING_TYPES.IMAGE,
                         )?.id;
                         if (id) requests.push(setting.remove(http, id));
                     }
@@ -117,7 +119,7 @@ export default function SettingForm<T extends Record<string, any>>({
                             key: field.key,
                             value,
                             type: field.type,
-                        })
+                        }),
                     );
                 }
             }
@@ -189,7 +191,7 @@ export default function SettingForm<T extends Record<string, any>>({
                                                 file as any,
                                                 {
                                                     shouldDirty: true,
-                                                }
+                                                },
                                             );
                                         }
                                     }}
@@ -213,7 +215,9 @@ export default function SettingForm<T extends Record<string, any>>({
                         <Button
                             type='button'
                             variant='outline'
-                            onClick={() => reset(defaults)}
+                            onClick={() => {
+                                reset(defaults);
+                            }}
                         >
                             Reset
                         </Button>

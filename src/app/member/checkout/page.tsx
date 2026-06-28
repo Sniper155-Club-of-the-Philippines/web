@@ -57,7 +57,9 @@ export default function MemberCheckoutPage() {
                     <ProofForm
                         orderId={openOrder.id}
                         total={openOrder.subtotal}
-                        onSubmitted={() => router.push('/member/orders')}
+                        onSubmitted={() => {
+                            router.push('/member/orders');
+                        }}
                     />
                 </div>
             )}

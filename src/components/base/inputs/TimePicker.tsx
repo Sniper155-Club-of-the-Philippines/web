@@ -30,7 +30,7 @@ export default function TimePicker({
 }) {
     const isControlled = value !== undefined;
     const [internalDate, setInternalDate] = useState<Date | undefined>(
-        defaultValue
+        defaultValue,
     );
     const date = isControlled ? value : internalDate;
     const hours = Array.from({ length: 12 }, (_, i) => i + 1);
@@ -42,7 +42,7 @@ export default function TimePicker({
 
     const handleTimeChange = (
         type: 'hour' | 'minute' | 'ampm',
-        val: string
+        val: string,
     ) => {
         if (disabled) return; // ✅ prevent updates when disabled
         const base = date ? new Date(date) : new Date();
@@ -89,7 +89,7 @@ export default function TimePicker({
                     className={cn(
                         'w-full justify-start text-left font-normal',
                         !date && 'text-muted-foreground',
-                        className
+                        className,
                     )}
                 >
                     {display ?? <span>{placeholder}</span>}
@@ -114,12 +114,12 @@ export default function TimePicker({
                                                     : 'ghost'
                                             }
                                             className='sm:w-full shrink-0 aspect-square'
-                                            onClick={() =>
+                                            onClick={() => {
                                                 handleTimeChange(
                                                     'hour',
-                                                    String(h)
-                                                )
-                                            }
+                                                    String(h),
+                                                );
+                                            }}
                                         >
                                             {h}
                                         </Button>
@@ -135,7 +135,7 @@ export default function TimePicker({
                             <div className='flex sm:flex-col p-2'>
                                 {Array.from(
                                     { length: 12 },
-                                    (_, i) => i * 5
+                                    (_, i) => i * 5,
                                 ).map((min) => (
                                     <Button
                                         key={min}
@@ -145,12 +145,12 @@ export default function TimePicker({
                                             isMinSel(min) ? 'default' : 'ghost'
                                         }
                                         className='sm:w-full shrink-0 aspect-square'
-                                        onClick={() =>
+                                        onClick={() => {
                                             handleTimeChange(
                                                 'minute',
-                                                String(min)
-                                            )
-                                        }
+                                                String(min),
+                                            );
+                                        }}
                                     >
                                         {String(min).padStart(2, '0')}
                                     </Button>
@@ -175,9 +175,9 @@ export default function TimePicker({
                                                 : 'ghost'
                                         }
                                         className='sm:w-full shrink-0 aspect-square'
-                                        onClick={() =>
-                                            handleTimeChange('ampm', a)
-                                        }
+                                        onClick={() => {
+                                            handleTimeChange('ampm', a);
+                                        }}
                                     >
                                         {a}
                                     </Button>

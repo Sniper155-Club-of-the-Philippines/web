@@ -56,7 +56,7 @@ const UserActionCell = ({ user, refetch }: Props) => {
     const handleEdit = async (data: UserFormInputs) => {
         setLoading(true);
         try {
-            await api.update(http, data);
+            await api.update(http, user.id, data);
             toast.success('Member updated successfully.', {
                 closeButton: true,
             });
@@ -82,10 +82,18 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setEditOpen(true);
+                        }}
+                    >
                         Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setDeleteOpen(true);
+                        }}
+                    >
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -104,7 +112,9 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     <UserForm
                         defaultValues={user}
                         onSubmit={handleEdit}
-                        onCancel={() => setEditOpen(false)}
+                        onCancel={() => {
+                            setEditOpen(false);
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -123,7 +133,9 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     <DialogFooter>
                         <Button
                             variant='outline'
-                            onClick={() => setDeleteOpen(false)}
+                            onClick={() => {
+                                setDeleteOpen(false);
+                            }}
                         >
                             Cancel
                         </Button>

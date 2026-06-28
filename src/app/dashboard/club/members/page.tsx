@@ -45,10 +45,7 @@ export default function ClubMembers() {
     const handleCreate = async (data: UserFormInputs) => {
         setLoading(true);
         try {
-            const result = (await user.store(http, data)) as {
-                user: { email: string };
-                temp_password: string;
-            };
+            const result = await user.store(http, data);
             toast.success('Member created successfully.', {
                 closeButton: true,
             });
@@ -59,7 +56,7 @@ export default function ClubMembers() {
                 email: result.user.email,
                 password: result.temp_password,
             });
-            refetch();
+            void refetch();
         } catch (error) {
             console.error(error);
             toast.error('Unable to create member.', {
@@ -157,7 +154,7 @@ export default function ClubMembers() {
     ];
 
     const exportData = () => {
-        exportToExcel(columns as any, users ?? [], 'members.xlsx');
+        exportToExcel(columns, users ?? [], 'members.xlsx');
     };
 
     return (
@@ -168,14 +165,18 @@ export default function ClubMembers() {
                     <Input
                         type='search'
                         placeholder='Search'
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                        }}
                         value={search}
                     />
                     <TableMenu
                         onRefresh={refetch}
                         onExport={exportData}
                         onPrint={handlePrint}
-                        onCreate={() => setCreateOpen(true)}
+                        onCreate={() => {
+                            setCreateOpen(true);
+                        }}
                     />
                     {/* Create Dialog */}
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
@@ -189,7 +190,9 @@ export default function ClubMembers() {
 
                             <UserForm
                                 onSubmit={handleCreate}
-                                onCancel={() => setCreateOpen(false)}
+                                onCancel={() => {
+                                    setCreateOpen(false);
+                                }}
                             />
                         </DialogContent>
                     </Dialog>
@@ -229,7 +232,7 @@ export default function ClubMembers() {
                                             variant='outline'
                                             size='icon'
                                             onClick={() => {
-                                                navigator.clipboard.writeText(
+                                                void navigator.clipboard.writeText(
                                                     credentials?.password ?? '',
                                                 );
                                                 toast.success(

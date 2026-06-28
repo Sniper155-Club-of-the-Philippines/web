@@ -19,10 +19,11 @@ import {
     TableRow,
 } from '@/components/ui/table';
 
-interface DataTableProps<TData, TValue> {
+interface DataTableProps<TData extends { id?: unknown }, TValue> {
     columns: ColumnDef<TData, TValue>[];
     data: TData[];
     search?: string;
+    tableRef?: React.Ref<DataTableRef>;
 }
 
 // The ref will expose the DOM scroll element and the virtualizer
@@ -33,10 +34,12 @@ export interface DataTableRef {
 
 const ROW_HEIGHT = 48;
 
-export const DataTable = React.forwardRef<
-    DataTableRef,
-    DataTableProps<any, any>
->(({ columns, data, search = '' }, ref) => {
+export function DataTable<TData extends { id?: unknown }, TValue>({
+    columns,
+    data,
+    search = '',
+    tableRef,
+}: DataTableProps<TData, TValue>) {
     const [globalFilter, setGlobalFilter] = useState('');
 
     const table = useReactTable({
@@ -47,10 +50,13 @@ export const DataTable = React.forwardRef<
         getCoreRowModel: getCoreRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         globalFilterFn: 'includesString',
-        getRowId: (row, index) => (typeof row.id === 'string' ? row.id : index),
+        getRowId: (row, index) =>
+            typeof row.id === 'string' ? row.id : String(index),
     });
 
-    useEffect(() => setGlobalFilter(search), [search]);
+    useEffect(() => {
+        setGlobalFilter(search);
+    }, [search]);
 
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +69,7 @@ export const DataTable = React.forwardRef<
     });
 
     // Expose scroll element + virtualizer to parent
-    useImperativeHandle(ref, () => ({
+    useImperativeHandle(tableRef, () => ({
         scrollElement: scrollRef.current,
         virtualizer,
     }));
@@ -94,7 +100,7 @@ export const DataTable = React.forwardRef<
                                             : flexRender(
                                                   header.column.columnDef
                                                       .header,
-                                                  header.getContext()
+                                                  header.getContext(),
                                               )}
                                     </div>
                                 </TableHead>
@@ -125,7 +131,7 @@ export const DataTable = React.forwardRef<
                                     <TableCell key={cell.id}>
                                         {flexRender(
                                             cell.column.columnDef.cell,
-                                            cell.getContext()
+                                            cell.getContext(),
                                         )}
                                     </TableCell>
                                 ))}
@@ -145,6 +151,4 @@ export const DataTable = React.forwardRef<
             </Table>
         </div>
     );
-});
-
-DataTable.displayName = 'DataTable';
+}

@@ -55,7 +55,9 @@ export default function VerifyForgotPasswordPage() {
         updateCountdown();
         const interval = setInterval(updateCountdown, 1000);
 
-        return () => clearInterval(interval);
+        return () => {
+            clearInterval(interval);
+        };
     }, [forgotPasswordData]);
 
     const formatTime = (seconds: number) => {
@@ -84,7 +86,10 @@ export default function VerifyForgotPasswordPage() {
             });
             router.push('/forgot-password/finalize');
         } catch (error) {
-            if (isAxiosError(error) && error.response?.data.message) {
+            if (
+                isAxiosError<{ message?: string }>(error) &&
+                error.response?.data.message
+            ) {
                 toast.error(error.response?.data.message, {
                     closeButton: true,
                 });

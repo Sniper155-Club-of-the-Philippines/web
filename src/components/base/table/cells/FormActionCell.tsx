@@ -27,7 +27,7 @@ import Link from 'next/link';
 
 type Props = {
     form: Form;
-    refetch?: () => void | Promise<any>;
+    refetch?: () => void | Promise<unknown>;
 };
 
 const FormActionCell = ({ form, refetch }: Props) => {
@@ -44,7 +44,7 @@ const FormActionCell = ({ form, refetch }: Props) => {
                 `Form is now ${form.active ? 'inactive' : 'active'}.`,
                 {
                     closeButton: true,
-                }
+                },
             );
         } catch (error) {
             console.error(error);
@@ -60,7 +60,7 @@ const FormActionCell = ({ form, refetch }: Props) => {
         setLoading(true);
         try {
             await api.remove(http, form.id);
-            refetch?.();
+            void refetch?.();
         } catch (error) {
             console.error(error);
             toast.success('Unable to delete form.', {
@@ -95,7 +95,11 @@ const FormActionCell = ({ form, refetch }: Props) => {
                     <DropdownMenuItem onClick={() => toggleStatus()}>
                         {form.active ? 'Deactivate' : 'Activate'}
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setDeleteOpen(true);
+                        }}
+                    >
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -115,7 +119,9 @@ const FormActionCell = ({ form, refetch }: Props) => {
                     <DialogFooter>
                         <Button
                             variant='outline'
-                            onClick={() => setDeleteOpen(false)}
+                            onClick={() => {
+                                setDeleteOpen(false);
+                            }}
                         >
                             Cancel
                         </Button>

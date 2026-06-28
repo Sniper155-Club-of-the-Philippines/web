@@ -29,11 +29,10 @@ type Option = {
     value: string;
 };
 
-interface MultiSelectProps
-    extends Omit<
-        React.SelectHTMLAttributes<HTMLSelectElement>,
-        'value' | 'onChange'
-    > {
+interface MultiSelectProps extends Omit<
+    React.SelectHTMLAttributes<HTMLSelectElement>,
+    'value' | 'onChange'
+> {
     options?: Option[];
     placeholder?: string;
     triggerWidth?: string;
@@ -51,17 +50,21 @@ const MultiSelect = React.forwardRef<HTMLSelectElement, MultiSelectProps>(
             triggerWidth,
             ...props
         },
-        ref
+        ref,
     ) => {
         const [open, setOpen] = React.useState(false);
         const [isMobile, setIsMobile] = React.useState(false);
 
         // detect screen size
         React.useEffect(() => {
-            const update = () => setIsMobile(window.innerWidth < 640);
+            const update = () => {
+                setIsMobile(window.innerWidth < 640);
+            };
             update();
             window.addEventListener('resize', update);
-            return () => window.removeEventListener('resize', update);
+            return () => {
+                window.removeEventListener('resize', update);
+            };
         }, []);
 
         const handleToggle = (val: string) => {
@@ -76,7 +79,7 @@ const MultiSelect = React.forwardRef<HTMLSelectElement, MultiSelectProps>(
 
         const handleSelectAll = () => {
             const allSelected = options.every((opt) =>
-                value.includes(opt.value)
+                value.includes(opt.value),
             );
             const newValues = allSelected
                 ? []
@@ -97,7 +100,9 @@ const MultiSelect = React.forwardRef<HTMLSelectElement, MultiSelectProps>(
                 role='combobox'
                 aria-expanded={open}
                 className={cn('justify-between', triggerWidth ?? 'w-full')}
-                onClick={() => setOpen(true)}
+                onClick={() => {
+                    setOpen(true);
+                }}
             >
                 {value.length > 0
                     ? options
@@ -184,7 +189,7 @@ const MultiSelect = React.forwardRef<HTMLSelectElement, MultiSelectProps>(
                 )}
             </>
         );
-    }
+    },
 );
 
 MultiSelect.displayName = 'MultiSelect';

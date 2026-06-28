@@ -47,7 +47,7 @@ export default function Events() {
                 closeButton: true,
             });
             setCreateOpen(false);
-            refetch();
+            void refetch();
         } catch (error) {
             console.error(error);
             toast.error('Unable to create event.', {
@@ -116,7 +116,9 @@ export default function Events() {
                 return (
                     <EventActionCell
                         event={row.original}
-                        onPreview={() => handlePreview(row.original.id)}
+                        onPreview={() => {
+                            handlePreview(row.original.id);
+                        }}
                     />
                 );
             },
@@ -124,7 +126,7 @@ export default function Events() {
     ];
 
     const exportData = () => {
-        exportToExcel(columns as any, events ?? [], 'events.xlsx');
+        exportToExcel(columns, events ?? [], 'events.xlsx');
     };
 
     useEffect(() => {
@@ -148,13 +150,17 @@ export default function Events() {
                         <Input
                             type='search'
                             placeholder='Search'
-                            onChange={(e) => setSearch(e.target.value)}
+                            onChange={(e) => {
+                                setSearch(e.target.value);
+                            }}
                             value={search}
                         />
                         <TableMenu
                             onRefresh={refetch}
                             onExport={exportData}
-                            onCreate={() => setCreateOpen(true)}
+                            onCreate={() => {
+                                setCreateOpen(true);
+                            }}
                             disable={['print']}
                         />
                         {/* Create Dialog */}
@@ -169,7 +175,9 @@ export default function Events() {
 
                                 <EventForm
                                     onSubmit={handleCreate}
-                                    onCancel={() => setCreateOpen(false)}
+                                    onCancel={() => {
+                                        setCreateOpen(false);
+                                    }}
                                 />
                             </DialogContent>
                         </Dialog>
@@ -177,7 +185,7 @@ export default function Events() {
                 </div>
                 <TabsContent value='list'>
                     <DataTable
-                        ref={dataTableRef}
+                        tableRef={dataTableRef}
                         columns={columns}
                         data={events ?? []}
                         search={search}

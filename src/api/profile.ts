@@ -14,9 +14,12 @@ export async function show(http: AxiosInstance, id: string) {
 }
 
 export async function store(http: AxiosInstance, payload: Partial<Profile>) {
-    const { data } = await http.post(`/v1/profiles`, payload);
+    const { data } = await http.post<{ profile: Profile }>(
+        `/v1/profiles`,
+        payload,
+    );
 
-    return data;
+    return data.profile;
 }
 
 export async function remove(http: AxiosInstance, id: string) {

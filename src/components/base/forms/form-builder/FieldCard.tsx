@@ -55,7 +55,7 @@ export default function FieldCard({
     handleCheckboxChange: (
         fieldId: string,
         value: string,
-        checked: CheckedState
+        checked: CheckedState,
     ) => void;
     onDelete: () => void;
     onUpdateField: (id: string, updated: Partial<Field>) => void;
@@ -124,7 +124,9 @@ export default function FieldCard({
                         {/* Editable option label */}
                         <Input
                             value={opt.label ?? ''}
-                            onChange={(e) => updateOption(idx, e.target.value)}
+                            onChange={(e) => {
+                                updateOption(idx, e.target.value);
+                            }}
                             className='flex-1'
                             disabled={readonly}
                             placeholder='Option text'
@@ -133,7 +135,9 @@ export default function FieldCard({
                             <Button
                                 size='icon'
                                 variant='ghost'
-                                onClick={() => deleteOption(idx)}
+                                onClick={() => {
+                                    deleteOption(idx);
+                                }}
                                 type='button'
                             >
                                 <Trash2 className='w-4 h-4 text-gray-500' />
@@ -164,7 +168,9 @@ export default function FieldCard({
                 return (
                     <Input
                         value={value ?? ''}
-                        onChange={(e) => setValue(e.target.value)}
+                        onChange={(e) => {
+                            setValue(e.target.value);
+                        }}
                         placeholder='Your answer'
                         className='border-0 border-b border-gray-300 rounded-none focus:border-blue-600 focus:ring-0'
                         disabled={disabled || readonly}
@@ -175,7 +181,9 @@ export default function FieldCard({
                 return (
                     <Textarea
                         value={value ?? ''}
-                        onChange={(e) => setValue(e.target.value)}
+                        onChange={(e) => {
+                            setValue(e.target.value);
+                        }}
                         placeholder='Your answer'
                         className='min-h-[100px] resize-none border-0 border-b border-gray-300 rounded-none focus:border-blue-600 focus:ring-0'
                         disabled={disabled || readonly}
@@ -187,7 +195,9 @@ export default function FieldCard({
                     <>
                         <RadioGroup
                             value={value ?? ''}
-                            onValueChange={(val) => setValue(val)}
+                            onValueChange={(val) => {
+                                setValue(val);
+                            }}
                             disabled={disabled || readonly}
                             className='space-y-2'
                         >
@@ -215,7 +225,7 @@ export default function FieldCard({
                                             'cursor-pointer',
                                             disabled || readonly
                                                 ? 'cursor-not-allowed opacity-50'
-                                                : ''
+                                                : '',
                                         )}
                                     >
                                         {opt.label}
@@ -238,16 +248,16 @@ export default function FieldCard({
                                     id={`${field.id}-${opt.value}`}
                                     checked={
                                         value?.includes(
-                                            answer ? opt.id : opt.value
+                                            answer ? opt.id : opt.value,
                                         ) || false
                                     }
-                                    onCheckedChange={(checked) =>
+                                    onCheckedChange={(checked) => {
                                         handleCheckboxChange(
                                             field.id,
                                             answer ? opt.id : opt.value,
-                                            checked
-                                        )
-                                    }
+                                            checked,
+                                        );
+                                    }}
                                     disabled={disabled || readonly}
                                 />
                                 <Label
@@ -265,7 +275,9 @@ export default function FieldCard({
                 return (
                     <Select
                         value={value ?? ''}
-                        onValueChange={(val) => setValue(val)}
+                        onValueChange={(val) => {
+                            setValue(val);
+                        }}
                         disabled={disabled || readonly}
                     >
                         <SelectTrigger className='w-full'>
@@ -288,7 +300,9 @@ export default function FieldCard({
                 return (
                     <DatePicker
                         value={value}
-                        onChange={(event) => setValue(event.target.value)}
+                        onChange={(event) => {
+                            setValue(event.target.value);
+                        }}
                         className='w-full'
                         disabled={disabled || readonly}
                     />
@@ -298,7 +312,9 @@ export default function FieldCard({
                 return (
                     <TimePicker
                         value={parseTime(value)}
-                        onChange={(e) => setValue(dayjs(e).toJSON())}
+                        onChange={(e) => {
+                            setValue(dayjs(e).toJSON());
+                        }}
                         placeholder='Select Time'
                         disabled={disabled || readonly}
                     />
@@ -312,7 +328,9 @@ export default function FieldCard({
                                 ? dayjs(value).toDate()
                                 : undefined
                         }
-                        onChange={(e) => setValue(dayjs(e).toJSON())}
+                        onChange={(e) => {
+                            setValue(dayjs(e).toJSON());
+                        }}
                         disabled={disabled || readonly}
                     />
                 );
@@ -343,11 +361,11 @@ export default function FieldCard({
                 ) : (
                     <Input
                         value={field.label ?? ''}
-                        onChange={(e) =>
+                        onChange={(e) => {
                             onUpdateField(field.id, {
                                 label: e.target.value,
-                            })
-                        }
+                            });
+                        }}
                         className='mb-3 font-medium border-0 border-b border-gray-300 rounded-none px-0 focus:border-blue-600 focus:ring-0'
                         disabled={readonly}
                         placeholder='Question'

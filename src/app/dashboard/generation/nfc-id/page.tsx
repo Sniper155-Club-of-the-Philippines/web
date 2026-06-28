@@ -65,7 +65,7 @@ export default function NFCID() {
                         data: encoder.encode(vcard.toString()).buffer,
                     },
                 ],
-                { overwrite: true, timeoutInSeconds: 5 }
+                { overwrite: true, timeoutInSeconds: 5 },
             );
 
             toast.success('NFC Write Successful', { closeButton: true });
@@ -99,12 +99,12 @@ export default function NFCID() {
 
     const name = useMemo(
         () => `${profile?.user?.first_name} ${profile?.user?.last_name}`,
-        [profile]
+        [profile],
     );
 
     const downloadCard = async (
         ref: RefObject<HTMLDivElement | null>,
-        title = ''
+        title = '',
     ) => {
         if (ref.current) {
             setLoading(true);
@@ -132,7 +132,7 @@ export default function NFCID() {
     useEffect(() => {
         deviceSupportsNFC()
             .then(setNfcSupported)
-            .catch((error) => {
+            .catch((error: unknown) => {
                 console.error(error);
                 setNfcSupported(false);
             });
@@ -155,13 +155,13 @@ export default function NFCID() {
                 <div>
                     <SelectSearch
                         id='name'
-                        onChange={(e) =>
+                        onChange={(e) => {
                             setProfile(
                                 profiles?.find(
-                                    (profile) => profile.id === e.target.value
-                                )
-                            )
-                        }
+                                    (profile) => profile.id === e.target.value,
+                                ),
+                            );
+                        }}
                         name='name'
                         options={options}
                         value={profile?.id}
@@ -193,7 +193,9 @@ export default function NFCID() {
                         <div
                             className='bg-muted h-full whitespace-pre-wrap cursor-pointer group relative'
                             onClick={() => {
-                                navigator.clipboard.writeText(vcard.toString());
+                                void navigator.clipboard.writeText(
+                                    vcard.toString(),
+                                );
                                 toast.info('Copied VCard to clipboard', {
                                     closeButton: true,
                                 });
@@ -221,7 +223,7 @@ export default function NFCID() {
                             <Button
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    downloadCard(frontCardRef, '-front');
+                                    void downloadCard(frontCardRef, '-front');
                                 }}
                             >
                                 Download
@@ -232,7 +234,7 @@ export default function NFCID() {
                             <Button
                                 onClick={(e) => {
                                     e.preventDefault();
-                                    downloadCard(rearCardRef, '-rear');
+                                    void downloadCard(rearCardRef, '-rear');
                                 }}
                             >
                                 Download

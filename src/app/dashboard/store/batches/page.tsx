@@ -94,7 +94,7 @@ export default function BatchesPage() {
         onSuccess: () => {
             toast.success(editing ? 'Batch updated.' : 'Batch created.');
             setOpen(false);
-            refresh();
+            void refresh();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to save batch.')),
@@ -103,7 +103,7 @@ export default function BatchesPage() {
         mutationFn: (id: string) => batch.remove(http, id),
         onSuccess: () => {
             toast.success('Batch deleted.');
-            refresh();
+            void refresh();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to delete batch.')),
@@ -125,7 +125,9 @@ export default function BatchesPage() {
         });
         setOpen(true);
     };
-    const submit = handleSubmit((values) => save.mutate(values));
+    const submit = handleSubmit((values) => {
+        save.mutate(values);
+    });
 
     return (
         <AdminPage
@@ -199,16 +201,18 @@ export default function BatchesPage() {
                                         <Button
                                             size='sm'
                                             variant='outline'
-                                            onClick={() => startEdit(item)}
+                                            onClick={() => {
+                                                startEdit(item);
+                                            }}
                                         >
                                             Edit
                                         </Button>
                                         <ConfirmDialog
                                             title='Delete batch?'
                                             description='This removes its product overrides too.'
-                                            onConfirm={() =>
-                                                remove.mutate(item.id)
-                                            }
+                                            onConfirm={() => {
+                                                remove.mutate(item.id);
+                                            }}
                                         />
                                     </div>
                                 </TableCell>
@@ -260,9 +264,9 @@ export default function BatchesPage() {
                                 <Checkbox
                                     id='batch-active'
                                     checked={form.is_active}
-                                    onCheckedChange={(v) =>
-                                        setValue('is_active', v === true)
-                                    }
+                                    onCheckedChange={(v) => {
+                                        setValue('is_active', v === true);
+                                    }}
                                 />
                                 <FieldLabel htmlFor='batch-active'>
                                     Active batch
@@ -287,11 +291,11 @@ export default function BatchesPage() {
                                                     ? new Date(field.value)
                                                     : undefined
                                             }
-                                            onChange={(value) =>
+                                            onChange={(value) => {
                                                 field.onChange(
                                                     value?.toISOString() ?? '',
-                                                )
-                                            }
+                                                );
+                                            }}
                                             onBlur={field.onBlur}
                                             aria-invalid={fieldState.invalid}
                                             placeholder='Select start date and time'
@@ -321,11 +325,11 @@ export default function BatchesPage() {
                                                     ? new Date(field.value)
                                                     : undefined
                                             }
-                                            onChange={(value) =>
+                                            onChange={(value) => {
                                                 field.onChange(
                                                     value?.toISOString() ?? '',
-                                                )
-                                            }
+                                                );
+                                            }}
                                             onBlur={field.onBlur}
                                             aria-invalid={fieldState.invalid}
                                             placeholder='Select end date and time'
@@ -350,7 +354,9 @@ export default function BatchesPage() {
                             <Button
                                 type='button'
                                 variant='outline'
-                                onClick={() => setOpen(false)}
+                                onClick={() => {
+                                    setOpen(false);
+                                }}
                             >
                                 Cancel
                             </Button>

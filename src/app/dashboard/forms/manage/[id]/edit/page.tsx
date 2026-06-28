@@ -54,7 +54,7 @@ export default function EditForm() {
             });
         } finally {
             setLoading(false);
-            queryClient.invalidateQueries({
+            void queryClient.invalidateQueries({
                 queryKey: ['forms', data.id],
             });
         }

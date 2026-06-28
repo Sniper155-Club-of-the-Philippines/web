@@ -150,7 +150,10 @@ describe('useRefreshToken — refresh flow', () => {
 
     it('logs out and redirects when the refresh returns 401', async () => {
         setToken(3600);
-        httpGet.mockRejectedValue({ response: { status: 401 } });
+        httpGet.mockRejectedValue({
+            isAxiosError: true,
+            response: { status: 401 },
+        });
         const { result } = renderHook(() =>
             useRefreshToken({ requireAuth: false }),
         );

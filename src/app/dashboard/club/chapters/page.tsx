@@ -44,7 +44,7 @@ export default function ClubChapters() {
                 closeButton: true,
             });
             setCreateOpen(false);
-            refetch();
+            void refetch();
         } catch (error) {
             console.error(error);
             toast.error('Unable to create chapter.', {
@@ -138,7 +138,7 @@ export default function ClubChapters() {
     ];
 
     const exportData = () => {
-        exportToExcel(columns as any, chapters ?? [], 'chapters.xlsx');
+        exportToExcel(columns, chapters ?? [], 'chapters.xlsx');
     };
 
     useEffect(() => {
@@ -157,14 +157,18 @@ export default function ClubChapters() {
                     <Input
                         type='search'
                         placeholder='Search'
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                        }}
                         value={search}
                     />
                     <TableMenu
                         onRefresh={refetch}
                         onExport={exportData}
                         onPrint={handlePrint}
-                        onCreate={() => setCreateOpen(true)}
+                        onCreate={() => {
+                            setCreateOpen(true);
+                        }}
                     />
                     {/* Create Dialog */}
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
@@ -178,7 +182,9 @@ export default function ClubChapters() {
 
                             <ChapterForm
                                 onSubmit={handleCreate}
-                                onCancel={() => setCreateOpen(false)}
+                                onCancel={() => {
+                                    setCreateOpen(false);
+                                }}
                             />
                         </DialogContent>
                     </Dialog>

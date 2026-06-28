@@ -47,36 +47,41 @@ export default function AnswerForm() {
     const handleSubmit = async (data: FormSubmitPayload) => {
         setLoading(true);
         try {
-            const answers = data.formData.reduce((payload, item) => {
-                switch (item.type) {
-                    case FORM_FIELD_TYPES.CHECKBOXES:
-                        payload[item.id] = item.value;
-                        break;
-                    case FORM_FIELD_TYPES.DATE:
-                        payload[item.id] = dayjs(item.value).toJSON();
-                        break;
-                    case FORM_FIELD_TYPES.DATETIME:
-                        payload[item.id] = dayjs(item.value).toJSON();
-                        break;
-                    case FORM_FIELD_TYPES.DROPDOWN:
-                        payload[item.id] = item.value;
-                        break;
-                    case FORM_FIELD_TYPES.MULTIPLE_CHOICE:
-                        payload[item.id] = item.value;
-                        break;
-                    case FORM_FIELD_TYPES.TEXT:
-                        payload[item.id] = item.value;
-                        break;
-                    case FORM_FIELD_TYPES.PARAGRAPH:
-                        payload[item.id] = item.value;
-                        break;
-                    case FORM_FIELD_TYPES.TIME:
-                        payload[item.id] = dayjs(item.value).format('HH:mm');
-                        break;
-                }
+            const answers = data.formData.reduce<Record<string, any>>(
+                (payload, item) => {
+                    switch (item.type) {
+                        case FORM_FIELD_TYPES.CHECKBOXES:
+                            payload[item.id] = item.value;
+                            break;
+                        case FORM_FIELD_TYPES.DATE:
+                            payload[item.id] = dayjs(item.value).toJSON();
+                            break;
+                        case FORM_FIELD_TYPES.DATETIME:
+                            payload[item.id] = dayjs(item.value).toJSON();
+                            break;
+                        case FORM_FIELD_TYPES.DROPDOWN:
+                            payload[item.id] = item.value;
+                            break;
+                        case FORM_FIELD_TYPES.MULTIPLE_CHOICE:
+                            payload[item.id] = item.value;
+                            break;
+                        case FORM_FIELD_TYPES.TEXT:
+                            payload[item.id] = item.value;
+                            break;
+                        case FORM_FIELD_TYPES.PARAGRAPH:
+                            payload[item.id] = item.value;
+                            break;
+                        case FORM_FIELD_TYPES.TIME:
+                            payload[item.id] = dayjs(item.value).format(
+                                'HH:mm',
+                            );
+                            break;
+                    }
 
-                return payload;
-            }, {} as Record<string, any>);
+                    return payload;
+                },
+                {},
+            );
 
             await form.answer(http, params.id, answers);
             toast.success('Form submitted successfully!', {
@@ -162,7 +167,7 @@ export default function AnswerForm() {
                             size='sm'
                             onClick={(e) => {
                                 e.preventDefault();
-                                logout();
+                                void logout();
                             }}
                         >
                             Sign out
@@ -195,7 +200,7 @@ export default function AnswerForm() {
                                 onClick={(e) => {
                                     e.preventDefault();
                                     setTimeout(() => {
-                                        logout();
+                                        void logout();
                                     }, 100);
                                     router.replace('/');
                                 }}

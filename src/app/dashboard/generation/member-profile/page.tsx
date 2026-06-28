@@ -41,15 +41,15 @@ export default function MemberProfile() {
                     data.user_id.map((user_id) =>
                         profile.store(http, {
                             user_id,
-                        })
-                    )
+                        }),
+                    ),
                 );
             }
             toast.success('Profile created successfully.', {
                 closeButton: true,
             });
             setCreateOpen(false);
-            refetch();
+            void refetch();
         } catch (error) {
             console.error(error);
             toast.error('Unable to create profile.', {
@@ -118,7 +118,7 @@ export default function MemberProfile() {
     ];
 
     const exportData = () => {
-        exportToExcel(columns as any, profiles ?? [], 'profiles.xlsx');
+        exportToExcel(columns, profiles ?? [], 'profiles.xlsx');
     };
 
     useEffect(() => {
@@ -137,13 +137,17 @@ export default function MemberProfile() {
                     <Input
                         type='search'
                         placeholder='Search'
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                        }}
                         value={search}
                     />
                     <TableMenu
                         onRefresh={refetch}
                         onExport={exportData}
-                        onCreate={() => setCreateOpen(true)}
+                        onCreate={() => {
+                            setCreateOpen(true);
+                        }}
                         disable={['print']}
                     />
                     {/* Create Dialog */}
@@ -158,7 +162,9 @@ export default function MemberProfile() {
 
                             <ProfileForm
                                 onSubmit={handleCreate}
-                                onCancel={() => setCreateOpen(false)}
+                                onCancel={() => {
+                                    setCreateOpen(false);
+                                }}
                             />
                         </DialogContent>
                     </Dialog>

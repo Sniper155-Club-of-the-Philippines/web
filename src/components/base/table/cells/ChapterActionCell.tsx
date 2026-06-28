@@ -56,7 +56,7 @@ const ChapterActionCell = ({ chapter, refetch }: Props) => {
     const handleEdit = async (data: ChapterFormInputs) => {
         setLoading(true);
         try {
-            await api.update(http, data);
+            await api.update(http, chapter.id, data);
             toast.success('Chapter updated successfully.', {
                 closeButton: true,
             });
@@ -82,10 +82,18 @@ const ChapterActionCell = ({ chapter, refetch }: Props) => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <DropdownMenuItem onClick={() => setEditOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setEditOpen(true);
+                        }}
+                    >
                         Edit
                     </DropdownMenuItem>
-                    <DropdownMenuItem onClick={() => setDeleteOpen(true)}>
+                    <DropdownMenuItem
+                        onClick={() => {
+                            setDeleteOpen(true);
+                        }}
+                    >
                         Delete
                     </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -105,7 +113,9 @@ const ChapterActionCell = ({ chapter, refetch }: Props) => {
                     <ChapterForm
                         defaultValues={chapter}
                         onSubmit={handleEdit}
-                        onCancel={() => setEditOpen(false)}
+                        onCancel={() => {
+                            setEditOpen(false);
+                        }}
                     />
                 </DialogContent>
             </Dialog>
@@ -124,7 +134,9 @@ const ChapterActionCell = ({ chapter, refetch }: Props) => {
                     <DialogFooter>
                         <Button
                             variant='outline'
-                            onClick={() => setDeleteOpen(false)}
+                            onClick={() => {
+                                setDeleteOpen(false);
+                            }}
                         >
                             Cancel
                         </Button>

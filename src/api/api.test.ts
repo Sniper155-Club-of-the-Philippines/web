@@ -131,7 +131,7 @@ describe('chapter api', () => {
     });
 
     it('update spoofs PUT via _method', async () => {
-        await chapter.update(http, { id: 'c1', name: 'New' });
+        await chapter.update(http, 'c1', { name: 'New' });
         const [url, body] = http.post.mock.calls[0];
         expect(url).toBe('/v1/chapters/c1');
         expect((body as FormData).get('_method')).toBe('PUT');
@@ -168,9 +168,8 @@ describe('event api', () => {
     });
 
     it('update puts json by id', async () => {
-        await event.update(http, { id: 'e1', title: 'X' });
+        await event.update(http, 'e1', { title: 'X' });
         expect(http.put).toHaveBeenCalledWith('/v1/events/e1', {
-            id: 'e1',
             title: 'X',
         });
     });
@@ -299,7 +298,7 @@ describe('user api', () => {
     });
 
     it('update drops an empty password and spoofs PUT', async () => {
-        await user.update(http, { id: 'u1', first_name: 'A', password: '' });
+        await user.update(http, 'u1', { first_name: 'A', password: '' });
         const [url, body] = http.post.mock.calls[0];
         expect(url).toBe('/v1/users/u1');
         expect((body as FormData).get('_method')).toBe('PUT');
@@ -307,7 +306,7 @@ describe('user api', () => {
     });
 
     it('update keeps a real password', async () => {
-        await user.update(http, { id: 'u1', password: 'secret' });
+        await user.update(http, 'u1', { password: 'secret' });
         const body = http.post.mock.calls[0][1] as FormData;
         expect(body.get('password')).toBe('secret');
     });

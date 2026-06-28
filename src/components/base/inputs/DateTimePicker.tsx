@@ -43,7 +43,7 @@ export default function DateTimePicker(props: DateTimePickerProps) {
         'aria-invalid': ariaInvalid,
     } = props;
     const [internalDate, setInternalDate] = useState<Date | undefined>(
-        defaultValue
+        defaultValue,
     );
     const [isOpen, setIsOpen] = useState(false);
     const isControlled = Object.prototype.hasOwnProperty.call(props, 'value');
@@ -74,7 +74,7 @@ export default function DateTimePicker(props: DateTimePickerProps) {
 
     const handleTimeChange = (
         type: 'hour' | 'minute' | 'ampm',
-        value: string
+        value: string,
     ) => {
         if (disabled || !date) return;
 
@@ -82,7 +82,7 @@ export default function DateTimePicker(props: DateTimePickerProps) {
 
         if (type === 'hour') {
             newDate.setHours(
-                (parseInt(value) % 12) + (newDate.getHours() >= 12 ? 12 : 0)
+                (parseInt(value) % 12) + (newDate.getHours() >= 12 ? 12 : 0),
             );
         } else if (type === 'minute') {
             newDate.setMinutes(parseInt(value));
@@ -123,7 +123,7 @@ export default function DateTimePicker(props: DateTimePickerProps) {
                     className={cn(
                         'w-full justify-start text-left font-normal',
                         !date && 'text-muted-foreground',
-                        className
+                        className,
                     )}
                 >
                     <CalendarIcon className='mr-2 h-4 w-4' />
@@ -160,12 +160,12 @@ export default function DateTimePicker(props: DateTimePickerProps) {
                                                         : 'ghost'
                                                 }
                                                 className='sm:w-full shrink-0 aspect-square'
-                                                onClick={() =>
+                                                onClick={() => {
                                                     handleTimeChange(
                                                         'hour',
-                                                        hour.toString()
-                                                    )
-                                                }
+                                                        hour.toString(),
+                                                    );
+                                                }}
                                             >
                                                 {hour}
                                             </Button>
@@ -182,7 +182,7 @@ export default function DateTimePicker(props: DateTimePickerProps) {
                                 <div className='flex sm:flex-col p-2'>
                                     {Array.from(
                                         { length: 12 },
-                                        (_, i) => i * 5
+                                        (_, i) => i * 5,
                                     ).map((minute) => (
                                         <Button
                                             key={minute}
@@ -196,12 +196,12 @@ export default function DateTimePicker(props: DateTimePickerProps) {
                                                     : 'ghost'
                                             }
                                             className='sm:w-full shrink-0 aspect-square'
-                                            onClick={() =>
+                                            onClick={() => {
                                                 handleTimeChange(
                                                     'minute',
-                                                    minute.toString()
-                                                )
-                                            }
+                                                    minute.toString(),
+                                                );
+                                            }}
                                         >
                                             {minute.toString().padStart(2, '0')}
                                         </Button>
@@ -232,9 +232,9 @@ export default function DateTimePicker(props: DateTimePickerProps) {
                                                     : 'ghost'
                                             }
                                             className='sm:w-full shrink-0 aspect-square'
-                                            onClick={() =>
-                                                handleTimeChange('ampm', ampm)
-                                            }
+                                            onClick={() => {
+                                                handleTimeChange('ampm', ampm);
+                                            }}
                                         >
                                             {ampm}
                                         </Button>

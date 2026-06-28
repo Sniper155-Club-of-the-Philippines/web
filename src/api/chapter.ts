@@ -14,12 +14,19 @@ export async function store(http: AxiosInstance, payload: Partial<Chapter>) {
         nullsAsUndefineds: true,
     });
 
-    const { data } = await http.post(`/v1/chapters`, formData);
+    const { data } = await http.post<{ chapter: Chapter }>(
+        `/v1/chapters`,
+        formData,
+    );
 
-    return data;
+    return data.chapter;
 }
 
-export async function update(http: AxiosInstance, payload: Partial<Chapter>) {
+export async function update(
+    http: AxiosInstance,
+    id: Chapter['id'],
+    payload: Partial<Chapter>,
+) {
     const FormData = await import('@avidian/form-data');
 
     const formData = new FormData.default(payload, {
@@ -28,9 +35,12 @@ export async function update(http: AxiosInstance, payload: Partial<Chapter>) {
 
     formData.set('_method', 'PUT');
 
-    const { data } = await http.post(`/v1/chapters/${payload.id}`, formData);
+    const { data } = await http.post<{ chapter: Chapter }>(
+        `/v1/chapters/${id}`,
+        formData,
+    );
 
-    return data;
+    return data.chapter;
 }
 
 export async function remove(http: AxiosInstance, id: string) {

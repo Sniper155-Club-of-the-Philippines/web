@@ -81,7 +81,7 @@ export default function ProductsPage() {
         onSuccess: () => {
             toast.success(editing ? 'Product updated.' : 'Product created.');
             setOpen(false);
-            refresh();
+            void refresh();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to save product.')),
@@ -90,7 +90,7 @@ export default function ProductsPage() {
         mutationFn: (id: string) => product.remove(http, id),
         onSuccess: () => {
             toast.success('Product deleted.');
-            refresh();
+            void refresh();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to delete product.')),
@@ -106,13 +106,15 @@ export default function ProductsPage() {
         });
         setOpen(true);
     };
-    const submit = handleSubmit((values) => save.mutate(values));
+    const submit = handleSubmit((values) => {
+        save.mutate(values);
+    });
     const upload = async (file?: File) => {
         if (!editing || !file) return;
         try {
             await product.uploadImage(http, editing.id, file);
             toast.success('Image uploaded.');
-            refresh();
+            void refresh();
             setEditing(
                 (await product.all(http)).find(
                     (item) => item.id === editing.id,
@@ -130,7 +132,7 @@ export default function ProductsPage() {
                 (image) => image.id !== imageId,
             );
             setEditing({ ...editing, images });
-            refresh();
+            void refresh();
         } catch (error) {
             toast.error(apiError(error, 'Unable to delete image.'));
         }
@@ -149,7 +151,7 @@ export default function ProductsPage() {
                 images,
             );
             setEditing({ ...editing, images: reordered });
-            refresh();
+            void refresh();
         } catch (error) {
             toast.error(apiError(error, 'Unable to reorder images.'));
         }
@@ -224,16 +226,18 @@ export default function ProductsPage() {
                                         <Button
                                             size='sm'
                                             variant='outline'
-                                            onClick={() => startEdit(item)}
+                                            onClick={() => {
+                                                startEdit(item);
+                                            }}
                                         >
                                             Edit
                                         </Button>
                                         <ConfirmDialog
                                             title='Delete product?'
                                             description='This also removes its batch configuration and images.'
-                                            onConfirm={() =>
-                                                remove.mutate(item.id)
-                                            }
+                                            onConfirm={() => {
+                                                remove.mutate(item.id);
+                                            }}
                                         />
                                     </div>
                                 </TableCell>
@@ -278,9 +282,9 @@ export default function ProductsPage() {
                             <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
                                 <Checkbox
                                     checked={form.is_active}
-                                    onCheckedChange={(v) =>
-                                        setValue('is_active', v === true)
-                                    }
+                                    onCheckedChange={(v) => {
+                                        setValue('is_active', v === true);
+                                    }}
                                 />{' '}
                                 Active product
                             </label>
@@ -389,7 +393,9 @@ export default function ProductsPage() {
                             <Button
                                 type='button'
                                 variant='outline'
-                                onClick={() => setOpen(false)}
+                                onClick={() => {
+                                    setOpen(false);
+                                }}
                             >
                                 Cancel
                             </Button>

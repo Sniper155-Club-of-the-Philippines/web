@@ -58,16 +58,18 @@ export default function StoreSettingsPage() {
                         <Checkbox
                             id='store-enabled'
                             checked={enabled}
-                            onCheckedChange={(checked) =>
-                                mutation.mutate(checked === true)
-                            }
+                            onCheckedChange={(checked) => {
+                                mutation.mutate(checked === true);
+                            }}
                             disabled={query.isLoading || mutation.isPending}
                         />
                         Store enabled
                     </label>
                     <Button
                         variant='outline'
-                        onClick={() => mutation.mutate(!enabled)}
+                        onClick={() => {
+                            mutation.mutate(!enabled);
+                        }}
                         disabled={query.isLoading || mutation.isPending}
                     >
                         {enabled ? 'Close store' : 'Open store'}

@@ -4,7 +4,7 @@ import { AxiosInstance } from 'axios';
 
 export async function all(
     http: AxiosInstance,
-    params: Pick<Partial<Setting>, 'group' | 'key'>
+    params: Pick<Partial<Setting>, 'group' | 'key'>,
 ) {
     const { data } = await http.get<{ settings: Setting[] }>('/v1/settings', {
         params,
@@ -16,12 +16,10 @@ export async function all(
 export async function store(http: AxiosInstance, payload: StorePayload) {
     const FormData = await import('@avidian/form-data');
 
-    const { data } = await http.post(
+    await http.post<{ setting: Setting }>(
         `/v1/settings`,
-        new FormData.default(payload)
+        new FormData.default(payload),
     );
-
-    return data;
 }
 
 export async function remove(http: AxiosInstance, id: string) {

@@ -4,10 +4,10 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
-    "build:analyze": "ANALYZE=true next build",
+    "build": "npm run lint && npm run typecheck && next build",
+    "build:analyze": "npm run lint && npm run typecheck && ANALYZE=true next build",
     "start": "next start",
-    "lint": "next lint",
+    "lint": "eslint . --max-warnings=0",
     "typecheck": "tsc -b",
     "test": "vitest run",
     "test:watch": "vitest",

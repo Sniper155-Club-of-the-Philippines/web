@@ -23,9 +23,14 @@ export default function Settings() {
     const http = useHttp();
 
     const onSubmit = async (data: UserFormInputs) => {
+        if (!user) {
+            toast.error('Unable to identify the current account.');
+            return;
+        }
+
         setLoading(true);
         try {
-            await api.update(http, data);
+            await api.update(http, user.id, data);
             toast.success('Settings saved successfully.', {
                 closeButton: true,
             });

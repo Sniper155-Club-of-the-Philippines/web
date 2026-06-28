@@ -89,7 +89,7 @@ export default function RolesPage() {
         onSuccess: () => {
             toast.success(editing ? 'Role updated.' : 'Role created.');
             setOpen(false);
-            refreshRoles();
+            void refreshRoles();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to save role.')),
@@ -98,7 +98,7 @@ export default function RolesPage() {
         mutationFn: (id: string) => role.remove(http, id),
         onSuccess: () => {
             toast.success('Role deleted.');
-            refreshRoles();
+            void refreshRoles();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to delete role.')),
@@ -107,7 +107,7 @@ export default function RolesPage() {
         mutationFn: () => user.assignRoles(http, selectedUserId, selectedRoles),
         onSuccess: () => {
             toast.success('User roles updated.');
-            queryClient.invalidateQueries({ queryKey: ['users'] });
+            void queryClient.invalidateQueries({ queryKey: ['users'] });
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to assign roles.')),
@@ -125,26 +125,30 @@ export default function RolesPage() {
         });
         setOpen(true);
     };
-    const togglePermission = (value: string, checked: boolean) =>
+    const togglePermission = (value: string, checked: boolean) => {
         setValue(
             'permissions',
             checked
                 ? [...selectedPermissions, value]
                 : selectedPermissions.filter((item) => item !== value),
         );
-    const toggleRole = (value: string, checked: boolean) =>
+    };
+    const toggleRole = (value: string, checked: boolean) => {
         setSelectedRoles(
             checked
                 ? [...selectedRoles, value]
                 : selectedRoles.filter((item) => item !== value),
         );
+    };
     const selectUser = (id: string) => {
         setSelectedUserId(id);
         setSelectedRoles(
             usersQuery.data?.find((item) => item.id === id)?.roles ?? [],
         );
     };
-    const submit = handleSubmit((values) => save.mutate(values));
+    const submit = handleSubmit((values) => {
+        save.mutate(values);
+    });
 
     return (
         <AdminPage
@@ -218,9 +222,9 @@ export default function RolesPage() {
                                                 <Button
                                                     size='sm'
                                                     variant='outline'
-                                                    onClick={() =>
-                                                        startEdit(item)
-                                                    }
+                                                    onClick={() => {
+                                                        startEdit(item);
+                                                    }}
                                                 >
                                                     Edit
                                                 </Button>
@@ -231,9 +235,9 @@ export default function RolesPage() {
                                                         'admin',
                                                         'member',
                                                     ].includes(item.name)}
-                                                    onConfirm={() =>
-                                                        remove.mutate(item.id)
-                                                    }
+                                                    onConfirm={() => {
+                                                        remove.mutate(item.id);
+                                                    }}
                                                 />
                                             </div>
                                         </TableCell>
@@ -288,12 +292,12 @@ export default function RolesPage() {
                                             checked={selectedRoles.includes(
                                                 item.name,
                                             )}
-                                            onCheckedChange={(v) =>
+                                            onCheckedChange={(v) => {
                                                 toggleRole(
                                                     item.name,
                                                     v === true,
-                                                )
-                                            }
+                                                );
+                                            }}
                                         />{' '}
                                         {item.name}
                                     </label>
@@ -303,7 +307,9 @@ export default function RolesPage() {
                         <div>
                             <Button
                                 disabled={!selectedUserId || assign.isPending}
-                                onClick={() => assign.mutate()}
+                                onClick={() => {
+                                    assign.mutate();
+                                }}
                             >
                                 {assign.isPending
                                     ? 'Saving…'
@@ -359,12 +365,14 @@ export default function RolesPage() {
                                                         checked={selectedPermissions.includes(
                                                             item.name,
                                                         )}
-                                                        onCheckedChange={(v) =>
+                                                        onCheckedChange={(
+                                                            v,
+                                                        ) => {
                                                             togglePermission(
                                                                 item.name,
                                                                 v === true,
-                                                            )
-                                                        }
+                                                            );
+                                                        }}
                                                     />
                                                     <span>
                                                         {
@@ -384,7 +392,9 @@ export default function RolesPage() {
                             <Button
                                 type='button'
                                 variant='outline'
-                                onClick={() => setOpen(false)}
+                                onClick={() => {
+                                    setOpen(false);
+                                }}
                             >
                                 Cancel
                             </Button>

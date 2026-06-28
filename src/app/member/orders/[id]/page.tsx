@@ -58,7 +58,11 @@ export default function MemberOrderDetailPage() {
             ) : (
                 <div className='flex flex-col gap-6'>
                     <section className='flex flex-wrap items-center gap-3'>
-                        <Badge variant={paymentStatusVariant(current.payment_status)}>
+                        <Badge
+                            variant={paymentStatusVariant(
+                                current.payment_status,
+                            )}
+                        >
                             {paymentStatusLabel(current.payment_status)}
                         </Badge>
                         <span className='text-muted-foreground text-sm'>
@@ -69,15 +73,17 @@ export default function MemberOrderDetailPage() {
                         </span>
                     </section>
 
-                    {current.payment_status === 'rejected' && current.reject_reason && (
-                        <Alert variant='destructive'>
-                            <TriangleAlert />
-                            <AlertTitle>Payment rejected</AlertTitle>
-                            <AlertDescription>
-                                {current.reject_reason} Submit a new proof below.
-                            </AlertDescription>
-                        </Alert>
-                    )}
+                    {current.payment_status === 'rejected' &&
+                        current.reject_reason && (
+                            <Alert variant='destructive'>
+                                <TriangleAlert />
+                                <AlertTitle>Payment rejected</AlertTitle>
+                                <AlertDescription>
+                                    {current.reject_reason} Submit a new proof
+                                    below.
+                                </AlertDescription>
+                            </Alert>
+                        )}
 
                     <section className='bg-card rounded-lg border'>
                         <div className='divide-border divide-y'>
@@ -91,8 +97,8 @@ export default function MemberOrderDetailPage() {
                                             {item.product_name}
                                         </span>
                                         <span className='text-muted-foreground text-sm'>
-                                            {item.recipient_nickname} · {item.size} ·
-                                            ×{item.quantity}
+                                            {item.recipient_nickname} ·{' '}
+                                            {item.size} · ×{item.quantity}
                                         </span>
                                     </div>
                                     <span className='font-medium'>
@@ -112,7 +118,8 @@ export default function MemberOrderDetailPage() {
                                         <div className='bg-primary mt-1.5 size-2 shrink-0 rounded-full' />
                                         <div className='flex flex-col'>
                                             <span className='text-sm'>
-                                                {entry.remarks ?? entry.new_value}
+                                                {entry.remarks ??
+                                                    entry.new_value}
                                             </span>
                                             {entry.created_at && (
                                                 <span className='text-muted-foreground text-xs'>
@@ -142,7 +149,9 @@ export default function MemberOrderDetailPage() {
                         {canVoid(current) && (
                             <Button
                                 variant='outline'
-                                onClick={() => voidOrder.mutate()}
+                                onClick={() => {
+                                    voidOrder.mutate();
+                                }}
                                 disabled={voidOrder.isPending}
                             >
                                 Void and return to cart

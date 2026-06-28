@@ -3,8 +3,6 @@ import { twMerge } from 'tailwind-merge';
 
 import * as XLSX from 'xlsx';
 import { saveAs } from 'file-saver';
-import { AccessorKeyColumnDefBase } from '@tanstack/react-table';
-import { KeyOf } from '@/types/object';
 import { Profile } from '@/types/models/profile';
 import { VCard } from '@scr2em/vcard';
 
@@ -12,33 +10,32 @@ export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
 }
 
-// Type for a column with string header and accessorKey pointing to a key of T
-type ColumnWithStringHeader<
-    T,
-    K extends keyof T
-> = AccessorKeyColumnDefBase<T> & {
-    header: string;
-    accessorKey: K;
-    accessorFn?: (row: T, index: number) => T[K];
-};
+interface ExportColumn<T> {
+    header?: unknown;
+    accessorKey?: PropertyKey;
+    accessorFn?: (row: T, index: number) => unknown;
+}
 
-export function exportToExcel<T, K extends keyof T>(
-    columnDefs: ColumnWithStringHeader<T, K>[],
+export function exportToExcel<T>(
+    columnDefs: readonly ExportColumn<T>[],
     data: T[],
-    fileName = 'data.xlsx'
+    fileName = 'data.xlsx',
 ) {
     const columns = columnDefs.filter(
-        (item) => item.accessorKey || item.accessorFn
+        (item) =>
+            typeof item.header === 'string' &&
+            (item.accessorKey !== undefined || item.accessorFn !== undefined),
     );
 
     // Map data to use headers as keys
-    const processed: Record<string, T[K]>[] = data.map((item, index) => {
-        const row: Record<string, T[K]> = {};
+    const processed: Record<string, unknown>[] = data.map((item, index) => {
+        const row: Record<string, unknown> = {};
         columns.forEach((col) => {
+            const header = String(col.header);
             if (col.accessorFn) {
-                row[col.header] = col.accessorFn(item, index);
-            } else {
-                row[col.header] = item[col.accessorKey];
+                row[header] = col.accessorFn(item, index);
+            } else if (col.accessorKey !== undefined) {
+                row[header] = Reflect.get(Object(item), col.accessorKey);
             }
         });
         return row;
@@ -52,10 +49,14 @@ export function exportToExcel<T, K extends keyof T>(
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Sheet1');
 
     // Generate Excel buffer
-    const excelBuffer = XLSX.write(workbook, {
+    const excelBuffer: unknown = XLSX.write(workbook, {
         bookType: 'xlsx',
         type: 'array',
     });
+
+    if (!(excelBuffer instanceof ArrayBuffer)) {
+        throw new TypeError('Excel export did not produce an ArrayBuffer.');
+    }
 
     // Save the file
     const blob = new Blob([excelBuffer], { type: 'application/octet-stream' });
@@ -65,7 +66,7 @@ export function exportToExcel<T, K extends keyof T>(
 export async function urlToFile(
     url: string,
     filename?: string,
-    mimeType?: string
+    mimeType?: string,
 ): Promise<File> {
     const response = await fetch(url);
 
@@ -73,7 +74,7 @@ export async function urlToFile(
     if (!filename) {
         const contentDisposition = response.headers.get('Content-Disposition');
         const match = contentDisposition?.match(
-            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i
+            /filename[^;=\n]*=((['"]).*?\2|[^;\n]*)/i,
         );
         if (match?.[1]) {
             filename = match[1].replace(/['"]/g, ''); // strip quotes
@@ -90,7 +91,7 @@ export async function urlToFile(
 export function searchArray<T>(
     items: T[] | undefined,
     search: string,
-    keys: KeyOf<T>[]
+    keys: readonly (keyof T)[],
 ) {
     if (!items) return [];
     if (!search) return items;
@@ -102,7 +103,7 @@ export function searchArray<T>(
             const value = item[key];
             if (value === null) return false;
             return String(value).toLowerCase().includes(lower);
-        })
+        }),
     );
 }
 

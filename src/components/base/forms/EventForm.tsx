@@ -19,7 +19,7 @@ const EventForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
     const { register, handleSubmit, reset, control } = useForm<EventFormInputs>(
         {
             defaultValues,
-        }
+        },
     );
 
     // reset when editing a different event
@@ -70,9 +70,9 @@ const EventForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                                     id='start'
                                     placeholder='Start Date'
                                     value={field.value}
-                                    onChange={(e) =>
-                                        field.onChange(e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        field.onChange(e.target.value);
+                                    }}
                                     onBlur={field.onBlur}
                                     name={field.name}
                                     ref={field.ref}
@@ -96,9 +96,9 @@ const EventForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                                     id='end'
                                     placeholder='End Date'
                                     value={field.value}
-                                    onChange={(e) =>
-                                        field.onChange(e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        field.onChange(e.target.value);
+                                    }}
                                     onBlur={field.onBlur}
                                     name={field.name}
                                     ref={field.ref}

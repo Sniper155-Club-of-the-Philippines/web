@@ -29,8 +29,7 @@ type Option = {
     value: string;
 };
 
-interface SelectSearchProps
-    extends React.SelectHTMLAttributes<HTMLSelectElement> {
+interface SelectSearchProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
     options?: Option[];
     placeholder?: string;
     triggerWidth?: string;
@@ -46,17 +45,21 @@ const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
             triggerWidth,
             ...props
         },
-        ref
+        ref,
     ) => {
         const [open, setOpen] = React.useState(false);
         const [isMobile, setIsMobile] = React.useState(false);
 
         // detect screen size for Drawer vs Popover
         React.useEffect(() => {
-            const update = () => setIsMobile(window.innerWidth < 640);
+            const update = () => {
+                setIsMobile(window.innerWidth < 640);
+            };
             update();
             window.addEventListener('resize', update);
-            return () => window.removeEventListener('resize', update);
+            return () => {
+                window.removeEventListener('resize', update);
+            };
         }, []);
 
         const selected = options.find((o) => o.value === value);
@@ -75,7 +78,9 @@ const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
                 role='combobox'
                 aria-expanded={open}
                 className={cn('justify-between', triggerWidth ?? 'w-full')}
-                onClick={() => setOpen(true)}
+                onClick={() => {
+                    setOpen(true);
+                }}
             >
                 {selected ? selected.label : placeholder}
                 <ChevronsUpDown className='ml-2 h-4 w-4 shrink-0 opacity-50' />
@@ -95,7 +100,9 @@ const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
                                 value={opt.label}
                                 // Also allow searching by the ID via keywords
                                 keywords={[opt.value]}
-                                onSelect={() => handleSelect(opt.value)}
+                                onSelect={() => {
+                                    handleSelect(opt.value);
+                                }}
                             >
                                 {opt.label}
                                 {opt.value === value && (
@@ -147,7 +154,7 @@ const SelectSearch = React.forwardRef<HTMLSelectElement, SelectSearchProps>(
                 )}
             </>
         );
-    }
+    },
 );
 
 SelectSearch.displayName = 'SelectSearch';

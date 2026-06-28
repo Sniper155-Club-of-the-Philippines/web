@@ -14,15 +14,22 @@ export async function show(http: AxiosInstance, id: string) {
 }
 
 export async function store(http: AxiosInstance, payload: Partial<Event>) {
-    const { data } = await http.post(`/v1/events`, payload);
+    const { data } = await http.post<{ event: Event }>(`/v1/events`, payload);
 
-    return data;
+    return data.event;
 }
 
-export async function update(http: AxiosInstance, payload: Partial<Event>) {
-    const { data } = await http.put(`/v1/events/${payload.id}`, payload);
+export async function update(
+    http: AxiosInstance,
+    id: Event['id'],
+    payload: Partial<Event>,
+) {
+    const { data } = await http.put<{ event: Event }>(
+        `/v1/events/${id}`,
+        payload,
+    );
 
-    return data;
+    return data.event;
 }
 
 export async function remove(http: AxiosInstance, id: string) {

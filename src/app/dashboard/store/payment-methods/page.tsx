@@ -94,7 +94,7 @@ export default function PaymentMethodsPage() {
                 editing ? 'Payment method updated.' : 'Payment method created.',
             );
             setOpen(false);
-            refresh();
+            void refresh();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to save payment method.')),
@@ -103,7 +103,7 @@ export default function PaymentMethodsPage() {
         mutationFn: (id: string) => paymentMethod.remove(http, id),
         onSuccess: () => {
             toast.success('Payment method deleted.');
-            refresh();
+            void refresh();
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to delete payment method.')),
@@ -127,7 +127,9 @@ export default function PaymentMethodsPage() {
         });
         setOpen(true);
     };
-    const submit = handleSubmit((values) => save.mutate(values));
+    const submit = handleSubmit((values) => {
+        save.mutate(values);
+    });
 
     return (
         <AdminPage
@@ -204,16 +206,18 @@ export default function PaymentMethodsPage() {
                                         <Button
                                             size='sm'
                                             variant='outline'
-                                            onClick={() => startEdit(item)}
+                                            onClick={() => {
+                                                startEdit(item);
+                                            }}
                                         >
                                             Edit
                                         </Button>
                                         <ConfirmDialog
                                             title='Delete payment method?'
                                             description='Members will no longer be able to select it.'
-                                            onConfirm={() =>
-                                                remove.mutate(item.id)
-                                            }
+                                            onConfirm={() => {
+                                                remove.mutate(item.id);
+                                            }}
                                         />
                                     </div>
                                 </TableCell>
@@ -248,7 +252,9 @@ export default function PaymentMethodsPage() {
                                     value={form.type}
                                     onValueChange={(
                                         type: PaymentMethod['type'],
-                                    ) => setValue('type', type)}
+                                    ) => {
+                                        setValue('type', type);
+                                    }}
                                 >
                                     <SelectTrigger>
                                         <SelectValue />
@@ -295,9 +301,9 @@ export default function PaymentMethodsPage() {
                             <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
                                 <Checkbox
                                     checked={form.is_active}
-                                    onCheckedChange={(v) =>
-                                        setValue('is_active', v === true)
-                                    }
+                                    onCheckedChange={(v) => {
+                                        setValue('is_active', v === true);
+                                    }}
                                 />{' '}
                                 Active method
                             </label>
@@ -310,12 +316,12 @@ export default function PaymentMethodsPage() {
                                 <Input
                                     type='file'
                                     accept='image/jpeg,image/png,image/webp'
-                                    onChange={(e) =>
+                                    onChange={(e) => {
                                         setValue(
                                             'qr_image',
                                             e.target.files?.[0],
-                                        )
-                                    }
+                                        );
+                                    }}
                                 />
                                 <span className='text-xs font-normal text-muted-foreground'>
                                     {editing?.qr_image_url && !form.qr_image
@@ -328,7 +334,9 @@ export default function PaymentMethodsPage() {
                             <Button
                                 type='button'
                                 variant='outline'
-                                onClick={() => setOpen(false)}
+                                onClick={() => {
+                                    setOpen(false);
+                                }}
                             >
                                 Cancel
                             </Button>

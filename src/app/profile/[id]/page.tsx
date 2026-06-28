@@ -38,13 +38,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     const description = `${name} – ${
         user?.designation || 'Member'
     } of Sniper 155 Club of the Philippines`;
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3000';
 
     return {
-        metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL!),
+        metadataBase: new URL(siteUrl),
         title: `${name} | Sniper 155 Club of the Philippines`,
         description,
         alternates: {
-            canonical: `${process.env.NEXT_PUBLIC_SITE_URL}/profiles/${id}`,
+            canonical: `${siteUrl}/profiles/${id}`,
         },
         openGraph: {
             title: name,
@@ -79,7 +80,7 @@ export default async function Profile({ params }: Props) {
 
     try {
         data = await profile.show(http, id);
-    } catch (error: any) {
+    } catch (error: unknown) {
         if (axios.isAxiosError(error) && error.response?.status === 404) {
             return notFound();
         }
@@ -149,7 +150,7 @@ export default async function Profile({ params }: Props) {
                     <article
                         className={cn(
                             'flex flex-col items-center w-full md:px-5',
-                            avatar ? 'pt-[100px] md:pt-[175px]' : ''
+                            avatar ? 'pt-[100px] md:pt-[175px]' : '',
                         )}
                     >
                         <h1 className='text-center text-xl md:text-4xl font-extrabold tracking-tight'>
@@ -169,10 +170,12 @@ export default async function Profile({ params }: Props) {
                                 >
                                     {user?.chapter?.photo_url && (
                                         <div className='w-10/24 relative flex items-center justify-center h-60'>
-                                            <img
+                                            <Image
                                                 src={user.chapter.photo_url}
                                                 alt={`${user.chapter.name} Chapter Logo`}
-                                                className='object-contain bg-no-repeat bg-center h-full w-full'
+                                                fill
+                                                unoptimized
+                                                className='object-contain'
                                             />
                                         </div>
                                     )}
@@ -181,7 +184,7 @@ export default async function Profile({ params }: Props) {
                                             'flex flex-col items-center justify-center',
                                             user?.chapter?.photo_url
                                                 ? 'w-14/24'
-                                                : 'w-full'
+                                                : 'w-full',
                                         )}
                                     >
                                         <div className='w-full p-4 md:p-8 rounded-2xl bg-accent gap-4 flex flex-col'>
@@ -259,7 +262,7 @@ export default async function Profile({ params }: Props) {
                                                             {social.icon}
                                                         </a>
                                                     </Button>
-                                                )
+                                                ),
                                             )}
                                         </div>
                                     </div>
@@ -295,7 +298,7 @@ export default async function Profile({ params }: Props) {
                                                     key={i}
                                                     className={`relative ${
                                                         img.src.includes(
-                                                            'yamaha'
+                                                            'yamaha',
                                                         )
                                                             ? 'h-18'
                                                             : 'h-full'
@@ -305,20 +308,20 @@ export default async function Profile({ params }: Props) {
                                                         src={img.src}
                                                         alt={
                                                             img.src.includes(
-                                                                'yamaha'
+                                                                'yamaha',
                                                             )
                                                                 ? 'Yamaha'
                                                                 : img.src.includes(
-                                                                      'yclub'
-                                                                  )
-                                                                ? 'YClub'
-                                                                : 'Imprint Customs'
+                                                                        'yclub',
+                                                                    )
+                                                                  ? 'YClub'
+                                                                  : 'Imprint Customs'
                                                         }
                                                         fill
                                                         className='object-contain'
                                                     />
                                                 </div>
-                                            )
+                                            ),
                                         )}
                                     </div>
                                 </div>

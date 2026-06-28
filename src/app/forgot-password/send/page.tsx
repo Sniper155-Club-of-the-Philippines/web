@@ -44,7 +44,10 @@ export default function SendForgotPasswordPage() {
             });
             router.push('/forgot-password/verify');
         } catch (error) {
-            if (isAxiosError(error) && error.response?.data.message) {
+            if (
+                isAxiosError<{ message?: string }>(error) &&
+                error.response?.data.message
+            ) {
                 toast.error(error.response?.data.message);
             } else {
                 console.error(error);

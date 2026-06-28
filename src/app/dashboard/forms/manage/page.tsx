@@ -77,7 +77,9 @@ export default function ManageForms() {
                     <Input
                         type='search'
                         placeholder='Search'
-                        onChange={(e) => setSearch(e.target.value)}
+                        onChange={(e) => {
+                            setSearch(e.target.value);
+                        }}
                         value={search}
                     />
                     <TableMenu onRefresh={refetch} onCreate={onCreate} />

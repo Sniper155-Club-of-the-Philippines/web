@@ -16,7 +16,7 @@ export default function Home() {
         heading: HOME_PANEL.heading as string,
         description: HOME_PANEL.description as string,
         cover: {
-            src: HOME_PANEL.cover.src as string,
+            src: HOME_PANEL.cover.src,
             alt: HOME_PANEL.cover.alt as string,
         },
     };

@@ -49,7 +49,10 @@ export default function FinalizeForgotPasswordPage() {
             });
             router.replace('/login');
         } catch (error) {
-            if (isAxiosError(error) && error.response?.data.message) {
+            if (
+                isAxiosError<{ message?: string }>(error) &&
+                error.response?.data.message
+            ) {
                 toast.error(error.response?.data.message, {
                     closeButton: true,
                 });

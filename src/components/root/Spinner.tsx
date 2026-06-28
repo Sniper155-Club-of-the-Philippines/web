@@ -17,8 +17,12 @@ export default function BaseSpinner() {
                     exit={{ opacity: 0 }}
                     className='fixed inset-0 z-[9999] flex items-center justify-center bg-black/50'
                     style={{ pointerEvents: 'all' }}
-                    onPointerDown={(e) => e.preventDefault()}
-                    onClick={(e) => e.preventDefault()}
+                    onPointerDown={(e) => {
+                        e.preventDefault();
+                    }}
+                    onClick={(e) => {
+                        e.preventDefault();
+                    }}
                 >
                     <div className='pointer-events-none'>
                         <Spinner

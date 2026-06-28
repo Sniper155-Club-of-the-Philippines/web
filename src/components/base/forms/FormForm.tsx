@@ -71,7 +71,7 @@ export default function FormForm({
 }: Props) {
     const [title, setTitle] = useState(initialTitle ?? 'Untitled Form');
     const [description, setDescription] = useState(
-        initialDescription ?? 'Form description'
+        initialDescription ?? 'Form description',
     );
     const [fields, setFields] = useState<Field[]>(initialFields);
     const [formData, setFormData] = useState<FormValue[]>(initialData);
@@ -89,7 +89,7 @@ export default function FormForm({
     const handleCheckboxChange = (
         fieldId: string,
         value: string,
-        checked: CheckedState
+        checked: CheckedState,
     ) => {
         setFormData((prev) => {
             const existing = prev.find((f) => f.id === fieldId);
@@ -102,10 +102,10 @@ export default function FormForm({
                               value: checked
                                   ? [...(f.value || []), value]
                                   : (f.value || []).filter(
-                                        (item: string) => item !== value
+                                        (item: string) => item !== value,
                                     ),
                           }
-                        : f
+                        : f,
                 );
 
                 return updated;
@@ -133,21 +133,21 @@ export default function FormForm({
                 type === 'text'
                     ? 'Short Answer Question'
                     : type === 'paragraph'
-                    ? 'Long Answer Question'
-                    : type === 'multiple_choice'
-                    ? 'Multiple Choice Question'
-                    : type === 'checkboxes'
-                    ? 'Checkbox Question'
-                    : type === 'dropdown'
-                    ? 'Dropdown Question'
-                    : type === 'date'
-                    ? 'Date Question'
-                    : type === 'time'
-                    ? 'Time Question'
-                    : 'Date and Time Question',
+                      ? 'Long Answer Question'
+                      : type === 'multiple_choice'
+                        ? 'Multiple Choice Question'
+                        : type === 'checkboxes'
+                          ? 'Checkbox Question'
+                          : type === 'dropdown'
+                            ? 'Dropdown Question'
+                            : type === 'date'
+                              ? 'Date Question'
+                              : type === 'time'
+                                ? 'Time Question'
+                                : 'Date and Time Question',
             type,
             options: ['multiple_choice', 'checkboxes', 'dropdown'].includes(
-                type
+                type,
             )
                 ? []
                 : undefined,
@@ -167,7 +167,7 @@ export default function FormForm({
 
     const updateField = (id: string, updated: Partial<Field>) => {
         setFields((prev) =>
-            prev.map((f) => (f.id === id ? { ...f, ...updated } : f))
+            prev.map((f) => (f.id === id ? { ...f, ...updated } : f)),
         );
     };
 
@@ -209,11 +209,13 @@ export default function FormForm({
                     key={field.id ?? index}
                     field={field}
                     value={value}
-                    setValue={(val) =>
-                        updateFieldValue(field.id, val, field.type)
-                    }
+                    setValue={(val) => {
+                        updateFieldValue(field.id, val, field.type);
+                    }}
                     handleCheckboxChange={handleCheckboxChange}
-                    onDelete={() => removeField(field.id)}
+                    onDelete={() => {
+                        removeField(field.id);
+                    }}
                     onUpdateField={updateField}
                     readonly={readonly}
                     answer={answer}
@@ -253,7 +255,9 @@ export default function FormForm({
                     ) : (
                         <Input
                             value={title ?? ''}
-                            onChange={(e) => setTitle(e.target.value)}
+                            onChange={(e) => {
+                                setTitle(e.target.value);
+                            }}
                             placeholder='Form title'
                             className='md:text-3xl font-normal px-0 border-0 focus:ring-0 focus:border-0'
                             disabled={readonly}
@@ -264,7 +268,9 @@ export default function FormForm({
                     ) : (
                         <Textarea
                             value={description ?? ''}
-                            onChange={(e) => setDescription(e.target.value)}
+                            onChange={(e) => {
+                                setDescription(e.target.value);
+                            }}
                             placeholder='Form description'
                             className='mt-2 border-0 focus:ring-0 px-0 focus:border-0 resize-none'
                             disabled={readonly}
@@ -283,7 +289,7 @@ export default function FormForm({
                         <Button
                             className='bg-blue-600 hover:bg-blue-700 text-white px-8'
                             onClick={() => {
-                                onSubmit?.({
+                                void onSubmit?.({
                                     title,
                                     description,
                                     fields,

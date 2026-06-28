@@ -11,6 +11,11 @@ export type UserPayload = Partial<User> & {
     photo?: File;
 };
 
+export interface CreatedUser {
+    user: User;
+    temp_password: string;
+}
+
 export async function all(http: AxiosInstance) {
     const { data } = await http.get<{ users: User[] }>('/v1/users');
 
@@ -22,12 +27,16 @@ export async function store(http: AxiosInstance, payload: UserPayload) {
 
     const formData = new FormData.default(payload);
 
-    const { data } = await http.post(`/v1/users`, formData);
+    const { data } = await http.post<CreatedUser>(`/v1/users`, formData);
 
     return data;
 }
 
-export async function update(http: AxiosInstance, payload: UserPayload) {
+export async function update(
+    http: AxiosInstance,
+    id: User['id'],
+    payload: UserPayload,
+) {
     const FormData = await import('@avidian/form-data');
 
     if ('password' in payload && !payload.password) {
@@ -38,9 +47,12 @@ export async function update(http: AxiosInstance, payload: UserPayload) {
 
     formData.set('_method', 'PUT');
 
-    const { data } = await http.post(`/v1/users/${payload.id}`, formData);
+    const { data } = await http.post<{ user: User }>(
+        `/v1/users/${id}`,
+        formData,
+    );
 
-    return data;
+    return data.user;
 }
 
 export async function assignRoles(

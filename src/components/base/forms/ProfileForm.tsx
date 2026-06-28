@@ -49,9 +49,9 @@ const ProfileForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                             render={({ field }) => (
                                 <MultiSelect
                                     id='name'
-                                    onChange={(e) =>
-                                        field.onChange(e.target.value)
-                                    }
+                                    onChange={(e) => {
+                                        field.onChange(e.target.value);
+                                    }}
                                     onBlur={field.onBlur}
                                     name={field.name}
                                     ref={field.ref}

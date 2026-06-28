@@ -62,7 +62,7 @@ function Login() {
     };
 
     const handleError = (error: unknown) => {
-        if (isAxiosError(error)) {
+        if (isAxiosError<{ message?: string }>(error)) {
             toast.error('Unable to login', {
                 description: error.response?.data?.message,
                 closeButton: true,
@@ -83,12 +83,14 @@ function Login() {
     const isValid = useMemo(() => email && password, [email, password]);
 
     useEffect(() => {
+        const returnTo = params.get('return');
+
         if (access && user) {
             // A forced password reset gates everything, including a return URL.
             if (mustChangePassword(user)) {
                 router.replace(AUTH_ROUTES.changePassword);
-            } else if (params.has('return')) {
-                router.replace(params.get('return')!);
+            } else if (returnTo) {
+                router.replace(returnTo);
             } else {
                 router.replace(landingPath(user));
             }
@@ -96,7 +98,7 @@ function Login() {
     }, [access, router, user, params]);
 
     useRefreshToken({
-        redirectTo: params.has('return') ? params.get('return') : null,
+        redirectTo: params.get('return'),
     });
 
     return (

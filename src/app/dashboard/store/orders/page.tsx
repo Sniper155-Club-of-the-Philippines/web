@@ -120,7 +120,7 @@ export default function AdminOrdersPage() {
                 (orderStatus === ALL || order.order_status === orderStatus) &&
                 (batchId === ALL || order.batch_id === batchId) &&
                 (chapterIds.length === 0 ||
-                    (order.user?.chapter_id != null &&
+                    (typeof order.user?.chapter_id === 'string' &&
                         chapterIds.includes(order.user.chapter_id))),
         );
     }, [orders, fuse, search, paymentStatus, orderStatus, batchId, chapterIds]);
@@ -153,14 +153,16 @@ export default function AdminOrdersPage() {
     });
 
     const allChecked = visible.length > 0 && selected.length === visible.length;
-    const toggleAll = () =>
+    const toggleAll = () => {
         setSelected(allChecked ? [] : visible.map((order) => order.id));
-    const toggleOne = (id: string) =>
+    };
+    const toggleOne = (id: string) => {
         setSelected((current) =>
             current.includes(id)
                 ? current.filter((value) => value !== id)
                 : [...current, id],
         );
+    };
 
     return (
         <AdminPage
@@ -172,7 +174,9 @@ export default function AdminOrdersPage() {
                     <Input
                         placeholder='Search order #, member, nickname…'
                         value={search}
-                        onChange={(event) => setSearch(event.target.value)}
+                        onChange={(event) => {
+                            setSearch(event.target.value);
+                        }}
                         className='w-full md:w-96'
                     />
                     <Select
@@ -268,7 +272,9 @@ export default function AdminOrdersPage() {
                         <Button
                             size='sm'
                             disabled={!bulkStatus || bulk.isPending}
-                            onClick={() => bulk.mutate()}
+                            onClick={() => {
+                                bulk.mutate();
+                            }}
                         >
                             Apply
                         </Button>
@@ -311,9 +317,9 @@ export default function AdminOrdersPage() {
                                                 checked={selected.includes(
                                                     order.id,
                                                 )}
-                                                onCheckedChange={() =>
-                                                    toggleOne(order.id)
-                                                }
+                                                onCheckedChange={() => {
+                                                    toggleOne(order.id);
+                                                }}
                                                 aria-label={`Select ${order.order_number}`}
                                             />
                                         </TableCell>
@@ -371,11 +377,11 @@ export default function AdminOrdersPage() {
                                                         order.voided_at !==
                                                             undefined
                                                     }
-                                                    onClick={() =>
+                                                    onClick={() => {
                                                         voidOrder.mutate(
                                                             order.id,
-                                                        )
-                                                    }
+                                                        );
+                                                    }}
                                                 >
                                                     Void
                                                 </Button>

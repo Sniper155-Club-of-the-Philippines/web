@@ -31,7 +31,9 @@ export function HoverPopover({
     const handleOpen = () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         if (openDelay > 0) {
-            timeoutRef.current = setTimeout(() => setOpen(true), openDelay);
+            timeoutRef.current = setTimeout(() => {
+                setOpen(true);
+            }, openDelay);
         } else {
             setOpen(true);
         }
@@ -40,7 +42,9 @@ export function HoverPopover({
     const handleClose = () => {
         if (timeoutRef.current) clearTimeout(timeoutRef.current);
         if (closeDelay > 0) {
-            timeoutRef.current = setTimeout(() => setOpen(false), closeDelay);
+            timeoutRef.current = setTimeout(() => {
+                setOpen(false);
+            }, closeDelay);
         } else {
             setOpen(false);
         }

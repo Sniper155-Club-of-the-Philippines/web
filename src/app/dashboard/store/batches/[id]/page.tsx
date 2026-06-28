@@ -73,18 +73,21 @@ function ProductOverride({
             }),
         onSuccess: () => {
             toast.success(`${item.name} saved.`);
-            queryClient.invalidateQueries({ queryKey: ['batch', batchId] });
+            void queryClient.invalidateQueries({
+                queryKey: ['batch', batchId],
+            });
         },
         onError: (error) =>
             toast.error(apiError(error, 'Unable to save product settings.')),
     });
-    const toggleSize = (size: string, checked: boolean) =>
+    const toggleSize = (size: string, checked: boolean) => {
         setValue(
             'available_sizes',
             checked
                 ? [...selectedSizes, size]
                 : selectedSizes.filter((value) => value !== size),
         );
+    };
     const submit = handleSubmit((values) => {
         if (!values.available_sizes.length)
             return toast.error('Select at least one size.');
@@ -137,27 +140,27 @@ function ProductOverride({
                     <label className='flex items-center gap-2'>
                         <Checkbox
                             checked={riderAllowed}
-                            onCheckedChange={(v) =>
-                                setValue('rider_allowed', v === true)
-                            }
+                            onCheckedChange={(v) => {
+                                setValue('rider_allowed', v === true);
+                            }}
                         />{' '}
                         Rider
                     </label>
                     <label className='flex items-center gap-2'>
                         <Checkbox
                             checked={obrAllowed}
-                            onCheckedChange={(v) =>
-                                setValue('obr_allowed', v === true)
-                            }
+                            onCheckedChange={(v) => {
+                                setValue('obr_allowed', v === true);
+                            }}
                         />{' '}
                         OBR
                     </label>
                     <label className='flex items-center gap-2'>
                         <Checkbox
                             checked={active}
-                            onCheckedChange={(v) =>
-                                setValue('is_active', v === true)
-                            }
+                            onCheckedChange={(v) => {
+                                setValue('is_active', v === true);
+                            }}
                         />{' '}
                         Active
                     </label>
@@ -175,9 +178,9 @@ function ProductOverride({
                         >
                             <Checkbox
                                 checked={selectedSizes.includes(size)}
-                                onCheckedChange={(v) =>
-                                    toggleSize(size, v === true)
-                                }
+                                onCheckedChange={(v) => {
+                                    toggleSize(size, v === true);
+                                }}
                             />{' '}
                             {size}
                         </label>
@@ -215,7 +218,9 @@ export default function BatchProductsPage() {
             document.body.append(link);
             link.click();
             link.remove();
-            window.setTimeout(() => URL.revokeObjectURL(url), 0);
+            window.setTimeout(() => {
+                URL.revokeObjectURL(url);
+            }, 0);
         },
         onError: (error) =>
             toast.error(apiError(error, 'Could not export this batch.')),
@@ -235,7 +240,9 @@ export default function BatchProductsPage() {
                         <Button
                             variant='outline'
                             disabled={exportOrders.isPending}
-                            onClick={() => exportOrders.mutate()}
+                            onClick={() => {
+                                exportOrders.mutate();
+                            }}
                         >
                             {exportOrders.isPending ? (
                                 <LoaderCircle
