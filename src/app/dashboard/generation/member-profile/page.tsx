@@ -34,20 +34,22 @@ export default function MemberProfile() {
     const { data: profiles, refetch, isLoading } = useProfileQuery();
 
     const handleCreate = async (data: ProfileFormInputs) => {
+        const userIds = data.user_id ?? [];
+
+        if (userIds.length === 0) {
+            toast.error('Select at least one member.');
+            return;
+        }
+
         setLoading(true);
         try {
-            if (data.user_id) {
-                await Promise.all(
-                    data.user_id.map((user_id) =>
-                        profile.store(http, {
-                            user_id,
-                        }),
-                    ),
-                );
-            }
-            toast.success('Profile created successfully.', {
-                closeButton: true,
-            });
+            const created = await profile.storeMany(http, userIds);
+            toast.success(
+                `Created ${created.length} profile${created.length === 1 ? '' : 's'}.`,
+                {
+                    closeButton: true,
+                },
+            );
             setCreateOpen(false);
             void refetch();
         } catch (error) {
@@ -154,9 +156,11 @@ export default function MemberProfile() {
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
                         <DialogContent className='sm:max-w-[800px]'>
                             <DialogHeader>
-                                <DialogTitle>Create Profile</DialogTitle>
+                                <DialogTitle>
+                                    Create Member Profiles
+                                </DialogTitle>
                                 <DialogDescription>
-                                    Fill in the form to add a new profile.
+                                    Select one or more members without profiles.
                                 </DialogDescription>
                             </DialogHeader>
 

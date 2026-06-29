@@ -249,6 +249,17 @@ describe('profile api', () => {
             user_id: 'u1',
         });
 
+        http.post.mockResolvedValueOnce({
+            data: { profiles: [{ id: 'p3' }, { id: 'p4' }] },
+        });
+        expect(await profile.storeMany(http, ['u1', 'u2'])).toEqual([
+            { id: 'p3' },
+            { id: 'p4' },
+        ]);
+        expect(http.post).toHaveBeenLastCalledWith('/v1/profiles/bulk', {
+            user_ids: ['u1', 'u2'],
+        });
+
         await profile.remove(http, 'p1');
         expect(http.delete).toHaveBeenCalledWith('/v1/profiles/p1');
     });

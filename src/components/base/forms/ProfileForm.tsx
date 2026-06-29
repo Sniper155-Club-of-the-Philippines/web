@@ -15,12 +15,14 @@ type Props = {
 };
 
 const ProfileForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
-    const { handleSubmit, reset, control } = useForm<ProfileFormInputs>({
-        defaultValues,
-    });
+    const { handleSubmit, reset, control, watch, formState } =
+        useForm<ProfileFormInputs>({
+            defaultValues: { user_id: [], ...defaultValues },
+        });
     const { data: profiles } = useProfileQuery();
     const { data: users } = useUserQuery();
     const profileData = profiles?.map((profile) => profile.user_id);
+    const selectedIds = watch('user_id') ?? [];
     const options =
         users
             ?.filter((user) => !profileData?.includes(user.id))
@@ -40,7 +42,7 @@ const ProfileForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                 {/* Member */}
                 <div className='grid grid-cols-1 md:grid-cols-4 items-center gap-4 md:max-h-[36px]'>
                     <Label htmlFor='name' className='text-right'>
-                        Member
+                        Members
                     </Label>
                     <div className='md:col-span-3'>
                         <Controller
@@ -57,6 +59,7 @@ const ProfileForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                                     ref={field.ref}
                                     value={field.value}
                                     options={options}
+                                    placeholder='Select members…'
                                 />
                             )}
                         />
@@ -70,7 +73,15 @@ const ProfileForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                         Cancel
                     </Button>
                 )}
-                <Button type='submit'>Save</Button>
+                <Button
+                    type='submit'
+                    disabled={
+                        selectedIds.length === 0 || formState.isSubmitting
+                    }
+                >
+                    Create {selectedIds.length || ''}{' '}
+                    {selectedIds.length === 1 ? 'profile' : 'profiles'}
+                </Button>
             </div>
         </form>
     );

@@ -22,6 +22,15 @@ export async function store(http: AxiosInstance, payload: Partial<Profile>) {
     return data.profile;
 }
 
+export async function storeMany(http: AxiosInstance, userIds: string[]) {
+    const { data } = await http.post<{ profiles: Profile[] }>(
+        '/v1/profiles/bulk',
+        { user_ids: userIds },
+    );
+
+    return data.profiles;
+}
+
 export async function remove(http: AxiosInstance, id: string) {
     await http.delete(`/v1/profiles/${id}`);
 }
