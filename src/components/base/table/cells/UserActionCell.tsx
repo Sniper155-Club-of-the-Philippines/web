@@ -14,6 +14,7 @@ import {
 import {
     DropdownMenu,
     DropdownMenuContent,
+    DropdownMenuGroup,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
@@ -25,6 +26,9 @@ import { useState } from 'react';
 import { toast } from 'sonner';
 import { UserFormInputs } from '@/types/form';
 import UserForm from '@/components/base/forms/UserForm';
+import TemporaryPasswordDialog, {
+    TemporaryPasswordCredentials,
+} from '@/components/base/TemporaryPasswordDialog';
 
 type Props = {
     user: User;
@@ -35,6 +39,9 @@ const UserActionCell = ({ user, refetch }: Props) => {
     const http = useHttp();
     const [editOpen, setEditOpen] = useState(false);
     const [deleteOpen, setDeleteOpen] = useState(false);
+    const [resetOpen, setResetOpen] = useState(false);
+    const [credentials, setCredentials] =
+        useState<TemporaryPasswordCredentials | null>(null);
     const [, setLoading] = useAtom(loadingAtom);
 
     const handleDelete = async () => {
@@ -44,7 +51,7 @@ const UserActionCell = ({ user, refetch }: Props) => {
             refetch?.();
         } catch (error) {
             console.error(error);
-            toast.success('Unable to delete member.', {
+            toast.error('Unable to delete member.', {
                 closeButton: true,
             });
         } finally {
@@ -72,6 +79,27 @@ const UserActionCell = ({ user, refetch }: Props) => {
         }
     };
 
+    const handleResetPassword = async () => {
+        setLoading(true);
+        try {
+            const result = await api.resetPassword(http, user.id);
+            setResetOpen(false);
+            setCredentials({
+                email: result.user.email,
+                password: result.temp_password,
+            });
+            toast.success('Member password reset.');
+            refetch?.();
+        } catch (error) {
+            console.error(error);
+            toast.error('Unable to reset member password.', {
+                closeButton: true,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     return (
         <>
             <DropdownMenu>
@@ -82,20 +110,30 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align='end'>
-                    <DropdownMenuItem
-                        onClick={() => {
-                            setEditOpen(true);
-                        }}
-                    >
-                        Edit
-                    </DropdownMenuItem>
-                    <DropdownMenuItem
-                        onClick={() => {
-                            setDeleteOpen(true);
-                        }}
-                    >
-                        Delete
-                    </DropdownMenuItem>
+                    <DropdownMenuGroup>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                setEditOpen(true);
+                            }}
+                        >
+                            Edit
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => {
+                                setResetOpen(true);
+                            }}
+                        >
+                            Reset password
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            variant='destructive'
+                            onClick={() => {
+                                setDeleteOpen(true);
+                            }}
+                        >
+                            Delete
+                        </DropdownMenuItem>
+                    </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
 
@@ -118,6 +156,36 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     />
                 </DialogContent>
             </Dialog>
+
+            <Dialog open={resetOpen} onOpenChange={setResetOpen}>
+                <DialogContent className='sm:max-w-[425px]'>
+                    <DialogHeader>
+                        <DialogTitle>Reset member password?</DialogTitle>
+                        <DialogDescription>
+                            {user.first_name}&apos;s current password will stop
+                            working immediately. A temporary password will be
+                            shown once and must be changed on next login.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter>
+                        <Button
+                            variant='outline'
+                            onClick={() => setResetOpen(false)}
+                        >
+                            Cancel
+                        </Button>
+                        <Button onClick={() => void handleResetPassword()}>
+                            Reset password
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
+
+            <TemporaryPasswordDialog
+                credentials={credentials}
+                title='Password reset'
+                onClose={() => setCredentials(null)}
+            />
 
             {/* Delete Dialog */}
             <Dialog open={deleteOpen} onOpenChange={setDeleteOpen}>

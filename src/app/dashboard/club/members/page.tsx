@@ -14,6 +14,9 @@ import { ColumnDef } from '@tanstack/react-table';
 import { toast } from 'sonner';
 import { saveAs } from 'file-saver';
 import UserActionCell from '@/components/base/table/cells/UserActionCell';
+import TemporaryPasswordDialog, {
+    TemporaryPasswordCredentials,
+} from '@/components/base/TemporaryPasswordDialog';
 import {
     Dialog,
     DialogContent,
@@ -24,8 +27,6 @@ import {
 import UserForm from '@/components/base/forms/UserForm';
 import { UserFormInputs } from '@/types/form';
 import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
-import { Copy } from 'lucide-react';
 import { useUserQuery } from '@/hooks/queries';
 import { userAtom } from '@/atoms/auth';
 
@@ -34,10 +35,8 @@ export default function ClubMembers() {
     const [, setLoading] = useAtom(loadingAtom);
     const printRef = useRef<HTMLDivElement>(null);
     const [createOpen, setCreateOpen] = useState(false);
-    const [credentials, setCredentials] = useState<{
-        email: string;
-        password: string;
-    } | null>(null);
+    const [credentials, setCredentials] =
+        useState<TemporaryPasswordCredentials | null>(null);
     const [search, setSearch] = useState('');
     const { data: users, refetch } = useUserQuery();
     const [me] = useAtom(userAtom);
@@ -196,57 +195,11 @@ export default function ClubMembers() {
                             />
                         </DialogContent>
                     </Dialog>
-                    {/* Temporary password — shown once, no email is sent */}
-                    <Dialog
-                        open={credentials !== null}
-                        onOpenChange={(open) => !open && setCredentials(null)}
-                    >
-                        <DialogContent className='sm:max-w-[480px]'>
-                            <DialogHeader>
-                                <DialogTitle>Member created</DialogTitle>
-                                <DialogDescription>
-                                    No email is sent. Write down this temporary
-                                    password and send it to the member on paper
-                                    together with their physical ID. It cannot
-                                    be shown again.
-                                </DialogDescription>
-                            </DialogHeader>
-                            <div className='grid gap-3'>
-                                <label className='grid gap-1 text-sm font-medium'>
-                                    Email
-                                    <Input
-                                        readOnly
-                                        value={credentials?.email ?? ''}
-                                    />
-                                </label>
-                                <label className='grid gap-1 text-sm font-medium'>
-                                    Temporary password
-                                    <div className='flex gap-2'>
-                                        <Input
-                                            readOnly
-                                            className='font-mono'
-                                            value={credentials?.password ?? ''}
-                                        />
-                                        <Button
-                                            type='button'
-                                            variant='outline'
-                                            size='icon'
-                                            onClick={() => {
-                                                void navigator.clipboard.writeText(
-                                                    credentials?.password ?? '',
-                                                );
-                                                toast.success(
-                                                    'Password copied.',
-                                                );
-                                            }}
-                                        >
-                                            <Copy />
-                                        </Button>
-                                    </div>
-                                </label>
-                            </div>
-                        </DialogContent>
-                    </Dialog>
+                    <TemporaryPasswordDialog
+                        credentials={credentials}
+                        title='Member created'
+                        onClose={() => setCredentials(null)}
+                    />
                 </div>
             </div>
             <DataTable columns={columns} data={users ?? []} search={search} />

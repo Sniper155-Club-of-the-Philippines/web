@@ -330,6 +330,17 @@ describe('user api', () => {
         });
     });
 
+    it('resetPassword returns one-time temporary credentials', async () => {
+        const response = {
+            user: { id: 'u1', email: 'member@example.com' },
+            temp_password: 'temporary123',
+        };
+        http.post.mockResolvedValue({ data: response });
+
+        expect(await user.resetPassword(http, 'u1')).toEqual(response);
+        expect(http.post).toHaveBeenCalledWith('/v1/users/u1/reset-password');
+    });
+
     it('remove deletes by id', async () => {
         await user.remove(http, 'u1');
         expect(http.delete).toHaveBeenCalledWith('/v1/users/u1');

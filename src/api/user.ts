@@ -11,7 +11,7 @@ export type UserPayload = Partial<User> & {
     photo?: File;
 };
 
-export interface CreatedUser {
+export interface TemporaryPasswordResponse {
     user: User;
     temp_password: string;
 }
@@ -27,7 +27,18 @@ export async function store(http: AxiosInstance, payload: UserPayload) {
 
     const formData = new FormData.default(payload);
 
-    const { data } = await http.post<CreatedUser>(`/v1/users`, formData);
+    const { data } = await http.post<TemporaryPasswordResponse>(
+        `/v1/users`,
+        formData,
+    );
+
+    return data;
+}
+
+export async function resetPassword(http: AxiosInstance, id: User['id']) {
+    const { data } = await http.post<TemporaryPasswordResponse>(
+        `/v1/users/${id}/reset-password`,
+    );
 
     return data;
 }
