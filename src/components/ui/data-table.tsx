@@ -86,7 +86,7 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
     return (
         <ScrollArea
             viewportRef={scrollRef}
-            className='relative h-full max-h-[calc(100vh-320px)] w-full md:max-h-[calc(100vh-160px)]'
+            className='relative h-[calc(100svh-20rem)] min-h-64 w-full md:h-[calc(100svh-10rem)]'
             viewportClassName='px-5'
         >
             <Table className='relative min-w-full'>
