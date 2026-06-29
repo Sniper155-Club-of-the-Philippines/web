@@ -17,6 +17,20 @@ export async function list(http: AxiosInstance) {
     return data.orders ?? [];
 }
 
+/**
+ * Export the given orders as an .xlsx workbook (same layout as the batch
+ * export). Pass the ids of the orders currently in view so the spreadsheet
+ * honours the active filters. Only approved, non-voided orders are included.
+ */
+export async function exportOrders(http: AxiosInstance, orderIds: string[]) {
+    const { data } = await http.post<Blob>(
+        '/v1/admin/orders/export',
+        { order_ids: orderIds },
+        { responseType: 'blob' },
+    );
+    return data;
+}
+
 export async function get(http: AxiosInstance, id: string) {
     const { data } = await http.get<{ order: Order }>(`/v1/admin/orders/${id}`);
     return data.order;

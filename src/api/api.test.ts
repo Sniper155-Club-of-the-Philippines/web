@@ -617,6 +617,18 @@ describe('admin order api', () => {
             items: [{ id: 'i1', quantity: 2 }],
         });
     });
+
+    it('exportOrders posts the ids and fetches the workbook as a blob', async () => {
+        const blob = new Blob(['xlsx']);
+        http.post.mockResolvedValue({ data: blob });
+
+        expect(await adminOrder.exportOrders(http, ['o1', 'o2'])).toBe(blob);
+        expect(http.post).toHaveBeenCalledWith(
+            '/v1/admin/orders/export',
+            { order_ids: ['o1', 'o2'] },
+            { responseType: 'blob' },
+        );
+    });
 });
 
 describe('batch export', () => {

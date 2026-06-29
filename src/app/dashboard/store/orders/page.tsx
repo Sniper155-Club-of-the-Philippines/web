@@ -18,6 +18,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
 import { formatPesos } from '@/lib/money';
+import { saveAs } from 'file-saver';
 import {
     areAllVisibleOrdersSelected,
     isOrderStatus,
@@ -263,10 +264,38 @@ export default function AdminOrdersPage() {
         },
     ];
 
+    // The spreadsheet is built server-side so it matches the batch export
+    // exactly (Summary + one sheet per product). We send the ids currently in
+    // view so the export honours the active filters; the backend further limits
+    // it to approved, non-voided orders.
+    const exportOrders = useMutation({
+        mutationFn: () =>
+            adminOrder.exportOrders(
+                http,
+                visible.map((order) => order.id),
+            ),
+        onSuccess: (blob) => {
+            saveAs(blob, 'orders.xlsx');
+        },
+        onError: (error) =>
+            toast.error(apiError(error, 'Could not export orders')),
+    });
+
     return (
         <AdminPage
             title='Orders'
             description='Search, review, and update member orders.'
+            action={
+                <Button
+                    variant='outline'
+                    disabled={visible.length === 0 || exportOrders.isPending}
+                    onClick={() => {
+                        exportOrders.mutate();
+                    }}
+                >
+                    {exportOrders.isPending ? 'Exporting…' : 'Export Excel'}
+                </Button>
+            }
         >
             <div className='flex flex-col gap-3'>
                 <div className='grid gap-2 grid-cols-2 lg:grid-cols-4 md:flex'>
