@@ -8,6 +8,7 @@ import { useEffect } from 'react';
 import { EventFormInputs } from '@/types/form';
 import { Textarea } from '@/components/ui/textarea';
 import DatePicker from '@/components/ui/date-picker';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Props = {
     defaultValues?: Partial<EventFormInputs>;
@@ -29,7 +30,11 @@ const EventForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
 
     return (
         <form onSubmit={handleSubmit(onSubmit)} className='h-full'>
-            <div className='grid gap-4 p-4 max-h-[600px] overflow-x-auto'>
+            <ScrollArea
+                className='max-h-[600px]'
+                viewportClassName='[&>div]:!block [&>div]:!min-w-0'
+            >
+                <div className='grid gap-4 p-4 pr-6'>
                 {/* Title */}
                 <div className='grid grid-cols-1 md:grid-cols-4 items-center gap-4 md:max-h-[36px]'>
                     <Label htmlFor='title' className='text-right'>
@@ -107,7 +112,8 @@ const EventForm = ({ defaultValues, onSubmit, onCancel }: Props) => {
                         />
                     </div>
                 </div>
-            </div>
+                </div>
+            </ScrollArea>
 
             <div className='flex justify-end gap-2 mt-6'>
                 {onCancel && (

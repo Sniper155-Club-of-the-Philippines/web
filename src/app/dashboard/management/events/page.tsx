@@ -25,7 +25,6 @@ import { Input } from '@/components/ui/input';
 import EventForm from '@/components/base/forms/EventForm';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import EventPanel from '@/components/root/panels/EventPanel';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import { useEventQuery } from '@/hooks/queries';
 
 export default function Events() {
@@ -192,10 +191,10 @@ export default function Events() {
                     />
                 </TabsContent>
                 <TabsContent value='preview'>
-                    <ScrollArea className='flex-1 overflow-x-auto max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-175px)]'>
-                        <ScrollBar orientation='vertical' />
-                        <EventPanel data={events ?? []} />
-                    </ScrollArea>
+                    <EventPanel
+                        data={events ?? []}
+                        className='max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-175px)]'
+                    />
                 </TabsContent>
             </Tabs>
         </div>

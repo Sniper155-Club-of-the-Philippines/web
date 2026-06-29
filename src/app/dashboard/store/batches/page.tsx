@@ -11,6 +11,7 @@ import DateTimePicker from '@/components/base/inputs/DateTimePicker';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     Dialog,
     DialogContent,
@@ -135,7 +136,7 @@ export default function BatchesPage() {
             description='Define ordering periods, then configure product pricing and limits for each batch.'
             action={<Button onClick={startCreate}>New batch</Button>}
         >
-            <div className='overflow-x-auto rounded-lg border'>
+            <ScrollArea className='rounded-lg border'>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -220,7 +221,8 @@ export default function BatchesPage() {
                         ))}
                     </TableBody>
                 </Table>
-            </div>
+                <ScrollBar orientation='horizontal' />
+            </ScrollArea>
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className='sm:max-w-xl'>
                     <form onSubmit={submit} className='grid gap-5'>

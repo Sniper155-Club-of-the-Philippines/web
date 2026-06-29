@@ -17,7 +17,7 @@ export default function ViewFormResponse() {
     const { form, answers, user } = data;
 
     return (
-        <div className='overflow-auto'>
+        <div className='min-w-0'>
             <div className='mb-2 flex max-w-2xl mx-auto gap-2 items-center'>
                 <span className='text-lg'>
                     {user?.last_name}, {user?.first_name}

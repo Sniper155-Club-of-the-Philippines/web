@@ -7,6 +7,7 @@ import dayjs from 'dayjs';
 import { useVirtualizer } from '@tanstack/react-virtual';
 import React, { useRef } from 'react';
 import { cn } from '@/lib/utils';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 type Props = {
     data: Event[];
@@ -46,17 +47,19 @@ export default function EventPanel({ data, className }: Props) {
     const totalSize = rowVirtualizer.getTotalSize();
 
     return (
-        <section
-            ref={parentRef}
+        <ScrollArea
+            viewportRef={parentRef}
             className={cn(
-                'bg-background py-8 md:py-20 w-full h-full overflow-x-auto max-h-[760px] flex justify-center',
-                className
+                'bg-background h-full max-h-[760px] w-full',
+                className,
             )}
+            viewportClassName='[&>div]:!block [&>div]:!min-w-0'
         >
-            <div className='container pb-14'>
-                <h1 className='text-foreground mb-10 text-center text-3xl font-bold tracking-tighter sm:text-6xl'>
-                    Events
-                </h1>
+            <section className='flex min-w-0 justify-center py-8 md:py-20'>
+                <div className='container pb-14'>
+                    <h1 className='text-foreground mb-10 text-center text-3xl font-bold tracking-tighter sm:text-6xl'>
+                        Events
+                    </h1>
 
                 <div className='relative mx-auto max-w-4xl'>
                     <div
@@ -105,7 +108,9 @@ export default function EventPanel({ data, className }: Props) {
                         })}
                     </div>
                 </div>
-            </div>
-        </section>
+                </div>
+            </section>
+            <ScrollBar orientation='horizontal' />
+        </ScrollArea>
     );
 }

@@ -18,6 +18,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 interface DataTableProps<TData extends { id?: unknown }, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -83,9 +84,10 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
             : 0;
 
     return (
-        <div
-            ref={scrollRef}
-            className='relative w-full h-full max-h-[calc(100vh-320px)] md:max-h-[calc(100vh-160px)] px-5 overflow-auto'
+        <ScrollArea
+            viewportRef={scrollRef}
+            className='relative h-full max-h-[calc(100vh-320px)] w-full md:max-h-[calc(100vh-160px)]'
+            viewportClassName='px-5'
         >
             <Table className='relative min-w-full'>
                 {/* Sticky Header */}
@@ -149,6 +151,7 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
                     )}
                 </TableBody>
             </Table>
-        </div>
+            <ScrollBar orientation='horizontal' />
+        </ScrollArea>
     );
 }

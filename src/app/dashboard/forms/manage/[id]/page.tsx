@@ -15,7 +15,7 @@ export default function ViewForm() {
     }
 
     return (
-        <div className='overflow-auto'>
+        <div className='min-w-0'>
             <div className='mb-2 flex justify-end max-w-2xl mx-auto gap-2'>
                 <Button asChild>
                     <Link href={`/dashboard/forms/manage/${data.id}/edit`}>

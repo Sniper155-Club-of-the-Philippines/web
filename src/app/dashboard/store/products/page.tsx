@@ -19,6 +19,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     Table,
     TableBody,
@@ -176,7 +177,7 @@ export default function ProductsPage() {
                 </Button>
             }
         >
-            <div className='overflow-x-auto rounded-lg border'>
+            <ScrollArea className='rounded-lg border'>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -245,10 +246,15 @@ export default function ProductsPage() {
                         ))}
                     </TableBody>
                 </Table>
-            </div>
+                <ScrollBar orientation='horizontal' />
+            </ScrollArea>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-2xl'>
-                    <form onSubmit={submit} className='grid gap-5'>
+                <DialogContent className='sm:max-w-2xl'>
+                    <ScrollArea
+                        className='max-h-[calc(90vh-3rem)]'
+                        viewportClassName='[&>div]:!block [&>div]:!min-w-0'
+                    >
+                        <form onSubmit={submit} className='grid gap-5 p-1 pr-4'>
                         <DialogHeader>
                             <DialogTitle>
                                 {editing ? 'Edit product' : 'New product'}
@@ -403,7 +409,8 @@ export default function ProductsPage() {
                                 {save.isPending ? 'Saving…' : 'Save product'}
                             </Button>
                         </DialogFooter>
-                    </form>
+                        </form>
+                    </ScrollArea>
                 </DialogContent>
             </Dialog>
         </AdminPage>

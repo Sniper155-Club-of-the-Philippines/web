@@ -65,7 +65,7 @@ export default function EditForm() {
     }
 
     return (
-        <div className='overflow-auto'>
+        <div className='min-w-0'>
             <FormForm
                 onSubmit={onSubmit}
                 initialTitle={data.title}

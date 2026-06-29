@@ -9,8 +9,12 @@ const ScrollArea = React.forwardRef<
     React.ComponentRef<typeof ScrollAreaPrimitive.Root>,
     React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
         viewportClassName?: string;
+        viewportRef?: React.Ref<
+            React.ComponentRef<typeof ScrollAreaPrimitive.Viewport>
+        >;
     }
->(({ className, children, viewportClassName, ...props }, ref) => (
+>(
+    ({ className, children, viewportClassName, viewportRef, ...props }, ref) => (
     <ScrollAreaPrimitive.Root
         ref={ref}
         data-slot='scroll-area'
@@ -18,6 +22,7 @@ const ScrollArea = React.forwardRef<
         {...props}
     >
         <ScrollAreaPrimitive.Viewport
+            ref={viewportRef}
             data-slot='scroll-area-viewport'
             className={cn(
                 'focus-visible:ring-ring/50 size-full rounded-[inherit] transition-[color,box-shadow] outline-none focus-visible:ring-[3px] focus-visible:outline-1',
@@ -29,7 +34,8 @@ const ScrollArea = React.forwardRef<
         <ScrollBar />
         <ScrollAreaPrimitive.Corner />
     </ScrollAreaPrimitive.Root>
-));
+    ),
+);
 ScrollArea.displayName = 'ScrollArea';
 
 function ScrollBar({
@@ -53,7 +59,7 @@ function ScrollBar({
         >
             <ScrollAreaPrimitive.ScrollAreaThumb
                 data-slot='scroll-area-thumb'
-                className='bg-border relative flex-1 rounded-full'
+                className='bg-border hover:bg-muted-foreground/55 relative flex-1 rounded-full transition-colors'
             />
         </ScrollAreaPrimitive.ScrollAreaScrollbar>
     );

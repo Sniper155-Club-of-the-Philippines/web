@@ -19,6 +19,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     Select,
     SelectContent,
@@ -164,7 +165,7 @@ export default function RolesPage() {
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value='roles' className='mt-4'>
-                    <div className='overflow-x-auto rounded-lg border'>
+                    <ScrollArea className='rounded-lg border'>
                         <Table>
                             <TableHeader>
                                 <TableRow>
@@ -245,7 +246,8 @@ export default function RolesPage() {
                                 ))}
                             </TableBody>
                         </Table>
-                    </div>
+                        <ScrollBar orientation='horizontal' />
+                    </ScrollArea>
                 </TabsContent>
                 <TabsContent value='assignments' className='mt-4'>
                     <section className='grid max-w-2xl gap-5 rounded-lg border p-5'>
@@ -320,8 +322,12 @@ export default function RolesPage() {
                 </TabsContent>
             </Tabs>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-3xl'>
-                    <form onSubmit={submit} className='grid gap-5'>
+                <DialogContent className='sm:max-w-3xl'>
+                    <ScrollArea
+                        className='max-h-[calc(90vh-3rem)]'
+                        viewportClassName='[&>div]:!block [&>div]:!min-w-0'
+                    >
+                        <form onSubmit={submit} className='grid gap-5 p-1 pr-4'>
                         <DialogHeader>
                             <DialogTitle>
                                 {editing ? 'Edit role' : 'New role'}
@@ -402,7 +408,8 @@ export default function RolesPage() {
                                 {save.isPending ? 'Saving…' : 'Save role'}
                             </Button>
                         </DialogFooter>
-                    </form>
+                        </form>
+                    </ScrollArea>
                 </DialogContent>
             </Dialog>
         </AdminPage>

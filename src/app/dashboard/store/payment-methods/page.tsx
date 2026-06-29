@@ -19,6 +19,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     Select,
     SelectContent,
@@ -137,7 +138,7 @@ export default function PaymentMethodsPage() {
             description='Configure the payment instructions members see during checkout.'
             action={<Button onClick={startCreate}>New payment method</Button>}
         >
-            <div className='overflow-x-auto rounded-lg border'>
+            <ScrollArea className='rounded-lg border'>
                 <Table>
                     <TableHeader>
                         <TableRow>
@@ -225,10 +226,15 @@ export default function PaymentMethodsPage() {
                         ))}
                     </TableBody>
                 </Table>
-            </div>
+                <ScrollBar orientation='horizontal' />
+            </ScrollArea>
             <Dialog open={open} onOpenChange={setOpen}>
-                <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-xl'>
-                    <form onSubmit={submit} className='grid gap-5'>
+                <DialogContent className='sm:max-w-xl'>
+                    <ScrollArea
+                        className='max-h-[calc(90vh-3rem)]'
+                        viewportClassName='[&>div]:!block [&>div]:!min-w-0'
+                    >
+                        <form onSubmit={submit} className='grid gap-5 p-1 pr-4'>
                         <DialogHeader>
                             <DialogTitle>
                                 {editing
@@ -344,7 +350,8 @@ export default function PaymentMethodsPage() {
                                 {save.isPending ? 'Saving…' : 'Save method'}
                             </Button>
                         </DialogFooter>
-                    </form>
+                        </form>
+                    </ScrollArea>
                 </DialogContent>
             </Dialog>
         </AdminPage>

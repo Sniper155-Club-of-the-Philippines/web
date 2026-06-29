@@ -21,6 +21,7 @@ import CardRear from '@/components/profile/cards/CardRear';
 import { useQrCode } from '@/hooks/qr';
 import { useAtom } from 'jotai';
 import { loadingAtom } from '@/atoms/misc';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 const encoder = new TextEncoder();
 
@@ -168,8 +169,12 @@ export default function NFCID() {
                     />
                 </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-2 gap-5 max-h-[calc(100vh-190px)] md:max-h-none overflow-y-scroll md:overflow-y-hidden pb-5 md:pb-0'>
-                <div className='flex flex-col gap-4'>
+            <ScrollArea
+                className='max-h-[calc(100vh-190px)] md:max-h-none'
+                viewportClassName='[&>div]:!block [&>div]:!min-w-0'
+            >
+                <div className='grid grid-cols-1 gap-5 pb-5 md:grid-cols-2 md:pb-0'>
+                    <div className='flex flex-col gap-4'>
                     <Label>QR Code</Label>
                     <div className='h-[300px] w-[300px]'>
                         <div
@@ -187,7 +192,7 @@ export default function NFCID() {
                         </Button>
                     )}
                 </div>
-                {vcard && (
+                    {vcard && (
                     <div className='flex flex-col gap-4'>
                         <Label>VCard NFC Data</Label>
                         <div
@@ -210,7 +215,7 @@ export default function NFCID() {
                         </div>
                     </div>
                 )}
-                {profile?.user && name && (
+                    {profile?.user && name && (
                     <>
                         <div className='flex flex-col gap-4'>
                             <CardFront
@@ -242,7 +247,8 @@ export default function NFCID() {
                         </div>
                     </>
                 )}
-            </div>
+                </div>
+            </ScrollArea>
         </div>
     );
 }

@@ -20,6 +20,7 @@ import { FORM_FIELD_TYPES } from '@/constants';
 import dayjs from 'dayjs';
 import { useToggle } from '@avidian/hooks';
 import { CircleCheckBigIcon } from 'lucide-react';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function AnswerForm() {
     const params = useParams<{ id: string }>();
@@ -211,15 +212,20 @@ export default function AnswerForm() {
                     </div>
                 </div>
             ) : (
-                <div className='overflow-auto flex-1 p-4'>
-                    <FormForm
-                        initialTitle={data.title}
-                        initialDescription={data.description}
-                        initialFields={data.fields}
-                        onSubmit={handleSubmit}
-                        answer
-                    />
-                </div>
+                <ScrollArea
+                    className='min-h-0 flex-1'
+                    viewportClassName='[&>div]:!block [&>div]:!min-w-0'
+                >
+                    <div className='p-4'>
+                        <FormForm
+                            initialTitle={data.title}
+                            initialDescription={data.description}
+                            initialFields={data.fields}
+                            onSubmit={handleSubmit}
+                            answer
+                        />
+                    </div>
+                </ScrollArea>
             )}
         </div>
     );

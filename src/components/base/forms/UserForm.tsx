@@ -16,6 +16,7 @@ import { Avatar, AvatarImage } from '@/components/ui/avatar';
 import { cn } from '@/lib/utils';
 import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { BLOOD_TYPES } from '@/constants';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 type Props = {
     defaultValues?: Partial<UserFormInputs>;
@@ -64,12 +65,11 @@ const UserForm = ({
 
     return (
         <form onSubmit={handleSubmit(onSubmit)}>
-            <div
-                className={cn(
-                    'space-y-2 py-6 max-h-[60vh] overflow-y-auto',
-                    className,
-                )}
+            <ScrollArea
+                className={cn('max-h-[60vh]', className)}
+                viewportClassName='[&>div]:!block [&>div]:!min-w-0'
             >
+                <div className='space-y-2 py-6 pr-4'>
                 {/* Section: Basic Info */}
                 <div className='rounded-2xl border p-6 shadow-sm'>
                     <h3 className='text-lg font-semibold mb-4'>
@@ -312,7 +312,8 @@ const UserForm = ({
                         </div>
                     </div>
                 </div>
-            </div>
+                </div>
+            </ScrollArea>
 
             {/* Actions */}
             <div className='flex justify-end gap-2 mt-6'>
