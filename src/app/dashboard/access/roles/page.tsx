@@ -28,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
 import type { Permission, Role } from '@/types/models/role';
+import { HoverPopover } from '@/components/base/popovers/HoverPopover';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -163,9 +164,29 @@ export default function RolesPage() {
                                     </Badge>
                                 ))}
                                 {permissions.length > 3 && (
-                                    <Badge variant='outline'>
-                                        +{permissions.length - 3} more
-                                    </Badge>
+                                    <HoverPopover
+                                        trigger={
+                                            <Badge
+                                                variant='outline'
+                                                className='cursor-pointer hover:bg-accent'
+                                            >
+                                                +{permissions.length - 3} more
+                                            </Badge>
+                                        }
+                                    >
+                                        <div className='flex max-w-xs flex-wrap gap-1'>
+                                            {permissions
+                                                .slice(3)
+                                                .map((value) => (
+                                                    <Badge
+                                                        key={value.id}
+                                                        variant='secondary'
+                                                    >
+                                                        {value.name}
+                                                    </Badge>
+                                                ))}
+                                        </div>
+                                    </HoverPopover>
                                 )}
                             </>
                         ) : (
