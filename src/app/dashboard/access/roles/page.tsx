@@ -328,86 +328,86 @@ export default function RolesPage() {
                         viewportClassName='[&>div]:!block [&>div]:!min-w-0'
                     >
                         <form onSubmit={submit} className='grid gap-5 p-1 pr-4'>
-                        <DialogHeader>
-                            <DialogTitle>
-                                {editing ? 'Edit role' : 'New role'}
-                            </DialogTitle>
-                            <DialogDescription>
-                                Role names use lowercase letters, numbers, and
-                                hyphens.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <label className='grid gap-2 text-sm font-medium'>
-                            Role name
-                            <Input
-                                pattern='[a-z0-9]+(?:-[a-z0-9]+)*'
-                                disabled={
-                                    editing
-                                        ? ['admin', 'member'].includes(
-                                              editing.name,
-                                          )
-                                        : false
-                                }
-                                {...register('name', { required: true })}
-                            />
-                        </label>
-                        <div className='grid gap-5 sm:grid-cols-2'>
-                            {Object.entries(permissionGroups).map(
-                                ([group, values]) => (
-                                    <fieldset
-                                        key={group}
-                                        className='rounded-md border p-4'
-                                    >
-                                        <legend className='px-1 text-sm font-medium capitalize'>
-                                            {group.replace('-', ' ')}
-                                        </legend>
-                                        <div className='grid gap-3'>
-                                            {values?.map((item) => (
-                                                <label
-                                                    key={item.id}
-                                                    className='flex items-start gap-2 text-sm'
-                                                >
-                                                    <Checkbox
-                                                        checked={selectedPermissions.includes(
-                                                            item.name,
-                                                        )}
-                                                        onCheckedChange={(
-                                                            v,
-                                                        ) => {
-                                                            togglePermission(
+                            <DialogHeader>
+                                <DialogTitle>
+                                    {editing ? 'Edit role' : 'New role'}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Role names use lowercase letters, numbers,
+                                    and hyphens.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <label className='grid gap-2 text-sm font-medium'>
+                                Role name
+                                <Input
+                                    pattern='[a-z0-9]+(?:-[a-z0-9]+)*'
+                                    disabled={
+                                        editing
+                                            ? ['admin', 'member'].includes(
+                                                  editing.name,
+                                              )
+                                            : false
+                                    }
+                                    {...register('name', { required: true })}
+                                />
+                            </label>
+                            <div className='grid gap-5 sm:grid-cols-2'>
+                                {Object.entries(permissionGroups).map(
+                                    ([group, values]) => (
+                                        <fieldset
+                                            key={group}
+                                            className='rounded-md border p-4'
+                                        >
+                                            <legend className='px-1 text-sm font-medium capitalize'>
+                                                {group.replace('-', ' ')}
+                                            </legend>
+                                            <div className='grid gap-3'>
+                                                {values?.map((item) => (
+                                                    <label
+                                                        key={item.id}
+                                                        className='flex items-start gap-2 text-sm'
+                                                    >
+                                                        <Checkbox
+                                                            checked={selectedPermissions.includes(
                                                                 item.name,
-                                                                v === true,
-                                                            );
-                                                        }}
-                                                    />
-                                                    <span>
-                                                        {
-                                                            item.name.split(
-                                                                '.',
-                                                            )[1]
-                                                        }
-                                                    </span>
-                                                </label>
-                                            ))}
-                                        </div>
-                                    </fieldset>
-                                ),
-                            )}
-                        </div>
-                        <DialogFooter>
-                            <Button
-                                type='button'
-                                variant='outline'
-                                onClick={() => {
-                                    setOpen(false);
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                            <Button disabled={save.isPending}>
-                                {save.isPending ? 'Saving…' : 'Save role'}
-                            </Button>
-                        </DialogFooter>
+                                                            )}
+                                                            onCheckedChange={(
+                                                                v,
+                                                            ) => {
+                                                                togglePermission(
+                                                                    item.name,
+                                                                    v === true,
+                                                                );
+                                                            }}
+                                                        />
+                                                        <span>
+                                                            {
+                                                                item.name.split(
+                                                                    '.',
+                                                                )[1]
+                                                            }
+                                                        </span>
+                                                    </label>
+                                                ))}
+                                            </div>
+                                        </fieldset>
+                                    ),
+                                )}
+                            </div>
+                            <DialogFooter>
+                                <Button
+                                    type='button'
+                                    variant='outline'
+                                    onClick={() => {
+                                        setOpen(false);
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button disabled={save.isPending}>
+                                    {save.isPending ? 'Saving…' : 'Save role'}
+                                </Button>
+                            </DialogFooter>
                         </form>
                     </ScrollArea>
                 </DialogContent>
