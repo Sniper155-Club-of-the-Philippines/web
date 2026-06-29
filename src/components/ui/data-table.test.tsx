@@ -157,4 +157,28 @@ describe('DataTable', () => {
             'table-cell',
         );
     });
+
+    it('does not mount a vertical scrollbar for rounding-only overflow', async () => {
+        mockViewportSize();
+        vi.spyOn(HTMLElement.prototype, 'clientHeight', 'get').mockReturnValue(
+            184,
+        );
+        vi.spyOn(HTMLElement.prototype, 'scrollHeight', 'get').mockReturnValue(
+            185,
+        );
+        const columns: ColumnDef<RowData>[] = [
+            { accessorKey: 'name', header: 'Name' },
+        ];
+        const { container } = render(
+            <DataTable columns={columns} data={rows.slice(0, 3)} />,
+        );
+
+        await screen.findByText('Row 1');
+
+        expect(
+            container.querySelector(
+                '[data-slot="scroll-area-scrollbar"][data-orientation="vertical"]',
+            ),
+        ).not.toBeInTheDocument();
+    });
 });

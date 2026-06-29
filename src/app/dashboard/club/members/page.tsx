@@ -180,7 +180,7 @@ export default function ClubMembers() {
                     />
                     {/* Create Dialog */}
                     <Dialog open={createOpen} onOpenChange={setCreateOpen}>
-                        <DialogContent className='sm:max-w-[800px]'>
+                        <DialogContent className='max-h-[calc(100svh-2rem)] sm:max-w-[800px]'>
                             <DialogHeader>
                                 <DialogTitle>Create User</DialogTitle>
                                 <DialogDescription>

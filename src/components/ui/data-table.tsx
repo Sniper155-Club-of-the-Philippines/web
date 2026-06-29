@@ -42,6 +42,7 @@ export interface DataTableRef {
 const DEFAULT_ROW_HEIGHT = 48;
 const BORDER_HEIGHT = 2;
 const OVERSCAN = 4;
+const OVERFLOW_TOLERANCE = 2;
 
 function VirtualizedTableRow<TData>({
     row,
@@ -76,6 +77,7 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
     rowHeight = DEFAULT_ROW_HEIGHT,
 }: DataTableProps<TData, TValue>) {
     const [globalFilter, setGlobalFilter] = useState('');
+    const [hasVerticalOverflow, setHasVerticalOverflow] = useState(false);
 
     const table = useReactTable({
         data,
@@ -121,9 +123,39 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
     const contentRows = isLoading || rows.length === 0 ? 2 : rows.length;
     const contentHeight = BORDER_HEIGHT + 40 + contentRows * rowHeight;
 
+    useEffect(() => {
+        const viewport = scrollRef.current;
+        if (!viewport) return;
+
+        const measureOverflow = () => {
+            setHasVerticalOverflow(
+                viewport.scrollHeight - viewport.clientHeight >
+                    OVERFLOW_TOLERANCE,
+            );
+        };
+
+        measureOverflow();
+        window.addEventListener('resize', measureOverflow);
+
+        const resizeObserver =
+            typeof ResizeObserver === 'undefined'
+                ? null
+                : new ResizeObserver(measureOverflow);
+        resizeObserver?.observe(viewport);
+
+        const content = viewport.firstElementChild;
+        if (content instanceof HTMLElement) resizeObserver?.observe(content);
+
+        return () => {
+            window.removeEventListener('resize', measureOverflow);
+            resizeObserver?.disconnect();
+        };
+    }, [contentHeight]);
+
     return (
         <ScrollArea
             viewportRef={scrollRef}
+            showVerticalScrollbar={hasVerticalOverflow}
             className={cn(
                 'relative w-full max-h-[calc(100svh-20rem)] rounded-lg border md:max-h-[calc(100svh-11rem)]',
                 className,

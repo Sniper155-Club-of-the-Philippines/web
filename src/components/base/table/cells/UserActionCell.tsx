@@ -101,7 +101,7 @@ const UserActionCell = ({ user, refetch }: Props) => {
 
             {/* Edit Dialog */}
             <Dialog open={editOpen} onOpenChange={setEditOpen}>
-                <DialogContent className='sm:max-w-[425px] md:max-w-[800px]'>
+                <DialogContent className='max-h-[calc(100svh-2rem)] sm:max-w-[425px] md:max-w-[800px]'>
                     <DialogHeader>
                         <DialogTitle>Edit User</DialogTitle>
                         <DialogDescription>
