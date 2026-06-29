@@ -30,17 +30,22 @@ import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
 import { formatPesos } from '@/lib/money';
 import {
+    areAllVisibleOrdersSelected,
+    isOrderStatus,
     orderStatusLabel,
     orderStatuses,
     paymentStatusLabel,
     paymentStatusVariant,
+    retainVisibleOrderSelection,
+    toggleVisibleOrderSelection,
 } from '@/lib/order';
 import type { OrderStatus, PaymentStatus } from '@/types/models/order';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Fuse from 'fuse.js';
 import Link from 'next/link';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 
 const paymentFilters: { value: PaymentStatus; label: string }[] = [
     { value: 'unpaid', label: 'Unpaid' },
@@ -62,7 +67,7 @@ export default function AdminOrdersPage() {
     const [batchId, setBatchId] = useState<string>(ALL);
     const [chapterIds, setChapterIds] = useState<string[]>([]);
     const [selected, setSelected] = useState<string[]>([]);
-    const [bulkStatus, setBulkStatus] = useState<string>('');
+    const [bulkStatus, setBulkStatus] = useState<OrderStatus | ''>('');
 
     const ordersQuery = useQuery({
         queryKey: ['admin-orders'],
@@ -128,9 +133,20 @@ export default function AdminOrdersPage() {
     const invalidate = () =>
         queryClient.invalidateQueries({ queryKey: ['admin-orders'] });
 
+    const visibleIds = useMemo(
+        () => visible.map((order) => order.id),
+        [visible],
+    );
+
+    useEffect(() => {
+        setSelected((current) =>
+            retainVisibleOrderSelection(visibleIds, current),
+        );
+    }, [visibleIds]);
+
     const bulk = useMutation({
-        mutationFn: () =>
-            adminOrder.bulkStatus(http, selected, bulkStatus as OrderStatus),
+        mutationFn: (status: OrderStatus) =>
+            adminOrder.bulkStatus(http, selected, status),
         onSuccess: async (changed) => {
             await invalidate();
             setSelected([]);
@@ -152,9 +168,11 @@ export default function AdminOrdersPage() {
             toast.error(apiError(error, 'Could not void order')),
     });
 
-    const allChecked = visible.length > 0 && selected.length === visible.length;
+    const allChecked = areAllVisibleOrdersSelected(visibleIds, selected);
     const toggleAll = () => {
-        setSelected(allChecked ? [] : visible.map((order) => order.id));
+        setSelected((current) =>
+            toggleVisibleOrderSelection(visibleIds, current),
+        );
     };
     const toggleOne = (id: string) => {
         setSelected((current) =>
@@ -253,7 +271,11 @@ export default function AdminOrdersPage() {
                         </span>
                         <Select
                             value={bulkStatus}
-                            onValueChange={setBulkStatus}
+                            onValueChange={(value) => {
+                                if (isOrderStatus(value)) {
+                                    setBulkStatus(value);
+                                }
+                            }}
                         >
                             <SelectTrigger className='w-56'>
                                 <SelectValue placeholder='Set status to…' />
@@ -273,15 +295,26 @@ export default function AdminOrdersPage() {
                             size='sm'
                             disabled={!bulkStatus || bulk.isPending}
                             onClick={() => {
-                                bulk.mutate();
+                                if (bulkStatus) {
+                                    bulk.mutate(bulkStatus);
+                                }
                             }}
                         >
                             Apply
                         </Button>
+                        <Button
+                            size='sm'
+                            variant='ghost'
+                            onClick={() => {
+                                setSelected([]);
+                            }}
+                        >
+                            Clear
+                        </Button>
                     </div>
                 )}
 
-                <div className='overflow-hidden rounded-lg border'>
+                <ScrollArea className='rounded-lg border'>
                     <Table>
                         <TableHeader>
                             <TableRow>
@@ -392,7 +425,8 @@ export default function AdminOrdersPage() {
                             )}
                         </TableBody>
                     </Table>
-                </div>
+                    <ScrollBar orientation='horizontal' />
+                </ScrollArea>
             </div>
         </AdminPage>
     );

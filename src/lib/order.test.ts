@@ -1,13 +1,17 @@
 import { describe, expect, it } from 'vitest';
 import type { Order, OrderStatus, PaymentStatus } from '@/types/models/order';
 import {
+    areAllVisibleOrdersSelected,
     canSubmitProof,
     canVoid,
+    isOrderStatus,
     orderStatusLabel,
     orderStatuses,
     orderTab,
     paymentStatusLabel,
     paymentStatusVariant,
+    retainVisibleOrderSelection,
+    toggleVisibleOrderSelection,
 } from './order';
 
 function order(overrides: Partial<Order> = {}): Order {
@@ -99,5 +103,28 @@ describe('member actions', () => {
     it('allows void on unpaid only', () => {
         expect(canVoid(order({ payment_status: 'unpaid' }))).toBe(true);
         expect(canVoid(order({ payment_status: 'proof_submitted' }))).toBe(false);
+    });
+});
+
+describe('bulk order selection', () => {
+    it('recognizes only valid order statuses', () => {
+        expect(isOrderStatus('in_production')).toBe(true);
+        expect(isOrderStatus('not-a-status')).toBe(false);
+    });
+
+    it('selects and deselects only visible orders', () => {
+        expect(toggleVisibleOrderSelection(['a', 'b'], ['hidden'])).toEqual([
+            'hidden',
+            'a',
+            'b',
+        ]);
+        expect(
+            toggleVisibleOrderSelection(['a', 'b'], ['hidden', 'a', 'b']),
+        ).toEqual(['hidden']);
+    });
+
+    it('retains explicit exclusions when filters are broadened again', () => {
+        expect(retainVisibleOrderSelection(['a'], ['a', 'b'])).toEqual(['a']);
+        expect(areAllVisibleOrdersSelected(['a', 'b'], ['a'])).toBe(false);
     });
 });

@@ -58,6 +58,39 @@ export const orderStatuses: { value: OrderStatus; label: string }[] = (
     Object.keys(orderStatusLabels) as OrderStatus[]
 ).map((value) => ({ value, label: orderStatusLabels[value] }));
 
+export function isOrderStatus(value: string): value is OrderStatus {
+    return Object.hasOwn(orderStatusLabels, value);
+}
+
+export function areAllVisibleOrdersSelected(
+    visibleIds: readonly string[],
+    selectedIds: readonly string[],
+): boolean {
+    const selected = new Set(selectedIds);
+    return visibleIds.length > 0 && visibleIds.every((id) => selected.has(id));
+}
+
+export function toggleVisibleOrderSelection(
+    visibleIds: readonly string[],
+    selectedIds: readonly string[],
+): string[] {
+    const visible = new Set(visibleIds);
+
+    if (areAllVisibleOrdersSelected(visibleIds, selectedIds)) {
+        return selectedIds.filter((id) => !visible.has(id));
+    }
+
+    return [...new Set([...selectedIds, ...visibleIds])];
+}
+
+export function retainVisibleOrderSelection(
+    visibleIds: readonly string[],
+    selectedIds: readonly string[],
+): string[] {
+    const visible = new Set(visibleIds);
+    return selectedIds.filter((id) => visible.has(id));
+}
+
 export function orderStatusLabel(status: OrderStatus | null): string {
     return status ? orderStatusLabels[status] : 'Awaiting payment';
 }
