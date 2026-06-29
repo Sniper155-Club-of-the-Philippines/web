@@ -46,6 +46,7 @@ export default function MemberCartPage() {
 
     const lines = cartQuery.data?.cart ?? [];
     const total = cartQuery.data?.total ?? 0;
+    const itemCount = lines.reduce((sum, line) => sum + line.quantity, 0);
     const storeClosed = statusQuery.data ? !statusQuery.data.open : false;
 
     const changeQuantity = async (id: string, quantity: number) => {
@@ -106,8 +107,8 @@ export default function MemberCartPage() {
                     </AlertDescription>
                 </Alert>
             ) : (
-                <div className='grid items-start gap-6 lg:grid-cols-[1fr_20rem]'>
-                    <div className='bg-card rounded-lg border px-5'>
+                <div className='grid min-w-0 items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]'>
+                    <div className='bg-card min-w-0 overflow-hidden rounded-lg border px-3 sm:px-5'>
                         <div className='divide-border divide-y'>
                             {lines.map((line) => (
                                 <CartLineRow
@@ -122,7 +123,7 @@ export default function MemberCartPage() {
                     </div>
 
                     <CartSummary
-                        itemCount={lines.length}
+                        itemCount={itemCount}
                         total={total}
                         storeClosed={storeClosed}
                         onCheckout={checkout}

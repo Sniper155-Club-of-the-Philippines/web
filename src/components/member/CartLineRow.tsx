@@ -39,8 +39,8 @@ export default function CartLineRow({
     const locked = disabled || busy;
 
     return (
-        <div className='flex gap-4 py-5'>
-            <div className='bg-muted relative size-20 shrink-0 overflow-hidden rounded-md'>
+        <div className='grid grid-cols-[4.5rem_minmax(0,1fr)] gap-3 py-4 sm:grid-cols-[5rem_minmax(0,1fr)] sm:gap-4 sm:py-5'>
+            <div className='bg-muted relative size-18 shrink-0 overflow-hidden rounded-md sm:size-20'>
                 {thumb ? (
                     <Image
                         src={thumb.image_url}
@@ -87,7 +87,7 @@ export default function CartLineRow({
                     </span>
                 </div>
 
-                <div className='mt-auto flex items-center justify-between gap-3'>
+                <div className='mt-auto flex flex-wrap items-center justify-between gap-3'>
                     <div className='flex items-center'>
                         <Button
                             variant='outline'
@@ -132,7 +132,7 @@ export default function CartLineRow({
                         </Button>
                     </div>
 
-                    <p className='font-semibold tabular-nums'>
+                    <p className='ml-auto font-semibold tabular-nums'>
                         {formatPesos(line.subtotal)}
                     </p>
                 </div>
