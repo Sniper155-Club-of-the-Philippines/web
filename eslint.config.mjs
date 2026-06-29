@@ -14,7 +14,6 @@ const eslintConfig = [
         ignores: [
             '.next/**',
             'coverage/**',
-            'eslint.config.mjs',
             'node_modules/**',
             'next-env.d.ts',
             'next.config.ts',
@@ -30,7 +29,9 @@ const eslintConfig = [
     ),
     ...compat.config({
         parserOptions: {
-            projectService: true,
+            projectService: {
+                allowDefaultProject: ['eslint.config.mjs'],
+            },
             tsconfigRootDir: __dirname,
         },
         rules: {
@@ -63,6 +64,15 @@ const eslintConfig = [
             'no-new-func': 'error',
         },
     }),
+    {
+        // The config is type-checked through the default project. ESLint's
+        // CommonJS compatibility bridge has no useful static types here.
+        files: ['eslint.config.mjs'],
+        rules: {
+            '@typescript-eslint/no-unsafe-assignment': 'off',
+            '@typescript-eslint/no-unsafe-call': 'off',
+        },
+    },
     {
         files: ['**/*.test.ts', '**/*.test.tsx', 'vitest.setup.ts'],
         rules: {
