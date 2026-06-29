@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState, useImperativeHandle } from 'react';
 import {
     ColumnDef,
+    Row,
     flexRender,
     getCoreRowModel,
     getFilteredRowModel,
@@ -34,6 +35,21 @@ export interface DataTableRef {
 }
 
 const ROW_HEIGHT = 48;
+const OVERSCAN = 4;
+
+function VirtualizedTableRow<TData>({ row }: { row: Row<TData> }) {
+    return (
+        <TableRow style={{ height: ROW_HEIGHT }}>
+            {row.getVisibleCells().map((cell) => (
+                <TableCell key={cell.id}>
+                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                </TableCell>
+            ))}
+        </TableRow>
+    );
+}
+
+const MemoizedTableRow = React.memo(VirtualizedTableRow);
 
 export function DataTable<TData extends { id?: unknown }, TValue>({
     columns,
@@ -62,11 +78,13 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
     const scrollRef = useRef<HTMLDivElement>(null);
 
     // Virtualizer
+    const rows = table.getRowModel().rows;
     const virtualizer = useVirtualizer({
-        count: table.getRowModel().rows.length,
+        count: rows.length,
         getScrollElement: () => scrollRef.current,
         estimateSize: () => ROW_HEIGHT,
-        overscan: 10,
+        getItemKey: (index) => rows[index].id,
+        overscan: OVERSCAN,
     });
 
     // Expose scroll element + virtualizer to parent
@@ -87,7 +105,7 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
         <ScrollArea
             viewportRef={scrollRef}
             className='relative h-[calc(100svh-20rem)] min-h-64 w-full md:h-[calc(100svh-11rem)]'
-            viewportClassName='px-5'
+            viewportClassName='[contain:strict] px-5'
         >
             <Table className='relative min-w-full'>
                 {/* Sticky Header */}
@@ -123,22 +141,8 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
                     )}
 
                     {virtualRows.map((vr) => {
-                        const row = table.getRowModel().rows[vr.index];
-                        return (
-                            <TableRow
-                                key={row.id}
-                                style={{ height: ROW_HEIGHT }}
-                            >
-                                {row.getVisibleCells().map((cell) => (
-                                    <TableCell key={cell.id}>
-                                        {flexRender(
-                                            cell.column.columnDef.cell,
-                                            cell.getContext(),
-                                        )}
-                                    </TableCell>
-                                ))}
-                            </TableRow>
-                        );
+                        const row = rows[vr.index];
+                        return <MemoizedTableRow key={row.id} row={row} />;
                     })}
 
                     {paddingBottom > 0 && (

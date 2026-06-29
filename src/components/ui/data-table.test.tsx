@@ -8,13 +8,6 @@ interface RowData {
     name: string;
 }
 
-const columns: ColumnDef<RowData>[] = [
-    {
-        accessorKey: 'name',
-        header: 'Name',
-    },
-];
-
 const rows = Array.from({ length: 100 }, (_, index) => ({
     id: String(index),
     name: `Row ${index + 1}`,
@@ -26,6 +19,16 @@ describe('DataTable', () => {
     });
 
     it('virtualizes rows against the ScrollArea viewport', async () => {
+        const renderCell = vi.fn(({ row }: { row: { original: RowData } }) =>
+            row.original.name,
+        );
+        const columns: ColumnDef<RowData>[] = [
+            {
+                accessorKey: 'name',
+                header: 'Name',
+                cell: renderCell,
+            },
+        ];
         vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(
             800,
         );
@@ -49,6 +52,20 @@ describe('DataTable', () => {
         if (!viewport) {
             throw new Error('ScrollArea viewport not found.');
         }
+
+        const initialCellRenders = renderCell.mock.calls.length;
+
+        viewport.scrollTop = 48;
+        fireEvent.scroll(viewport);
+
+        await waitFor(() => {
+            expect(renderCell.mock.calls.length).toBeGreaterThan(
+                initialCellRenders,
+            );
+        });
+        expect(renderCell.mock.calls.length - initialCellRenders).toBeLessThan(
+            3,
+        );
 
         viewport.scrollTop = 48 * 50;
         fireEvent.scroll(viewport);
