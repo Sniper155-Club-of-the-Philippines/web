@@ -13,14 +13,19 @@ const rows = Array.from({ length: 100 }, (_, index) => ({
     name: `Row ${index + 1}`,
 }));
 
+function mockViewportSize() {
+    vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(800);
+    vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(240);
+}
+
 describe('DataTable', () => {
     afterEach(() => {
         vi.restoreAllMocks();
     });
 
     it('virtualizes rows against the ScrollArea viewport', async () => {
-        const renderCell = vi.fn(({ row }: { row: { original: RowData } }) =>
-            row.original.name,
+        const renderCell = vi.fn(
+            ({ row }: { row: { original: RowData } }) => row.original.name,
         );
         const columns: ColumnDef<RowData>[] = [
             {
@@ -29,12 +34,7 @@ describe('DataTable', () => {
                 cell: renderCell,
             },
         ];
-        vi.spyOn(HTMLElement.prototype, 'offsetWidth', 'get').mockReturnValue(
-            800,
-        );
-        vi.spyOn(HTMLElement.prototype, 'offsetHeight', 'get').mockReturnValue(
-            240,
-        );
+        mockViewportSize();
 
         const { container } = render(
             <DataTable columns={columns} data={rows} />,
@@ -74,5 +74,46 @@ describe('DataTable', () => {
             expect(screen.getByText('Row 51')).toBeInTheDocument();
         });
         expect(screen.queryByText('Row 1')).not.toBeInTheDocument();
+    });
+
+    it('refreshes memoized cells when column closures change', async () => {
+        mockViewportSize();
+        const firstColumns: ColumnDef<RowData>[] = [
+            { header: 'Name', cell: () => 'First value' },
+        ];
+        const secondColumns: ColumnDef<RowData>[] = [
+            { header: 'Name', cell: () => 'Updated value' },
+        ];
+        const { rerender } = render(
+            <DataTable columns={firstColumns} data={[rows[0]]} />,
+        );
+
+        expect(await screen.findByText('First value')).toBeInTheDocument();
+
+        rerender(<DataTable columns={secondColumns} data={[rows[0]]} />);
+
+        expect(await screen.findByText('Updated value')).toBeInTheDocument();
+    });
+
+    it('owns loading and empty table states', () => {
+        mockViewportSize();
+        const columns: ColumnDef<RowData>[] = [
+            { accessorKey: 'name', header: 'Name' },
+        ];
+        const { rerender } = render(
+            <DataTable columns={columns} data={[]} isLoading />,
+        );
+
+        expect(screen.getByText('Loading…')).toBeInTheDocument();
+
+        rerender(
+            <DataTable
+                columns={columns}
+                data={[]}
+                emptyMessage='Nothing here.'
+            />,
+        );
+
+        expect(screen.getByText('Nothing here.')).toBeInTheDocument();
     });
 });

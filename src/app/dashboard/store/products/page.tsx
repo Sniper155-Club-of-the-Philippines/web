@@ -1,11 +1,7 @@
 'use client';
 
 import { product } from '@/api';
-import {
-    AdminPage,
-    TableEmpty,
-    TableLoading,
-} from '@/components/admin/AdminPage';
+import { AdminPage } from '@/components/admin/AdminPage';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,15 +15,8 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import { DataTable } from '@/components/ui/data-table';
 import { Textarea } from '@/components/ui/textarea';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
@@ -38,6 +27,7 @@ import Image from 'next/image';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import type { ColumnDef } from '@tanstack/react-table';
 
 type ProductInputs = {
     name: string;
@@ -157,6 +147,64 @@ export default function ProductsPage() {
             toast.error(apiError(error, 'Unable to reorder images.'));
         }
     };
+    const columns: ColumnDef<Product>[] = [
+        {
+            header: 'Product',
+            accessorKey: 'name',
+            cell: ({ row }) => (
+                <div>
+                    <div className='font-medium'>{row.original.name}</div>
+                    <div className='text-xs text-muted-foreground'>
+                        {row.original.slug}
+                    </div>
+                </div>
+            ),
+        },
+        {
+            header: 'Gallery',
+            cell: ({ row }) => (
+                <>
+                    {row.original.images.length} image
+                    {row.original.images.length === 1 ? '' : 's'}
+                </>
+            ),
+        },
+        {
+            header: 'Status',
+            accessorKey: 'is_active',
+            cell: ({ row }) => (
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
+                    {row.original.is_active ? 'Active' : 'Inactive'}
+                </Badge>
+            ),
+        },
+        {
+            id: 'actions',
+            header: () => <div className='text-right'>Actions</div>,
+            cell: ({ row }) => (
+                <div className='flex justify-end gap-2'>
+                    <Button
+                        size='sm'
+                        variant='outline'
+                        onClick={() => {
+                            startEdit(row.original);
+                        }}
+                    >
+                        Edit
+                    </Button>
+                    <ConfirmDialog
+                        title='Delete product?'
+                        description='This also removes its batch configuration and images.'
+                        onConfirm={() => {
+                            remove.mutate(row.original.id);
+                        }}
+                    />
+                </div>
+            ),
+        },
+    ];
 
     return (
         <AdminPage
@@ -177,77 +225,13 @@ export default function ProductsPage() {
                 </Button>
             }
         >
-            <ScrollArea className='rounded-lg border'>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Product</TableHead>
-                            <TableHead>Gallery</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className='text-right'>
-                                Actions
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {query.isLoading && <TableLoading columns={4} />}
-                        {!query.isLoading && !query.data?.length && (
-                            <TableEmpty
-                                columns={4}
-                                message='No products in the catalog.'
-                            />
-                        )}
-                        {query.data?.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>
-                                    <div className='font-medium'>
-                                        {item.name}
-                                    </div>
-                                    <div className='text-xs text-muted-foreground'>
-                                        {item.slug}
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    {item.images.length} image
-                                    {item.images.length === 1 ? '' : 's'}
-                                </TableCell>
-                                <TableCell>
-                                    <Badge
-                                        variant={
-                                            item.is_active
-                                                ? 'default'
-                                                : 'secondary'
-                                        }
-                                    >
-                                        {item.is_active ? 'Active' : 'Inactive'}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <div className='flex justify-end gap-2'>
-                                        <Button
-                                            size='sm'
-                                            variant='outline'
-                                            onClick={() => {
-                                                startEdit(item);
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <ConfirmDialog
-                                            title='Delete product?'
-                                            description='This also removes its batch configuration and images.'
-                                            onConfirm={() => {
-                                                remove.mutate(item.id);
-                                            }}
-                                        />
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <ScrollBar orientation='horizontal' />
-            </ScrollArea>
+            <DataTable
+                columns={columns}
+                data={query.data ?? []}
+                isLoading={query.isLoading}
+                emptyMessage='No products in the catalog.'
+                rowHeight={64}
+            />
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className='sm:max-w-2xl'>
                     <ScrollArea
@@ -255,160 +239,169 @@ export default function ProductsPage() {
                         viewportClassName='[&>div]:!block [&>div]:!min-w-0'
                     >
                         <form onSubmit={submit} className='grid gap-5 p-1 pr-4'>
-                        <DialogHeader>
-                            <DialogTitle>
-                                {editing ? 'Edit product' : 'New product'}
-                            </DialogTitle>
-                            <DialogDescription>
-                                Slug may be left blank when creating; it will be
-                                generated from the name.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className='grid gap-4 sm:grid-cols-2'>
-                            <label className='grid gap-2 text-sm font-medium'>
-                                Name
-                                <Input
-                                    {...register('name', { required: true })}
-                                />
-                            </label>
-                            <label className='grid gap-2 text-sm font-medium'>
-                                Slug
-                                <Input {...register('slug')} />
-                            </label>
-                            <label className='grid gap-2 text-sm font-medium'>
-                                Sort order
-                                <Input
-                                    min={0}
-                                    type='number'
-                                    {...register('sort_order', {
-                                        valueAsNumber: true,
-                                    })}
-                                />
-                            </label>
-                            <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
-                                <Checkbox
-                                    checked={form.is_active}
-                                    onCheckedChange={(v) => {
-                                        setValue('is_active', v === true);
-                                    }}
-                                />{' '}
-                                Active product
-                            </label>
-                            <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
-                                Description
-                                <Textarea {...register('description')} />
-                            </label>
-                        </div>
-                        {editing && (
-                            <section className='grid gap-3 border-t pt-5'>
-                                <div className='flex items-center justify-between gap-4'>
-                                    <div>
-                                        <h3 className='text-sm font-medium'>
-                                            Image gallery
-                                        </h3>
-                                        <p className='text-xs text-muted-foreground'>
-                                            Upload JPG, PNG, or WebP up to 10
-                                            MB.
-                                        </p>
-                                    </div>
-                                    <Button
-                                        asChild
-                                        type='button'
-                                        size='sm'
-                                        variant='outline'
-                                    >
-                                        <label className='cursor-pointer'>
-                                            <Upload /> Upload
-                                            <input
-                                                className='sr-only'
-                                                type='file'
-                                                accept='image/jpeg,image/png,image/webp'
-                                                onChange={(e) =>
-                                                    upload(e.target.files?.[0])
-                                                }
-                                            />
-                                        </label>
-                                    </Button>
-                                </div>
-                                <div className='grid gap-3 sm:grid-cols-2'>
-                                    {editing.images.map((image, index) => (
-                                        <div
-                                            key={image.id}
-                                            className='flex items-center gap-3 rounded-md border p-2'
-                                        >
-                                            <Image
-                                                src={image.image_url}
-                                                alt={`${editing.name} gallery image ${index + 1}`}
-                                                width={72}
-                                                height={72}
-                                                unoptimized
-                                                className='size-18 rounded object-cover'
-                                            />
-                                            <div className='ml-auto flex gap-1'>
-                                                <Button
-                                                    type='button'
-                                                    size='icon'
-                                                    variant='ghost'
-                                                    aria-label='Move image up'
-                                                    onClick={() =>
-                                                        move(image, -1)
-                                                    }
-                                                    disabled={index === 0}
-                                                >
-                                                    <ArrowUp />
-                                                </Button>
-                                                <Button
-                                                    type='button'
-                                                    size='icon'
-                                                    variant='ghost'
-                                                    aria-label='Move image down'
-                                                    onClick={() =>
-                                                        move(image, 1)
-                                                    }
-                                                    disabled={
-                                                        index ===
-                                                        editing.images.length -
-                                                            1
-                                                    }
-                                                >
-                                                    <ArrowDown />
-                                                </Button>
-                                                <Button
-                                                    type='button'
-                                                    size='icon'
-                                                    variant='ghost'
-                                                    aria-label='Delete image'
-                                                    onClick={() =>
-                                                        deleteImage(image.id)
-                                                    }
-                                                >
-                                                    <Trash2 />
-                                                </Button>
-                                            </div>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    {editing ? 'Edit product' : 'New product'}
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Slug may be left blank when creating; it
+                                    will be generated from the name.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <div className='grid gap-4 sm:grid-cols-2'>
+                                <label className='grid gap-2 text-sm font-medium'>
+                                    Name
+                                    <Input
+                                        {...register('name', {
+                                            required: true,
+                                        })}
+                                    />
+                                </label>
+                                <label className='grid gap-2 text-sm font-medium'>
+                                    Slug
+                                    <Input {...register('slug')} />
+                                </label>
+                                <label className='grid gap-2 text-sm font-medium'>
+                                    Sort order
+                                    <Input
+                                        min={0}
+                                        type='number'
+                                        {...register('sort_order', {
+                                            valueAsNumber: true,
+                                        })}
+                                    />
+                                </label>
+                                <label className='flex items-end gap-3 pb-2 text-sm font-medium'>
+                                    <Checkbox
+                                        checked={form.is_active}
+                                        onCheckedChange={(v) => {
+                                            setValue('is_active', v === true);
+                                        }}
+                                    />{' '}
+                                    Active product
+                                </label>
+                                <label className='grid gap-2 text-sm font-medium sm:col-span-2'>
+                                    Description
+                                    <Textarea {...register('description')} />
+                                </label>
+                            </div>
+                            {editing && (
+                                <section className='grid gap-3 border-t pt-5'>
+                                    <div className='flex items-center justify-between gap-4'>
+                                        <div>
+                                            <h3 className='text-sm font-medium'>
+                                                Image gallery
+                                            </h3>
+                                            <p className='text-xs text-muted-foreground'>
+                                                Upload JPG, PNG, or WebP up to
+                                                10 MB.
+                                            </p>
                                         </div>
-                                    ))}
-                                </div>
-                                {!editing.images.length && (
-                                    <p className='rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground'>
-                                        No gallery images.
-                                    </p>
-                                )}
-                            </section>
-                        )}
-                        <DialogFooter>
-                            <Button
-                                type='button'
-                                variant='outline'
-                                onClick={() => {
-                                    setOpen(false);
-                                }}
-                            >
-                                Cancel
-                            </Button>
-                            <Button disabled={save.isPending}>
-                                {save.isPending ? 'Saving…' : 'Save product'}
-                            </Button>
-                        </DialogFooter>
+                                        <Button
+                                            asChild
+                                            type='button'
+                                            size='sm'
+                                            variant='outline'
+                                        >
+                                            <label className='cursor-pointer'>
+                                                <Upload /> Upload
+                                                <input
+                                                    className='sr-only'
+                                                    type='file'
+                                                    accept='image/jpeg,image/png,image/webp'
+                                                    onChange={(e) =>
+                                                        upload(
+                                                            e.target.files?.[0],
+                                                        )
+                                                    }
+                                                />
+                                            </label>
+                                        </Button>
+                                    </div>
+                                    <div className='grid gap-3 sm:grid-cols-2'>
+                                        {editing.images.map((image, index) => (
+                                            <div
+                                                key={image.id}
+                                                className='flex items-center gap-3 rounded-md border p-2'
+                                            >
+                                                <Image
+                                                    src={image.image_url}
+                                                    alt={`${editing.name} gallery image ${index + 1}`}
+                                                    width={72}
+                                                    height={72}
+                                                    unoptimized
+                                                    className='size-18 rounded object-cover'
+                                                />
+                                                <div className='ml-auto flex gap-1'>
+                                                    <Button
+                                                        type='button'
+                                                        size='icon'
+                                                        variant='ghost'
+                                                        aria-label='Move image up'
+                                                        onClick={() =>
+                                                            move(image, -1)
+                                                        }
+                                                        disabled={index === 0}
+                                                    >
+                                                        <ArrowUp />
+                                                    </Button>
+                                                    <Button
+                                                        type='button'
+                                                        size='icon'
+                                                        variant='ghost'
+                                                        aria-label='Move image down'
+                                                        onClick={() =>
+                                                            move(image, 1)
+                                                        }
+                                                        disabled={
+                                                            index ===
+                                                            editing.images
+                                                                .length -
+                                                                1
+                                                        }
+                                                    >
+                                                        <ArrowDown />
+                                                    </Button>
+                                                    <Button
+                                                        type='button'
+                                                        size='icon'
+                                                        variant='ghost'
+                                                        aria-label='Delete image'
+                                                        onClick={() =>
+                                                            deleteImage(
+                                                                image.id,
+                                                            )
+                                                        }
+                                                    >
+                                                        <Trash2 />
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                    {!editing.images.length && (
+                                        <p className='rounded-md border border-dashed p-6 text-center text-sm text-muted-foreground'>
+                                            No gallery images.
+                                        </p>
+                                    )}
+                                </section>
+                            )}
+                            <DialogFooter>
+                                <Button
+                                    type='button'
+                                    variant='outline'
+                                    onClick={() => {
+                                        setOpen(false);
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button disabled={save.isPending}>
+                                    {save.isPending
+                                        ? 'Saving…'
+                                        : 'Save product'}
+                                </Button>
+                            </DialogFooter>
                         </form>
                     </ScrollArea>
                 </DialogContent>

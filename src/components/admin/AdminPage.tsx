@@ -28,35 +28,3 @@ export function AdminPage({
         </main>
     );
 }
-
-export function TableLoading({ columns }: { columns: number }) {
-    return (
-        <tr>
-            <td
-                className='h-24 text-center text-sm text-muted-foreground'
-                colSpan={columns}
-            >
-                Loading…
-            </td>
-        </tr>
-    );
-}
-
-export function TableEmpty({
-    columns,
-    message,
-}: {
-    columns: number;
-    message: string;
-}) {
-    return (
-        <tr>
-            <td
-                className='h-24 text-center text-sm text-muted-foreground'
-                colSpan={columns}
-            >
-                {message}
-            </td>
-        </tr>
-    );
-}

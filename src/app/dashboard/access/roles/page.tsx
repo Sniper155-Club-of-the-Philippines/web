@@ -1,11 +1,7 @@
 'use client';
 
 import { permission, role, user } from '@/api';
-import {
-    AdminPage,
-    TableEmpty,
-    TableLoading,
-} from '@/components/admin/AdminPage';
+import { AdminPage } from '@/components/admin/AdminPage';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -19,7 +15,7 @@ import {
     DialogTitle,
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import {
     Select,
     SelectContent,
@@ -27,14 +23,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { DataTable } from '@/components/ui/data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
@@ -43,6 +32,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import type { ColumnDef } from '@tanstack/react-table';
 
 type RoleInputs = {
     name: string;
@@ -150,6 +140,78 @@ export default function RolesPage() {
     const submit = handleSubmit((values) => {
         save.mutate(values);
     });
+    const columns: ColumnDef<Role>[] = [
+        {
+            header: 'Role',
+            accessorKey: 'name',
+            cell: ({ row }) => (
+                <span className='font-medium'>{row.original.name}</span>
+            ),
+        },
+        {
+            header: 'Permissions',
+            cell: ({ row }) => {
+                const permissions = row.original.permissions ?? [];
+
+                return (
+                    <div className='flex items-center gap-1'>
+                        {permissions.length ? (
+                            <>
+                                {permissions.slice(0, 3).map((value) => (
+                                    <Badge key={value.id} variant='secondary'>
+                                        {value.name}
+                                    </Badge>
+                                ))}
+                                {permissions.length > 3 && (
+                                    <Badge variant='outline'>
+                                        +{permissions.length - 3} more
+                                    </Badge>
+                                )}
+                            </>
+                        ) : (
+                            <span className='text-sm text-muted-foreground'>
+                                {row.original.name === 'admin'
+                                    ? 'Full access bypass'
+                                    : 'No permissions'}
+                            </span>
+                        )}
+                    </div>
+                );
+            },
+        },
+        {
+            header: 'Users',
+            accessorKey: 'users_count',
+            cell: ({ row }) => row.original.users_count ?? 0,
+        },
+        {
+            id: 'actions',
+            header: () => <div className='text-right'>Actions</div>,
+            cell: ({ row }) => (
+                <div className='flex justify-end gap-2'>
+                    <Button
+                        size='sm'
+                        variant='outline'
+                        onClick={() => {
+                            startEdit(row.original);
+                        }}
+                    >
+                        Edit
+                    </Button>
+                    <ConfirmDialog
+                        title='Delete role?'
+                        description='Users assigned only this role may lose access.'
+                        disabled={['admin', 'member'].includes(
+                            row.original.name,
+                        )}
+                        onConfirm={() => {
+                            remove.mutate(row.original.id);
+                        }}
+                    />
+                </div>
+            ),
+        },
+    ];
 
     return (
         <AdminPage
@@ -165,89 +227,13 @@ export default function RolesPage() {
                     </TabsTrigger>
                 </TabsList>
                 <TabsContent value='roles' className='mt-4'>
-                    <ScrollArea className='rounded-lg border'>
-                        <Table>
-                            <TableHeader>
-                                <TableRow>
-                                    <TableHead>Role</TableHead>
-                                    <TableHead>Permissions</TableHead>
-                                    <TableHead>Users</TableHead>
-                                    <TableHead className='text-right'>
-                                        Actions
-                                    </TableHead>
-                                </TableRow>
-                            </TableHeader>
-                            <TableBody>
-                                {rolesQuery.isLoading && (
-                                    <TableLoading columns={4} />
-                                )}
-                                {!rolesQuery.isLoading &&
-                                    !rolesQuery.data?.length && (
-                                        <TableEmpty
-                                            columns={4}
-                                            message='No roles configured.'
-                                        />
-                                    )}
-                                {rolesQuery.data?.map((item) => (
-                                    <TableRow key={item.id}>
-                                        <TableCell className='font-medium'>
-                                            {item.name}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className='flex max-w-xl flex-wrap gap-1'>
-                                                {item.permissions?.length ? (
-                                                    item.permissions.map(
-                                                        (value) => (
-                                                            <Badge
-                                                                key={value.id}
-                                                                variant='secondary'
-                                                            >
-                                                                {value.name}
-                                                            </Badge>
-                                                        ),
-                                                    )
-                                                ) : (
-                                                    <span className='text-sm text-muted-foreground'>
-                                                        {item.name === 'admin'
-                                                            ? 'Full access bypass'
-                                                            : 'No permissions'}
-                                                    </span>
-                                                )}
-                                            </div>
-                                        </TableCell>
-                                        <TableCell>
-                                            {item.users_count ?? 0}
-                                        </TableCell>
-                                        <TableCell>
-                                            <div className='flex justify-end gap-2'>
-                                                <Button
-                                                    size='sm'
-                                                    variant='outline'
-                                                    onClick={() => {
-                                                        startEdit(item);
-                                                    }}
-                                                >
-                                                    Edit
-                                                </Button>
-                                                <ConfirmDialog
-                                                    title='Delete role?'
-                                                    description='Users assigned only this role may lose access.'
-                                                    disabled={[
-                                                        'admin',
-                                                        'member',
-                                                    ].includes(item.name)}
-                                                    onConfirm={() => {
-                                                        remove.mutate(item.id);
-                                                    }}
-                                                />
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))}
-                            </TableBody>
-                        </Table>
-                        <ScrollBar orientation='horizontal' />
-                    </ScrollArea>
+                    <DataTable
+                        columns={columns}
+                        data={rolesQuery.data ?? []}
+                        isLoading={rolesQuery.isLoading}
+                        emptyMessage='No roles configured.'
+                        rowHeight={64}
+                    />
                 </TabsContent>
                 <TabsContent value='assignments' className='mt-4'>
                     <section className='grid max-w-2xl gap-5 rounded-lg border p-5'>

@@ -1,11 +1,7 @@
 'use client';
 
 import { adminOrder, batch } from '@/api';
-import {
-    AdminPage,
-    TableEmpty,
-    TableLoading,
-} from '@/components/admin/AdminPage';
+import { AdminPage } from '@/components/admin/AdminPage';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import MultiSelect from '@/components/base/inputs/MultiSelect';
@@ -18,14 +14,7 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { DataTable } from '@/components/ui/data-table';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
 import { formatPesos } from '@/lib/money';
@@ -39,13 +28,13 @@ import {
     retainVisibleOrderSelection,
     toggleVisibleOrderSelection,
 } from '@/lib/order';
-import type { OrderStatus, PaymentStatus } from '@/types/models/order';
+import type { Order, OrderStatus, PaymentStatus } from '@/types/models/order';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import Fuse from 'fuse.js';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 import { toast } from 'sonner';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import type { ColumnDef } from '@tanstack/react-table';
 
 const paymentFilters: { value: PaymentStatus; label: string }[] = [
     { value: 'unpaid', label: 'Unpaid' },
@@ -55,7 +44,6 @@ const paymentFilters: { value: PaymentStatus; label: string }[] = [
 ];
 
 const ALL = 'all';
-const COLUMNS = 6;
 
 export default function AdminOrdersPage() {
     const http = useHttp();
@@ -181,6 +169,99 @@ export default function AdminOrdersPage() {
                 : [...current, id],
         );
     };
+    const columns: ColumnDef<Order>[] = [
+        {
+            id: 'selected',
+            header: () => (
+                <Checkbox
+                    checked={allChecked}
+                    onCheckedChange={toggleAll}
+                    aria-label='Select all'
+                />
+            ),
+            cell: ({ row }) => (
+                <Checkbox
+                    checked={selected.includes(row.original.id)}
+                    onCheckedChange={() => {
+                        toggleOne(row.original.id);
+                    }}
+                    aria-label={`Select ${row.original.order_number}`}
+                />
+            ),
+        },
+        {
+            header: 'Order',
+            accessorKey: 'order_number',
+            cell: ({ row }) => (
+                <div className='font-medium'>
+                    {row.original.order_number}
+                    <span className='block text-xs font-normal text-muted-foreground'>
+                        {orderStatusLabel(row.original.order_status)}
+                    </span>
+                </div>
+            ),
+        },
+        {
+            header: 'Member',
+            accessorFn: (order) =>
+                order.user
+                    ? `${order.user.first_name} ${order.user.last_name}`
+                    : '—',
+            cell: ({ row }) => (
+                <div>
+                    {row.original.user
+                        ? `${row.original.user.first_name} ${row.original.user.last_name}`
+                        : '—'}
+                    {row.original.user?.club_number && (
+                        <span className='block text-xs text-muted-foreground'>
+                            {row.original.user.club_number}
+                        </span>
+                    )}
+                </div>
+            ),
+        },
+        {
+            header: 'Total',
+            accessorKey: 'subtotal',
+            cell: ({ row }) => formatPesos(row.original.subtotal),
+        },
+        {
+            header: 'Payment',
+            accessorKey: 'payment_status',
+            cell: ({ row }) => (
+                <Badge
+                    variant={paymentStatusVariant(row.original.payment_status)}
+                >
+                    {paymentStatusLabel(row.original.payment_status)}
+                </Badge>
+            ),
+        },
+        {
+            id: 'actions',
+            header: () => <div className='text-right'>Actions</div>,
+            cell: ({ row }) => (
+                <div className='flex justify-end gap-2'>
+                    <Button asChild size='sm' variant='outline'>
+                        <Link
+                            href={`/dashboard/store/orders/${row.original.id}`}
+                        >
+                            Review
+                        </Link>
+                    </Button>
+                    <Button
+                        size='sm'
+                        variant='ghost'
+                        disabled={Boolean(row.original.voided_at)}
+                        onClick={() => {
+                            voidOrder.mutate(row.original.id);
+                        }}
+                    >
+                        Void
+                    </Button>
+                </div>
+            ),
+        },
+    ];
 
     return (
         <AdminPage
@@ -314,119 +395,13 @@ export default function AdminOrdersPage() {
                     </div>
                 )}
 
-                <ScrollArea className='rounded-lg border'>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead className='w-10'>
-                                    <Checkbox
-                                        checked={allChecked}
-                                        onCheckedChange={toggleAll}
-                                        aria-label='Select all'
-                                    />
-                                </TableHead>
-                                <TableHead>Order</TableHead>
-                                <TableHead>Member</TableHead>
-                                <TableHead>Total</TableHead>
-                                <TableHead>Payment</TableHead>
-                                <TableHead className='text-right'>
-                                    Actions
-                                </TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {ordersQuery.isLoading ? (
-                                <TableLoading columns={COLUMNS} />
-                            ) : visible.length === 0 ? (
-                                <TableEmpty
-                                    columns={COLUMNS}
-                                    message='No orders match these filters.'
-                                />
-                            ) : (
-                                visible.map((order) => (
-                                    <TableRow key={order.id}>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={selected.includes(
-                                                    order.id,
-                                                )}
-                                                onCheckedChange={() => {
-                                                    toggleOne(order.id);
-                                                }}
-                                                aria-label={`Select ${order.order_number}`}
-                                            />
-                                        </TableCell>
-                                        <TableCell className='font-medium'>
-                                            {order.order_number}
-                                            <span className='block text-xs text-muted-foreground'>
-                                                {orderStatusLabel(
-                                                    order.order_status,
-                                                )}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell>
-                                            {order.user
-                                                ? `${order.user.first_name} ${order.user.last_name}`
-                                                : '—'}
-                                            {order.user?.club_number && (
-                                                <span className='block text-xs text-muted-foreground'>
-                                                    {order.user.club_number}
-                                                </span>
-                                            )}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatPesos(order.subtotal)}
-                                        </TableCell>
-                                        <TableCell>
-                                            <Badge
-                                                variant={paymentStatusVariant(
-                                                    order.payment_status,
-                                                )}
-                                            >
-                                                {paymentStatusLabel(
-                                                    order.payment_status,
-                                                )}
-                                            </Badge>
-                                        </TableCell>
-                                        <TableCell className='text-right'>
-                                            <div className='flex justify-end gap-2'>
-                                                <Button
-                                                    asChild
-                                                    size='sm'
-                                                    variant='outline'
-                                                >
-                                                    <Link
-                                                        href={`/dashboard/store/orders/${order.id}`}
-                                                    >
-                                                        Review
-                                                    </Link>
-                                                </Button>
-                                                <Button
-                                                    size='sm'
-                                                    variant='ghost'
-                                                    disabled={
-                                                        order.voided_at !==
-                                                            null &&
-                                                        order.voided_at !==
-                                                            undefined
-                                                    }
-                                                    onClick={() => {
-                                                        voidOrder.mutate(
-                                                            order.id,
-                                                        );
-                                                    }}
-                                                >
-                                                    Void
-                                                </Button>
-                                            </div>
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
-                    <ScrollBar orientation='horizontal' />
-                </ScrollArea>
+                <DataTable
+                    columns={columns}
+                    data={visible}
+                    isLoading={ordersQuery.isLoading}
+                    emptyMessage='No orders match these filters.'
+                    rowHeight={64}
+                />
             </div>
         </AdminPage>
     );

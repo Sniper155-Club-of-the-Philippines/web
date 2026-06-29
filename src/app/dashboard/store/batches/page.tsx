@@ -1,17 +1,12 @@
 'use client';
 
 import { batch } from '@/api';
-import {
-    AdminPage,
-    TableEmpty,
-    TableLoading,
-} from '@/components/admin/AdminPage';
+import { AdminPage } from '@/components/admin/AdminPage';
 import { ConfirmDialog } from '@/components/admin/ConfirmDialog';
 import DateTimePicker from '@/components/base/inputs/DateTimePicker';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
 import {
     Dialog,
     DialogContent,
@@ -27,14 +22,7 @@ import {
     FieldLabel,
 } from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
+import { DataTable } from '@/components/ui/data-table';
 import { Textarea } from '@/components/ui/textarea';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
@@ -45,6 +33,7 @@ import Link from 'next/link';
 import { useState } from 'react';
 import { Controller, useForm } from 'react-hook-form';
 import { toast } from 'sonner';
+import type { ColumnDef } from '@tanstack/react-table';
 
 type BatchInputs = {
     name: string;
@@ -129,6 +118,76 @@ export default function BatchesPage() {
     const submit = handleSubmit((values) => {
         save.mutate(values);
     });
+    const columns: ColumnDef<Batch>[] = [
+        {
+            header: 'Batch',
+            accessorKey: 'name',
+            cell: ({ row }) => (
+                <div>
+                    <div className='font-medium'>{row.original.name}</div>
+                    <div className='text-xs text-muted-foreground'>
+                        Sequence {row.original.sequence}
+                    </div>
+                </div>
+            ),
+        },
+        {
+            header: 'Window',
+            cell: ({ row }) => (
+                <>
+                    {dayjs(row.original.ordering_start_at).format(
+                        'MMM D, YYYY h:mm A',
+                    )}{' '}
+                    –{' '}
+                    {dayjs(row.original.ordering_end_at).format(
+                        'MMM D, YYYY h:mm A',
+                    )}
+                </>
+            ),
+        },
+        {
+            header: 'Status',
+            accessorKey: 'is_active',
+            cell: ({ row }) => (
+                <Badge
+                    variant={row.original.is_active ? 'default' : 'secondary'}
+                >
+                    {row.original.is_active ? 'Active' : 'Inactive'}
+                </Badge>
+            ),
+        },
+        {
+            id: 'actions',
+            header: () => <div className='text-right'>Actions</div>,
+            cell: ({ row }) => (
+                <div className='flex justify-end gap-2'>
+                    <Button asChild size='sm' variant='outline'>
+                        <Link
+                            href={`/dashboard/store/batches/${row.original.id}`}
+                        >
+                            Products
+                        </Link>
+                    </Button>
+                    <Button
+                        size='sm'
+                        variant='outline'
+                        onClick={() => {
+                            startEdit(row.original);
+                        }}
+                    >
+                        Edit
+                    </Button>
+                    <ConfirmDialog
+                        title='Delete batch?'
+                        description='This removes its product overrides too.'
+                        onConfirm={() => {
+                            remove.mutate(row.original.id);
+                        }}
+                    />
+                </div>
+            ),
+        },
+    ];
 
     return (
         <AdminPage
@@ -136,93 +195,13 @@ export default function BatchesPage() {
             description='Define ordering periods, then configure product pricing and limits for each batch.'
             action={<Button onClick={startCreate}>New batch</Button>}
         >
-            <ScrollArea className='rounded-lg border'>
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Batch</TableHead>
-                            <TableHead>Window</TableHead>
-                            <TableHead>Status</TableHead>
-                            <TableHead className='text-right'>
-                                Actions
-                            </TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {query.isLoading && <TableLoading columns={4} />}
-                        {!query.isLoading && !query.data?.length && (
-                            <TableEmpty
-                                columns={4}
-                                message='No ordering batches yet.'
-                            />
-                        )}
-                        {query.data?.map((item) => (
-                            <TableRow key={item.id}>
-                                <TableCell>
-                                    <div className='font-medium'>
-                                        {item.name}
-                                    </div>
-                                    <div className='text-xs text-muted-foreground'>
-                                        Sequence {item.sequence}
-                                    </div>
-                                </TableCell>
-                                <TableCell>
-                                    {dayjs(item.ordering_start_at).format(
-                                        'MMM D, YYYY h:mm A',
-                                    )}{' '}
-                                    –{' '}
-                                    {dayjs(item.ordering_end_at).format(
-                                        'MMM D, YYYY h:mm A',
-                                    )}
-                                </TableCell>
-                                <TableCell>
-                                    <Badge
-                                        variant={
-                                            item.is_active
-                                                ? 'default'
-                                                : 'secondary'
-                                        }
-                                    >
-                                        {item.is_active ? 'Active' : 'Inactive'}
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>
-                                    <div className='flex justify-end gap-2'>
-                                        <Button
-                                            asChild
-                                            size='sm'
-                                            variant='outline'
-                                        >
-                                            <Link
-                                                href={`/dashboard/store/batches/${item.id}`}
-                                            >
-                                                Products
-                                            </Link>
-                                        </Button>
-                                        <Button
-                                            size='sm'
-                                            variant='outline'
-                                            onClick={() => {
-                                                startEdit(item);
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
-                                        <ConfirmDialog
-                                            title='Delete batch?'
-                                            description='This removes its product overrides too.'
-                                            onConfirm={() => {
-                                                remove.mutate(item.id);
-                                            }}
-                                        />
-                                    </div>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
-                </Table>
-                <ScrollBar orientation='horizontal' />
-            </ScrollArea>
+            <DataTable
+                columns={columns}
+                data={query.data ?? []}
+                isLoading={query.isLoading}
+                emptyMessage='No ordering batches yet.'
+                rowHeight={64}
+            />
             <Dialog open={open} onOpenChange={setOpen}>
                 <DialogContent className='sm:max-w-xl'>
                     <form onSubmit={submit} className='grid gap-5'>
