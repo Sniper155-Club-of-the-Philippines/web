@@ -32,6 +32,8 @@ import { useAtomValue } from 'jotai';
 import { LoaderCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
+import ProductImageGallery from '@/components/member/ProductImageGallery';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function StoreProductDialog({
     product,
@@ -89,95 +91,132 @@ export default function StoreProductDialog({
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>{children}</DialogTrigger>
-            <DialogContent>
-                <DialogHeader>
-                    <DialogTitle>{product.name}</DialogTitle>
-                    <DialogDescription>
-                        {formatPesos(product.price)}
-                        {product.description ? ` · ${product.description}` : ''}
-                    </DialogDescription>
-                </DialogHeader>
+            <DialogContent className='p-0 sm:max-w-3xl'>
+                <ScrollArea
+                    className='max-h-[calc(100svh-2rem)]'
+                    viewportClassName='[&>div]:!block [&>div]:!min-w-0'
+                >
+                    <div className='grid gap-5 p-6'>
+                        <DialogHeader>
+                            <DialogTitle>{product.name}</DialogTitle>
+                            <DialogDescription>
+                                {formatPesos(product.price)}
+                                {product.description
+                                    ? ` · ${product.description}`
+                                    : ''}
+                            </DialogDescription>
+                        </DialogHeader>
 
-                {recipients.length === 0 ? (
-                    <p className='text-muted-foreground text-sm'>
-                        Set the matching rider or OBR nickname on your profile
-                        before ordering this item.
-                    </p>
-                ) : (
-                    <div className='flex flex-col gap-4'>
-                        <div className='flex flex-col gap-2'>
-                            <Label htmlFor='store-size'>Size</Label>
-                            <Select value={size} onValueChange={setSize}>
-                                <SelectTrigger id='store-size'>
-                                    <SelectValue placeholder='Select size' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {product.available_sizes.map((value) => (
-                                        <SelectItem key={value} value={value}>
-                                            {value}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                        <div className='grid items-start gap-5 sm:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]'>
+                            <ProductImageGallery
+                                images={product.images}
+                                name={product.name}
+                                showThumbnails
+                            />
+
+                            {recipients.length === 0 ? (
+                                <p className='text-muted-foreground text-sm'>
+                                    Set the matching rider or OBR nickname on
+                                    your profile before ordering this item.
+                                </p>
+                            ) : (
+                                <div className='flex flex-col gap-4'>
+                                    <div className='flex flex-col gap-2'>
+                                        <Label htmlFor='store-size'>Size</Label>
+                                        <Select
+                                            value={size}
+                                            onValueChange={setSize}
+                                        >
+                                            <SelectTrigger id='store-size'>
+                                                <SelectValue placeholder='Select size' />
+                                            </SelectTrigger>
+                                            <SelectContent>
+                                                {product.available_sizes.map(
+                                                    (value) => (
+                                                        <SelectItem
+                                                            key={value}
+                                                            value={value}
+                                                        >
+                                                            {value}
+                                                        </SelectItem>
+                                                    ),
+                                                )}
+                                            </SelectContent>
+                                        </Select>
+                                    </div>
+
+                                    <div className='flex flex-col gap-2'>
+                                        <Label>Recipient</Label>
+                                        <RadioGroup
+                                            value={recipientType}
+                                            onValueChange={(value) => {
+                                                if (
+                                                    value === 'rider' ||
+                                                    value === 'obr'
+                                                ) {
+                                                    setRecipientType(value);
+                                                    setQuantity(1);
+                                                }
+                                            }}
+                                        >
+                                            {recipients.map((option) => (
+                                                <Label
+                                                    key={option.type}
+                                                    className='flex items-center gap-2 font-normal'
+                                                >
+                                                    <RadioGroupItem
+                                                        value={option.type}
+                                                    />
+                                                    {option.label} (
+                                                    {option.nickname}) · up to{' '}
+                                                    {option.limit}
+                                                </Label>
+                                            ))}
+                                        </RadioGroup>
+                                    </div>
+
+                                    <div className='flex flex-col gap-2'>
+                                        <Label htmlFor='store-qty'>
+                                            Quantity
+                                        </Label>
+                                        <Input
+                                            id='store-qty'
+                                            type='number'
+                                            min={1}
+                                            max={recipient?.limit ?? 1}
+                                            value={quantity}
+                                            onChange={(event) => {
+                                                setQuantity(
+                                                    Math.max(
+                                                        1,
+                                                        Number(
+                                                            event.target.value,
+                                                        ) || 1,
+                                                    ),
+                                                );
+                                            }}
+                                        />
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
-                        <div className='flex flex-col gap-2'>
-                            <Label>Recipient</Label>
-                            <RadioGroup
-                                value={recipientType}
-                                onValueChange={(value) => {
-                                    setRecipientType(value as RecipientType);
-                                    setQuantity(1);
-                                }}
+                        <DialogFooter>
+                            <Button
+                                onClick={submit}
+                                disabled={!canSubmit || submitting}
                             >
-                                {recipients.map((option) => (
-                                    <Label
-                                        key={option.type}
-                                        className='flex items-center gap-2 font-normal'
-                                    >
-                                        <RadioGroupItem value={option.type} />
-                                        {option.label} ({option.nickname}) · up
-                                        to {option.limit}
-                                    </Label>
-                                ))}
-                            </RadioGroup>
-                        </div>
-
-                        <div className='flex flex-col gap-2'>
-                            <Label htmlFor='store-qty'>Quantity</Label>
-                            <Input
-                                id='store-qty'
-                                type='number'
-                                min={1}
-                                max={recipient?.limit ?? 1}
-                                value={quantity}
-                                onChange={(event) => {
-                                    setQuantity(
-                                        Math.max(
-                                            1,
-                                            Number(event.target.value) || 1,
-                                        ),
-                                    );
-                                }}
-                            />
-                        </div>
+                                {submitting && (
+                                    <LoaderCircle
+                                        data-icon='inline-start'
+                                        className='animate-spin motion-reduce:animate-none'
+                                    />
+                                )}
+                                Add to cart
+                            </Button>
+                        </DialogFooter>
                     </div>
-                )}
-
-                <DialogFooter>
-                    <Button
-                        onClick={submit}
-                        disabled={!canSubmit || submitting}
-                    >
-                        {submitting && (
-                            <LoaderCircle
-                                data-icon='inline-start'
-                                className='animate-spin motion-reduce:animate-none'
-                            />
-                        )}
-                        Add to cart
-                    </Button>
-                </DialogFooter>
+                </ScrollArea>
             </DialogContent>
         </Dialog>
     );

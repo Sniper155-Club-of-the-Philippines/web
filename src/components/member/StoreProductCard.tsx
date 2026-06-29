@@ -12,32 +12,16 @@ import {
 } from '@/components/ui/card';
 import { formatPesos } from '@/lib/money';
 import type { StoreProduct } from '@/types/models/store';
-import { ImageOff } from 'lucide-react';
-import Image from 'next/image';
+import ProductImageGallery from '@/components/member/ProductImageGallery';
 
 export default function StoreProductCard({
     product,
 }: {
     product: StoreProduct;
 }) {
-    const cover = product.images[0];
-
     return (
         <Card className='overflow-hidden pt-0 gap-3 md:gap-6 pb-3 md:pb-6'>
-            <div className='bg-muted relative flex aspect-square items-center justify-center'>
-                {cover ? (
-                    <Image
-                        src={cover.image_url}
-                        alt={product.name}
-                        fill
-                        sizes='(min-width: 768px) 33vw, 50vw'
-                        className='object-cover'
-                        unoptimized
-                    />
-                ) : (
-                    <ImageOff className='text-muted-foreground size-10' />
-                )}
-            </div>
+            <ProductImageGallery images={product.images} name={product.name} />
             <CardHeader className='px-2 md:px-6'>
                 <CardTitle className='text-base'>{product.name}</CardTitle>
                 <p className='text-lg font-semibold'>
