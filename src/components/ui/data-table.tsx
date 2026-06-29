@@ -40,6 +40,7 @@ export interface DataTableRef {
 }
 
 const DEFAULT_ROW_HEIGHT = 48;
+const BORDER_HEIGHT = 2;
 const OVERSCAN = 4;
 
 function VirtualizedTableRow<TData>({
@@ -118,7 +119,7 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
             ? totalSize - virtualRows[virtualRows.length - 1].end
             : 0;
     const contentRows = isLoading || rows.length === 0 ? 2 : rows.length;
-    const contentHeight = 40 + contentRows * rowHeight;
+    const contentHeight = BORDER_HEIGHT + 40 + contentRows * rowHeight;
 
     return (
         <ScrollArea
@@ -127,7 +128,7 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
                 'relative w-full max-h-[calc(100svh-20rem)] rounded-lg border md:max-h-[calc(100svh-11rem)]',
                 className,
             )}
-            viewportClassName='[contain:strict] px-5'
+            viewportClassName='[contain:strict]'
             style={{ height: contentHeight }}
         >
             <Table className='relative min-w-full' aria-busy={isLoading}>
@@ -137,15 +138,12 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
                         <TableRow key={hg.id}>
                             {hg.headers.map((header) => (
                                 <TableHead key={header.id}>
-                                    <div className='px-3'>
-                                        {header.isPlaceholder
-                                            ? null
-                                            : flexRender(
-                                                  header.column.columnDef
-                                                      .header,
-                                                  header.getContext(),
-                                              )}
-                                    </div>
+                                    {header.isPlaceholder
+                                        ? null
+                                        : flexRender(
+                                              header.column.columnDef.header,
+                                              header.getContext(),
+                                          )}
                                 </TableHead>
                             ))}
                         </TableRow>

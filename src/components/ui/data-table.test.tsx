@@ -116,4 +116,45 @@ describe('DataTable', () => {
 
         expect(screen.getByText('Nothing here.')).toBeInTheDocument();
     });
+
+    it('keeps table edges flush and header controls column-aligned', async () => {
+        mockViewportSize();
+        const columns: ColumnDef<RowData>[] = [
+            {
+                id: 'selected',
+                header: () => (
+                    <button type='button' aria-label='Select all rows' />
+                ),
+                cell: () => (
+                    <button type='button' aria-label='Select this row' />
+                ),
+            },
+            { accessorKey: 'name', header: 'Name' },
+        ];
+        const { container } = render(
+            <DataTable columns={columns} data={[rows[0]]} />,
+        );
+
+        const viewport = container.querySelector(
+            '[data-slot="scroll-area-viewport"]',
+        );
+        const root = container.querySelector('[data-slot="scroll-area"]');
+        const headerControl = screen.getByRole('button', {
+            name: 'Select all rows',
+        });
+        const rowControl = await screen.findByRole('button', {
+            name: 'Select this row',
+        });
+
+        expect(viewport).not.toHaveClass('px-5');
+        expect(root).toHaveStyle({ height: '90px' });
+        expect(headerControl.parentElement).toHaveAttribute(
+            'data-slot',
+            'table-head',
+        );
+        expect(rowControl.parentElement).toHaveAttribute(
+            'data-slot',
+            'table-cell',
+        );
+    });
 });
