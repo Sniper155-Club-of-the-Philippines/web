@@ -1,4 +1,4 @@
-import { decodeTime } from 'ulid';
+import { isValid } from 'ulid';
 
 export function randomString(length: number = 10): string {
     const chars =
@@ -13,11 +13,22 @@ export function randomString(length: number = 10): string {
     return result;
 }
 
+/**
+ * Turn a machine role name into a human label:
+ * "content-manager" -> "Content Manager", "order_manager" -> "Order Manager".
+ */
+export function prettifyRole(role: string): string {
+    return role
+        .trim()
+        .split(/[-_\s]+/)
+        .filter(Boolean)
+        .map(
+            (word) =>
+                word.charAt(0).toUpperCase() + word.slice(1).toLowerCase(),
+        )
+        .join(' ');
+}
+
 export function isValidULID(ulid: string) {
-    try {
-        decodeTime(ulid);
-        return true;
-    } catch {
-        return false;
-    }
+    return isValid(ulid);
 }

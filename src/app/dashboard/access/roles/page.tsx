@@ -21,6 +21,7 @@ import { DataTable } from '@/components/ui/data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHttp } from '@/hooks/http';
 import { apiError } from '@/lib/api-error';
+import { prettifyRole } from '@/lib/string';
 import type { Permission, Role } from '@/types/models/role';
 import { HoverPopover } from '@/components/base/popovers/HoverPopover';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
@@ -140,7 +141,9 @@ export default function RolesPage() {
             header: 'Role',
             accessorKey: 'name',
             cell: ({ row }) => (
-                <span className='font-medium'>{row.original.name}</span>
+                <span className='font-medium'>
+                    {prettifyRole(row.original.name)}
+                </span>
             ),
         },
         {
@@ -295,7 +298,7 @@ export default function RolesPage() {
                                                 );
                                             }}
                                         />{' '}
-                                        {item.name}
+                                        {prettifyRole(item.name)}
                                     </label>
                                 ))}
                             </div>

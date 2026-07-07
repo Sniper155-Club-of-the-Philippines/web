@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { ulid } from 'ulid';
-import { isValidULID, randomString } from './string';
+import { isValidULID, prettifyRole, randomString } from './string';
 
 describe('randomString', () => {
     it('defaults to length 10', () => {
@@ -14,6 +14,23 @@ describe('randomString', () => {
 
     it('only uses the alphanumeric alphabet', () => {
         expect(randomString(200)).toMatch(/^[A-Za-z0-9]+$/);
+    });
+});
+
+describe('prettifyRole', () => {
+    it('title-cases kebab and snake role names', () => {
+        expect(prettifyRole('content-manager')).toBe('Content Manager');
+        expect(prettifyRole('order_manager')).toBe('Order Manager');
+    });
+
+    it('handles single words and mixed casing', () => {
+        expect(prettifyRole('admin')).toBe('Admin');
+        expect(prettifyRole('SUPER-Admin')).toBe('Super Admin');
+    });
+
+    it('collapses extra separators and trims', () => {
+        expect(prettifyRole('  content--manager  ')).toBe('Content Manager');
+        expect(prettifyRole('')).toBe('');
     });
 });
 
