@@ -16,13 +16,7 @@ import {
 } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import {
-    Select,
-    SelectContent,
-    SelectItem,
-    SelectTrigger,
-    SelectValue,
-} from '@/components/ui/select';
+import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { DataTable } from '@/components/ui/data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useHttp } from '@/hooks/http';
@@ -267,25 +261,18 @@ export default function RolesPage() {
                         </div>
                         <label className='grid gap-2 text-sm font-medium'>
                             Member
-                            <Select
+                            <SelectSearch
+                                placeholder='Select a member'
                                 value={selectedUserId}
-                                onValueChange={selectUser}
-                            >
-                                <SelectTrigger>
-                                    <SelectValue placeholder='Select a member' />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    {usersQuery.data?.map((item) => (
-                                        <SelectItem
-                                            key={item.id}
-                                            value={item.id}
-                                        >
-                                            {item.last_name}, {item.first_name}{' '}
-                                            — {item.email}
-                                        </SelectItem>
-                                    ))}
-                                </SelectContent>
-                            </Select>
+                                triggerWidth='w-full'
+                                options={
+                                    usersQuery.data?.map((item) => ({
+                                        value: item.id,
+                                        label: `${item.last_name}, ${item.first_name} — ${item.email}`,
+                                    })) ?? []
+                                }
+                                onChange={(e) => selectUser(e.target.value)}
+                            />
                         </label>
                         <fieldset disabled={!selectedUserId}>
                             <legend className='mb-3 text-sm font-medium'>
