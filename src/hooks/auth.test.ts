@@ -270,6 +270,34 @@ describe('useRefreshToken — scheduling', () => {
         expect(httpGet).toHaveBeenCalledTimes(1);
     });
 
+    it('does not hot-loop when the server access-token TTL is <= the refresh buffer', async () => {
+        vi.useFakeTimers();
+        // Fresh tokens live exactly as long as the default buffer, so every
+        // refreshed token is instantly "expiring soon" — the pre-fix loop
+        // condition that flickered the login page against short-TTL prod.
+        setToken(300);
+        httpGet.mockResolvedValue({
+            data: {
+                access: { type: 'Bearer', token: makeToken(300) },
+                user: {},
+            },
+        });
+        await act(async () => {
+            renderHook(() => useRefreshToken({ requireAuth: false }));
+        });
+        // Flush the initial proactive refresh + its reschedule.
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(0);
+        });
+        const afterMount = httpGet.mock.calls.length;
+        // Advance far past a 1 Hz loop window; the backoff must stay quiet.
+        await act(async () => {
+            await vi.advanceTimersByTimeAsync(60_000);
+        });
+        expect(afterMount).toBe(1);
+        expect(httpGet).toHaveBeenCalledTimes(1);
+    });
+
     it('refreshes immediately when the stored token cannot be decoded', async () => {
         httpGet.mockResolvedValue({
             data: {

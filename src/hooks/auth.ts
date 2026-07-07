@@ -267,6 +267,34 @@ export function useRefreshToken(config: RefreshConfig = {}) {
 
             // If token should be refreshed immediately (proactive refresh)
             if (shouldRefreshToken(token)) {
+                // Guard against a hot refresh loop: if we *just* refreshed and
+                // the fresh token is already inside the buffer, the server's
+                // access-token TTL is <= refreshBuffer. Refreshing again
+                // immediately would loop forever (flicker + hammering). Instead
+                // back off to half the token's remaining life.
+                const sinceLastRefresh =
+                    now - refreshState.current.lastRefreshAttempt;
+                if (sinceLastRefresh < finalConfig.refreshBuffer) {
+                    const backoff = Math.max(
+                        Math.floor((expiryTime - now) / 2),
+                        finalConfig.minRefreshDelay,
+                    );
+                    refreshState.current.timeoutId = setTimeout(() => {
+                        if (mounted.current && access?.token) {
+                            console.info(
+                                'Scheduled token refresh triggered (proactive, short-TTL backoff)',
+                            );
+                            void refreshToken(false, false);
+                        }
+                    }, backoff);
+                    console.debug(
+                        `Short-lived token (TTL <= buffer); next refresh in ${Math.round(
+                            backoff / 1000,
+                        )}s (backoff)`,
+                    );
+                    return;
+                }
+
                 console.info(
                     'Token expires soon, refreshing immediately (proactive)',
                 );
