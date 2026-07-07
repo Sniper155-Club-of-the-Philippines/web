@@ -27,7 +27,7 @@ import { useRefreshToken } from '@/hooks/auth';
 import { AUTH_ROUTES, landingPath, mustChangePassword } from '@/lib/auth';
 import Link from 'next/link';
 import { Label } from '@/components/ui/label';
-import Spinner from '@/components/root/Spinner';
+import LoadingOverlay from '@/components/root/LoadingOverlay';
 
 type Inputs = {
     email: string;
@@ -174,7 +174,7 @@ function Login() {
 
 export default function Page() {
     return (
-        <Suspense fallback={<Spinner />}>
+        <Suspense fallback={<LoadingOverlay />}>
             <Login />
         </Suspense>
     );

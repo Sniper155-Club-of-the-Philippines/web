@@ -6,6 +6,7 @@ import { portalRedirect, type PortalKind } from '@/lib/auth';
 import { useAtomValue } from 'jotai';
 import { usePathname, useRouter } from 'next/navigation';
 import { useEffect } from 'react';
+import LoadingOverlay from '@/components/root/LoadingOverlay';
 
 export default function PortalGuard({
     children,
@@ -29,8 +30,9 @@ export default function PortalGuard({
         }
     }, [redirect, router]);
 
+    // Still validating the stored token, or redirecting to the right portal.
     if (!access || !user || redirect) {
-        return null;
+        return <LoadingOverlay />;
     }
 
     return children;

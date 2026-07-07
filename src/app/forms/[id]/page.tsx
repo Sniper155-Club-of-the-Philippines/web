@@ -4,6 +4,7 @@ import NotFound from '@/app/not-found';
 import { loadingAtom } from '@/atoms/misc';
 import FormForm, { FormSubmitPayload } from '@/components/base/forms/FormForm';
 import { useRefreshToken } from '@/hooks/auth';
+import { useLoadingEffect } from '@/hooks/loading';
 import { useFormQuery } from '@/hooks/queries';
 import { useAtom } from 'jotai';
 import { useParams, useRouter } from 'next/navigation';
@@ -110,13 +111,8 @@ export default function AnswerForm() {
         setAccess(RESET);
     };
 
-    useEffect(() => {
-        if (isLoading && !loading) {
-            setLoading(true);
-        } else if (!isLoading && loading) {
-            setLoading(false);
-        }
-    }, [isLoading, loading, setLoading]);
+    // Show the universal loading overlay while the form loads.
+    useLoadingEffect(isLoading || !user);
 
     useEffect(() => {
         fetchStatus();
@@ -136,6 +132,10 @@ export default function AnswerForm() {
         return null;
     }
 
+    if (!user) {
+        return null;
+    }
+
     return (
         <div className='flex flex-col h-full'>
             <div className='flex justify-between items-center border-b px-4 py-2 bg-background shadow-sm'>
@@ -145,7 +145,7 @@ export default function AnswerForm() {
                 <div className='grid flex-1 text-left text-sm leading-tight ml-2'>
                     <span className='truncate font-medium'>S155CP Inc</span>
                 </div>
-                {user && !submitted && (
+                {!submitted && (
                     <div className='flex items-center gap-3'>
                         <span className='text-sm text-muted-foreground'>
                             {user.first_name} {user.last_name} ({user.email})

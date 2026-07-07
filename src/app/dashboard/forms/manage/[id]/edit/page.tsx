@@ -6,6 +6,7 @@ import FormForm, {
     type FormSubmitPayload,
 } from '@/components/base/forms/FormForm';
 import { useHttp } from '@/hooks/http';
+import { useLoadingEffect } from '@/hooks/loading';
 import { useFormQuery } from '@/hooks/queries';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAtom } from 'jotai';
@@ -17,8 +18,11 @@ export default function EditForm() {
     const http = useHttp();
     const router = useRouter();
     const params = useParams<{ id: string }>();
-    const { data } = useFormQuery(params.id);
+    const { data, isLoading } = useFormQuery(params.id);
     const queryClient = useQueryClient();
+
+    // Show the universal loading overlay while the form record loads.
+    useLoadingEffect(isLoading);
 
     const onSubmit = async (payload: FormSubmitPayload) => {
         if (!data) {
