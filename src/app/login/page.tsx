@@ -99,6 +99,7 @@ function Login() {
 
     useRefreshToken({
         redirectTo: params.get('return'),
+        requireAuth: false,
     });
 
     return (
