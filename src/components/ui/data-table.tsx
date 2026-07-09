@@ -173,11 +173,14 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
                     rows happen to be mounted by the virtualizer. */}
                 <colgroup>
                     {table.getAllLeafColumns().map((column) => (
-                        <col key={column.id} style={{ width: column.getSize() }} />
+                        <col
+                            key={column.id}
+                            style={{ width: column.getSize() }}
+                        />
                     ))}
                 </colgroup>
                 {/* Sticky Header */}
-                <TableHeader className='sticky top-0 z-20 bg-background w-full'>
+                <TableHeader className='sticky top-0 z-20 bg-background w-full border-b-white'>
                     {table.getHeaderGroups().map((hg) => (
                         <TableRow key={hg.id}>
                             {hg.headers.map((header) => (
