@@ -163,7 +163,10 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
             viewportClassName='[contain:strict]'
             style={{ height: contentHeight }}
         >
-            <Table className='relative min-w-full' aria-busy={isLoading}>
+            <Table
+                className='relative h-full min-w-full'
+                aria-busy={isLoading}
+            >
                 {/* Sticky Header */}
                 <TableHeader className='sticky top-0 z-20 bg-background w-full'>
                     {table.getHeaderGroups().map((hg) => (
