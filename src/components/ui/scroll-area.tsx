@@ -9,6 +9,7 @@ const ScrollArea = React.forwardRef<
     React.ComponentRef<typeof ScrollAreaPrimitive.Root>,
     React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root> & {
         showVerticalScrollbar?: boolean;
+        showHorizontalScrollbar?: boolean;
         viewportClassName?: string;
         viewportRef?: React.Ref<
             React.ComponentRef<typeof ScrollAreaPrimitive.Viewport>
@@ -20,6 +21,7 @@ const ScrollArea = React.forwardRef<
             className,
             children,
             showVerticalScrollbar = true,
+            showHorizontalScrollbar = false,
             viewportClassName,
             viewportRef,
             ...props
@@ -43,6 +45,7 @@ const ScrollArea = React.forwardRef<
                 {children}
             </ScrollAreaPrimitive.Viewport>
             {showVerticalScrollbar && <ScrollBar />}
+            {showHorizontalScrollbar && <ScrollBar orientation='horizontal' />}
             <ScrollAreaPrimitive.Corner />
         </ScrollAreaPrimitive.Root>
     ),

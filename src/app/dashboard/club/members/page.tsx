@@ -87,16 +87,19 @@ export default function ClubMembers() {
             header: 'Name',
             accessorFn: (row) => `${row.last_name}, ${row.first_name}`,
             enableGlobalFilter: true,
+            minSize: 300,
         },
         {
             accessorKey: 'email',
             header: 'Email',
             enableGlobalFilter: true,
+            minSize: 300,
         },
         {
             accessorKey: 'address',
             header: 'Address',
             enableGlobalFilter: true,
+            minSize: 360,
         },
         {
             accessorKey: 'phone',
@@ -108,6 +111,7 @@ export default function ClubMembers() {
             accessorFn: (row) => (row.designation ? row.designation : 'N/A'),
             header: 'Designation',
             enableGlobalFilter: true,
+            minSize: 250,
         },
         {
             accessorKey: 'club_number',
@@ -133,12 +137,14 @@ export default function ClubMembers() {
             accessorFn: (row) =>
                 dayjs(row.created_at).format('MMM DD, YYYY hh:mm A'),
             header: 'Created',
+            minSize: 200,
         },
         {
             accessorKey: 'updated_at',
             accessorFn: (row) =>
                 dayjs(row.updated_at).format('MMM DD, YYYY hh:mm A'),
             header: 'Updated',
+            minSize: 200,
         },
         {
             id: 'actions',

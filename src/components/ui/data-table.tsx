@@ -19,7 +19,7 @@ import {
     TableHeader,
     TableRow,
 } from '@/components/ui/table';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
 
 interface DataTableProps<TData extends { id?: unknown }, TValue> {
@@ -156,6 +156,7 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
         <ScrollArea
             viewportRef={scrollRef}
             showVerticalScrollbar={hasVerticalOverflow}
+            showHorizontalScrollbar
             className={cn(
                 'relative w-full max-h-[calc(100svh-20rem)] rounded-lg border md:max-h-[calc(100svh-11rem)]',
                 className,
@@ -246,7 +247,6 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
                     )}
                 </TableBody>
             </Table>
-            <ScrollBar orientation='horizontal' />
         </ScrollArea>
     );
 }
