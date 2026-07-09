@@ -173,6 +173,7 @@ export default function AdminOrdersPage() {
     const columns: ColumnDef<Order>[] = [
         {
             id: 'selected',
+            size: 40,
             header: () => (
                 <Checkbox
                     checked={allChecked}
@@ -193,6 +194,7 @@ export default function AdminOrdersPage() {
         {
             header: 'Order',
             accessorKey: 'order_number',
+            size: 160,
             cell: ({ row }) => (
                 <div className='font-medium'>
                     {row.original.order_number}
@@ -204,6 +206,7 @@ export default function AdminOrdersPage() {
         },
         {
             header: 'Member',
+            size: 260,
             accessorFn: (order) =>
                 order.user
                     ? `${order.user.first_name} ${order.user.last_name}`
@@ -223,11 +226,13 @@ export default function AdminOrdersPage() {
         },
         {
             header: 'Total',
+            size: 120,
             accessorKey: 'subtotal',
             cell: ({ row }) => formatPesos(row.original.subtotal),
         },
         {
             header: 'Payment',
+            size: 140,
             accessorKey: 'payment_status',
             cell: ({ row }) => (
                 <Badge
@@ -239,6 +244,7 @@ export default function AdminOrdersPage() {
         },
         {
             id: 'actions',
+            size: 180,
             header: () => <div className='text-right'>Actions</div>,
             cell: ({ row }) => (
                 <div className='flex justify-end gap-2'>

@@ -164,9 +164,17 @@ export function DataTable<TData extends { id?: unknown }, TValue>({
             style={{ height: contentHeight }}
         >
             <Table
-                className='relative h-full min-w-full'
+                className='relative h-full min-w-full table-fixed'
                 aria-busy={isLoading}
             >
+                {/* Pin each column to its declared size so the browser's
+                    auto table layout can't re-measure widths from whichever
+                    rows happen to be mounted by the virtualizer. */}
+                <colgroup>
+                    {table.getAllLeafColumns().map((column) => (
+                        <col key={column.id} style={{ width: column.getSize() }} />
+                    ))}
+                </colgroup>
                 {/* Sticky Header */}
                 <TableHeader className='sticky top-0 z-20 bg-background w-full'>
                     {table.getHeaderGroups().map((hg) => (
