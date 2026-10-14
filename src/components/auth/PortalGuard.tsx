@@ -2,6 +2,7 @@
 
 import { accessAtom, userAtom } from '@/atoms/auth';
 import { useRefreshToken } from '@/hooks/auth';
+import { useHydrated } from '@/hooks/hydrated';
 import { portalRedirect, type PortalKind } from '@/lib/auth';
 import { useAtomValue } from 'jotai';
 import { usePathname, useRouter } from 'next/navigation';
@@ -19,6 +20,7 @@ export default function PortalGuard({
     const user = useAtomValue(userAtom);
     const pathname = usePathname();
     const router = useRouter();
+    const hydrated = useHydrated();
 
     useRefreshToken({ redirectTo: pathname });
 
@@ -30,8 +32,9 @@ export default function PortalGuard({
         }
     }, [redirect, router]);
 
-    // Still validating the stored token, or redirecting to the right portal.
-    if (!access || !user || redirect) {
+    // Still hydrating (the server never sees the stored session), validating
+    // the stored token, or redirecting to the right portal.
+    if (!hydrated || !access || !user || redirect) {
         return <LoadingOverlay />;
     }
 
