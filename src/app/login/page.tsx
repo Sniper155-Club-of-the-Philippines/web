@@ -3,6 +3,7 @@
 import { auth } from '@/api';
 import { accessAtom, userAtom } from '@/atoms/auth';
 import GoogleButton from '@/components/auth/GoogleButton';
+import PasswordInput from '@/components/base/inputs/PasswordInput';
 import Logo from '@/components/root/Logo';
 import { Button } from '@/components/ui/button';
 import {
@@ -140,12 +141,11 @@ function Login() {
                                                 Forgot your password?
                                             </Link>
                                         </div>
-                                        <Input
+                                        <PasswordInput
                                             {...register('password', {
                                                 required: true,
                                             })}
                                             id='password'
-                                            type='password'
                                             placeholder='Password'
                                         />
                                     </div>

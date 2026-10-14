@@ -2,6 +2,7 @@
 
 import { auth } from '@/api';
 import { userAtom } from '@/atoms/auth';
+import PasswordInput from '@/components/base/inputs/PasswordInput';
 import { Button } from '@/components/ui/button';
 import {
     Field,
@@ -10,7 +11,6 @@ import {
     FieldGroup,
     FieldLabel,
 } from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
 import { useHttp } from '@/hooks/http';
 import type { User } from '@/types/models/user';
 import { isAxiosError } from 'axios';
@@ -81,9 +81,8 @@ export default function ChangePasswordForm({
                     <FieldLabel htmlFor='current-password'>
                         Current password
                     </FieldLabel>
-                    <Input
+                    <PasswordInput
                         id='current-password'
-                        type='password'
                         autoComplete='current-password'
                         aria-invalid={Boolean(errors.current_password)}
                         {...register('current_password', {
@@ -95,9 +94,8 @@ export default function ChangePasswordForm({
 
                 <Field data-invalid={Boolean(errors.password)}>
                     <FieldLabel htmlFor='new-password'>New password</FieldLabel>
-                    <Input
+                    <PasswordInput
                         id='new-password'
-                        type='password'
                         autoComplete='new-password'
                         aria-invalid={Boolean(errors.password)}
                         {...register('password', {
@@ -118,9 +116,8 @@ export default function ChangePasswordForm({
                     <FieldLabel htmlFor='confirm-password'>
                         Confirm new password
                     </FieldLabel>
-                    <Input
+                    <PasswordInput
                         id='confirm-password'
-                        type='password'
                         autoComplete='new-password'
                         aria-invalid={Boolean(errors.password_confirmation)}
                         {...register('password_confirmation', {

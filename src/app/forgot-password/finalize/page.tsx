@@ -2,6 +2,7 @@
 
 import { forgotPassword } from '@/api';
 import { forgotPasswordAtom } from '@/atoms/forgot-password';
+import PasswordInput from '@/components/base/inputs/PasswordInput';
 import { loadingAtom } from '@/atoms/misc';
 import { Button } from '@/components/ui/button';
 import {
@@ -11,7 +12,6 @@ import {
     CardTitle,
     CardDescription,
 } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useHttp } from '@/hooks/http';
 import { isAxiosError } from 'axios';
@@ -77,10 +77,9 @@ export default function FinalizeForgotPasswordPage() {
                 <form onSubmit={handleSubmit(onSubmit)}>
                     <div className='grid gap-3'>
                         <Label htmlFor='password'>New Password</Label>
-                        <Input
+                        <PasswordInput
                             {...register('password', { required: true })}
                             id='password'
-                            type='password'
                             placeholder='New password'
                             disabled={loading}
                         />
@@ -89,12 +88,11 @@ export default function FinalizeForgotPasswordPage() {
                         <Label htmlFor='password_confirmation'>
                             Confirm Password
                         </Label>
-                        <Input
+                        <PasswordInput
                             {...register('password_confirmation', {
                                 required: true,
                             })}
                             id='password_confirmation'
-                            type='password'
                             placeholder='Confirm password'
                             disabled={loading}
                         />
