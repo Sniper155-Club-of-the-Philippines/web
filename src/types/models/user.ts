@@ -25,4 +25,6 @@ export interface User extends Model {
     roles?: string[];
     permissions?: string[];
     force_password_change?: boolean;
+    /** Admin user list only: false until the member receives credentials. */
+    has_password?: boolean;
 }

@@ -17,6 +17,8 @@ import { cn } from '@/lib/utils';
 import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { BLOOD_TYPES } from '@/constants';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import MemberPasswordField from '@/components/base/MemberPasswordField';
+import { User } from '@/types/models/user';
 
 type Props = {
     defaultValues?: Partial<UserFormInputs>;
@@ -26,6 +28,8 @@ type Props = {
     // Region and role assignment are admin-only. The self-service settings
     // screen hides them so members cannot edit their own access.
     hideAccess?: boolean;
+    // Set when an admin edits an existing member, to show their password.
+    memberId?: User['id'];
 };
 
 const UserForm = ({
@@ -34,6 +38,7 @@ const UserForm = ({
     onCancel,
     className,
     hideAccess = false,
+    memberId,
 }: Props) => {
     const http = useHttp();
     const { register, handleSubmit, watch, setValue, reset, control } =
@@ -130,10 +135,9 @@ const UserForm = ({
                                 Access
                             </h3>
                             <p className='text-sm text-muted-foreground mb-4'>
-                                A temporary password is generated and shown once
-                                on creation; write it down and hand it to the
-                                member with their physical ID. They set their
-                                own on first login.
+                                The username is the member&apos;s email. Saving
+                                a new member emails them a temporary password,
+                                which they change on first login.
                             </p>
                             <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
                                 <div className='flex flex-col gap-2'>
@@ -176,6 +180,9 @@ const UserForm = ({
                                         )}
                                     />
                                 </div>
+                                {memberId && (
+                                    <MemberPasswordField userId={memberId} />
+                                )}
                             </div>
                         </div>
                     )}

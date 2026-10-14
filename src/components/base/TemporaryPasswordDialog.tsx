@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 export interface TemporaryPasswordCredentials {
     email: string;
     password: string;
+    emailSent: boolean;
 }
 
 interface Props {
@@ -52,14 +53,17 @@ export default function TemporaryPasswordDialog({
                 <DialogHeader>
                     <DialogTitle>{title}</DialogTitle>
                     <DialogDescription>
-                        No email is sent. Record these credentials before
-                        closing. This password cannot be shown again, and the
-                        member must change it on next login.
+                        {credentials?.emailSent
+                            ? 'These credentials were emailed to the member.'
+                            : 'The email could not be sent. Give these credentials to the member in person.'}{' '}
+                        The member must change the password on next login.
                     </DialogDescription>
                 </DialogHeader>
                 <div className='grid gap-3'>
                     <div className='grid gap-1'>
-                        <Label htmlFor='temporary-password-email'>Email</Label>
+                        <Label htmlFor='temporary-password-email'>
+                            Username
+                        </Label>
                         <Input
                             id='temporary-password-email'
                             readOnly

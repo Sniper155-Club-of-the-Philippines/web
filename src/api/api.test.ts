@@ -341,6 +341,20 @@ describe('user api', () => {
         expect(http.post).toHaveBeenCalledWith('/v1/users/u1/reset-password');
     });
 
+    it('password reads the member password', async () => {
+        http.get.mockResolvedValue({ data: { password: 'kT4m@Qz9w!Rb' } });
+
+        expect(await user.password(http, 'u1')).toBe('kT4m@Qz9w!Rb');
+        expect(http.get).toHaveBeenCalledWith('/v1/users/u1/password');
+    });
+
+    it('sendCredentials returns how many members were queued', async () => {
+        http.post.mockResolvedValue({ data: { queued: 181 } });
+
+        expect(await user.sendCredentials(http)).toBe(181);
+        expect(http.post).toHaveBeenCalledWith('/v1/users/send-credentials');
+    });
+
     it('remove deletes by id', async () => {
         await user.remove(http, 'u1');
         expect(http.delete).toHaveBeenCalledWith('/v1/users/u1');

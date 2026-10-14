@@ -52,8 +52,8 @@ export default function ChangePasswordPage() {
                     <CardHeader>
                         <CardTitle>Choose a new password</CardTitle>
                         <CardDescription>
-                            Your current password is the temporary password sent
-                            to your email.
+                            Your current password is the temporary password you
+                            just used to log in.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

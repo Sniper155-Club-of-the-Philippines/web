@@ -14,6 +14,8 @@ export type UserPayload = Partial<User> & {
 export interface TemporaryPasswordResponse {
     user: User;
     temp_password: string;
+    /** False when the mail server rejected the credentials email. */
+    email_sent: boolean;
 }
 
 export async function all(http: AxiosInstance) {
@@ -41,6 +43,30 @@ export async function resetPassword(http: AxiosInstance, id: User['id']) {
     );
 
     return data;
+}
+
+/**
+ * The member's current password, readable by admins only. Null when the
+ * password was set before the API started keeping a readable copy.
+ */
+export async function password(http: AxiosInstance, id: User['id']) {
+    const { data } = await http.get<{ password: string | null }>(
+        `/v1/users/${id}/password`,
+    );
+
+    return data.password;
+}
+
+/**
+ * Queue credential emails for every member without a password. Resolves to
+ * how many members were queued.
+ */
+export async function sendCredentials(http: AxiosInstance) {
+    const { data } = await http.post<{ queued: number }>(
+        '/v1/users/send-credentials',
+    );
+
+    return data.queued;
 }
 
 export async function update(

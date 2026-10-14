@@ -21,9 +21,14 @@ import {
     Dialog,
     DialogContent,
     DialogDescription,
+    DialogFooter,
     DialogHeader,
     DialogTitle,
 } from '@/components/ui/dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { hasPermission } from '@/lib/permissions';
+import { credentialEmailsEta, membersWithoutAccount } from '@/lib/credentials';
 import UserForm from '@/components/base/forms/UserForm';
 import { UserFormInputs } from '@/types/form';
 import { Input } from '@/components/ui/input';
@@ -40,6 +45,8 @@ export default function ClubMembers() {
     const [search, setSearch] = useState('');
     const { data: users, refetch } = useUserQuery();
     const [me] = useAtom(userAtom);
+    const [sendOpen, setSendOpen] = useState(false);
+    const pendingCount = membersWithoutAccount(users ?? []).length;
 
     const handleCreate = async (data: UserFormInputs) => {
         setLoading(true);
@@ -49,16 +56,40 @@ export default function ClubMembers() {
                 closeButton: true,
             });
             setCreateOpen(false);
-            // No email is sent: surface the temporary password once so the admin
-            // can write it down and hand it to the member with their physical ID.
+            // The API emails the credentials; they are also shown here so the
+            // admin can hand them over in person if the email did not go out.
             setCredentials({
                 email: result.user.email,
                 password: result.temp_password,
+                emailSent: result.email_sent,
             });
             void refetch();
         } catch (error) {
             console.error(error);
             toast.error('Unable to create member.', {
+                closeButton: true,
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleSendCredentials = async () => {
+        setLoading(true);
+        try {
+            const queued = await user.sendCredentials(http);
+            setSendOpen(false);
+            toast.success(
+                `Sending credentials to ${queued} member${queued === 1 ? '' : 's'}.`,
+                {
+                    description: `All emails should be out in ${credentialEmailsEta(queued)}.`,
+                    closeButton: true,
+                },
+            );
+            void refetch();
+        } catch (error) {
+            console.error(error);
+            toast.error('Unable to send credentials.', {
                 closeButton: true,
             });
         } finally {
@@ -94,6 +125,18 @@ export default function ClubMembers() {
             header: 'Email',
             enableGlobalFilter: true,
             minSize: 300,
+        },
+        {
+            id: 'account',
+            header: 'Account',
+            accessorFn: (row) => (row.has_password ? 'Active' : 'No account'),
+            enableGlobalFilter: true,
+            cell: ({ row }) =>
+                row.original.has_password ? (
+                    <Badge variant='secondary'>Active</Badge>
+                ) : (
+                    <Badge variant='outline'>No account</Badge>
+                ),
         },
         {
             accessorKey: 'address',
@@ -175,6 +218,14 @@ export default function ClubMembers() {
                         }}
                         value={search}
                     />
+                    {pendingCount > 0 && hasPermission(me, 'users.create') && (
+                        <Button
+                            variant='outline'
+                            onClick={() => setSendOpen(true)}
+                        >
+                            Send credentials ({pendingCount})
+                        </Button>
+                    )}
                     <TableMenu
                         onRefresh={refetch}
                         onExport={exportData}
@@ -206,6 +257,37 @@ export default function ClubMembers() {
                         title='Member created'
                         onClose={() => setCredentials(null)}
                     />
+                    <Dialog open={sendOpen} onOpenChange={setSendOpen}>
+                        <DialogContent className='sm:max-w-[480px]'>
+                            <DialogHeader>
+                                <DialogTitle>
+                                    Send credentials to {pendingCount} member
+                                    {pendingCount === 1 ? '' : 's'}?
+                                </DialogTitle>
+                                <DialogDescription>
+                                    Each member without an account gets an email
+                                    with their username (their email address)
+                                    and a temporary password. Emails go out one
+                                    every 30 seconds to stay within the mail
+                                    limit, so all of them should be out in{' '}
+                                    {credentialEmailsEta(pendingCount)}.
+                                </DialogDescription>
+                            </DialogHeader>
+                            <DialogFooter>
+                                <Button
+                                    variant='outline'
+                                    onClick={() => setSendOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    onClick={() => void handleSendCredentials()}
+                                >
+                                    Send credentials
+                                </Button>
+                            </DialogFooter>
+                        </DialogContent>
+                    </Dialog>
                 </div>
             </div>
             <DataTable columns={columns} data={users ?? []} search={search} />

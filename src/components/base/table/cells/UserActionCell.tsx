@@ -1,6 +1,7 @@
 'use client';
 
 import { user as api } from '@/api';
+import { userAtom } from '@/atoms/auth';
 import { loadingAtom } from '@/atoms/misc';
 import { Button } from '@/components/ui/button';
 import {
@@ -19,6 +20,7 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useHttp } from '@/hooks/http';
+import { hasPermission } from '@/lib/permissions';
 import { User } from '@/types/models/user';
 import { useAtom } from 'jotai';
 import { MoreHorizontal } from 'lucide-react';
@@ -43,6 +45,7 @@ const UserActionCell = ({ user, refetch }: Props) => {
     const [credentials, setCredentials] =
         useState<TemporaryPasswordCredentials | null>(null);
     const [, setLoading] = useAtom(loadingAtom);
+    const [me] = useAtom(userAtom);
 
     const handleDelete = async () => {
         setLoading(true);
@@ -87,6 +90,7 @@ const UserActionCell = ({ user, refetch }: Props) => {
             setCredentials({
                 email: result.user.email,
                 password: result.temp_password,
+                emailSent: result.email_sent,
             });
             toast.success('Member password reset.');
             refetch?.();
@@ -149,6 +153,11 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     </DialogHeader>
                     <UserForm
                         defaultValues={user}
+                        memberId={
+                            hasPermission(me, 'users.viewPassword')
+                                ? user.id
+                                : undefined
+                        }
                         onSubmit={handleEdit}
                         onCancel={() => {
                             setEditOpen(false);
@@ -164,7 +173,8 @@ const UserActionCell = ({ user, refetch }: Props) => {
                         <DialogDescription>
                             {user.first_name}&apos;s current password will stop
                             working immediately. A temporary password will be
-                            shown once and must be changed on next login.
+                            emailed to {user.email} and must be changed on next
+                            login.
                         </DialogDescription>
                     </DialogHeader>
                     <DialogFooter>
