@@ -2,11 +2,12 @@ import type { User } from '@/types/models/user';
 
 /**
  * Mirrors the API backfill: the shared host allows 200 outgoing emails per
- * hour, so credential emails go out one every 30 seconds, and the queue
- * worker only starts every 5 minutes.
+ * hour, so credential emails are rate-limited to two a minute. The queue
+ * worker starts every 5 minutes and runs for 4 of them.
  */
-export const CREDENTIAL_EMAIL_SPACING_SECONDS = 30;
+export const CREDENTIAL_EMAILS_PER_MINUTE = 2;
 export const QUEUE_START_MINUTES = 5;
+export const QUEUE_RUN_MINUTES = 4;
 
 /** Members who have never received a username and password. */
 export function membersWithoutAccount(users: User[]): User[] {
@@ -15,13 +16,14 @@ export function membersWithoutAccount(users: User[]): User[] {
 
 /**
  * Rough time until the last credential email of a backfill is sent, e.g.
- * "about 1 hour 35 minutes".
+ * "about 1 hour 59 minutes".
  */
 export function credentialEmailsEta(count: number): string {
     const minutes =
         QUEUE_START_MINUTES +
         Math.ceil(
-            (Math.max(count - 1, 0) * CREDENTIAL_EMAIL_SPACING_SECONDS) / 60,
+            (count / CREDENTIAL_EMAILS_PER_MINUTE) *
+                (QUEUE_START_MINUTES / QUEUE_RUN_MINUTES),
         );
     const hours = Math.floor(minutes / 60);
     const rest = minutes % 60;

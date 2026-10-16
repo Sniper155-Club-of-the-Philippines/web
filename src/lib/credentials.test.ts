@@ -18,11 +18,11 @@ describe('membersWithoutAccount', () => {
 
 describe('credentialEmailsEta', () => {
     it.each([
-        [1, 'about 5 minutes'],
-        [2, 'about 6 minutes'],
-        [111, 'about 1 hour'],
-        [181, 'about 1 hour 35 minutes'],
-        [241, 'about 2 hours 5 minutes'],
+        [1, 'about 6 minutes'],
+        [2, 'about 7 minutes'],
+        [88, 'about 1 hour'],
+        [181, 'about 1 hour 59 minutes'],
+        [241, 'about 2 hours 36 minutes'],
     ])('estimates %i email(s) as %s', (count, expected) => {
         expect(credentialEmailsEta(count)).toBe(expected);
     });

@@ -267,9 +267,9 @@ export default function ClubMembers() {
                                 <DialogDescription>
                                     Each member without an account gets an email
                                     with their username (their email address)
-                                    and a temporary password. Emails go out one
-                                    every 30 seconds to stay within the mail
-                                    limit, so all of them should be out in{' '}
+                                    and a temporary password. Emails go out two
+                                    a minute to stay within the mail limit, so
+                                    all of them should be out in{' '}
                                     {credentialEmailsEta(pendingCount)}.
                                 </DialogDescription>
                             </DialogHeader>
