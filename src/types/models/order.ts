@@ -12,7 +12,8 @@ export type OrderStatus =
     | 'ready_for_shipment'
     | 'completed';
 
-export type OrderHistoryType = 'order_status' | 'payment_status' | 'void';
+export type OrderHistoryType =
+    'order_status' | 'payment_status' | 'void' | 'items';
 
 export interface OrderStatusHistory {
     id: string;

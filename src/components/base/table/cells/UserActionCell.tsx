@@ -153,11 +153,8 @@ const UserActionCell = ({ user, refetch }: Props) => {
                     </DialogHeader>
                     <UserForm
                         defaultValues={user}
-                        memberId={
-                            hasPermission(me, 'users.viewPassword')
-                                ? user.id
-                                : undefined
-                        }
+                        memberId={user.id}
+                        showPassword={hasPermission(me, 'users.viewPassword')}
                         onSubmit={handleEdit}
                         onCancel={() => {
                             setEditOpen(false);

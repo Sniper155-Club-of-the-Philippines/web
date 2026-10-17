@@ -1,4 +1,4 @@
-import { User } from '@/types/models/user';
+import { User, UserChange } from '@/types/models/user';
 import { AxiosInstance } from 'axios';
 
 /**
@@ -55,6 +55,15 @@ export async function password(http: AxiosInstance, id: User['id']) {
     );
 
     return data.password;
+}
+
+/** The member's personal-info change log, newest first. */
+export async function changes(http: AxiosInstance, id: User['id']) {
+    const { data } = await http.get<{ changes: UserChange[] }>(
+        `/v1/users/${id}/changes`,
+    );
+
+    return data.changes;
 }
 
 /**

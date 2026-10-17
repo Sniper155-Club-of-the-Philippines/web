@@ -18,6 +18,8 @@ import SelectSearch from '@/components/base/inputs/SelectSearch';
 import { BLOOD_TYPES } from '@/constants';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import MemberPasswordField from '@/components/base/MemberPasswordField';
+import MemberChangeLog from '@/components/base/MemberChangeLog';
+import { SIZES } from '@/lib/sizes';
 import { User } from '@/types/models/user';
 
 type Props = {
@@ -28,8 +30,11 @@ type Props = {
     // Region and role assignment are admin-only. The self-service settings
     // screen hides them so members cannot edit their own access.
     hideAccess?: boolean;
-    // Set when an admin edits an existing member, to show their password.
+    // Set when an admin edits an existing member, to show their rider and
+    // OBR details and change history.
     memberId?: User['id'];
+    // Whether the admin may read the member's current password.
+    showPassword?: boolean;
 };
 
 const UserForm = ({
@@ -39,6 +44,7 @@ const UserForm = ({
     className,
     hideAccess = false,
     memberId,
+    showPassword = false,
 }: Props) => {
     const http = useHttp();
     const { register, handleSubmit, watch, setValue, reset, control } =
@@ -180,7 +186,7 @@ const UserForm = ({
                                         )}
                                     />
                                 </div>
-                                {memberId && (
+                                {memberId && showPassword && (
                                     <MemberPasswordField userId={memberId} />
                                 )}
                             </div>
@@ -250,6 +256,91 @@ const UserForm = ({
                         </div>
                     </div>
 
+                    {/* Section: Rider and OBR */}
+                    {memberId && (
+                        <div className='rounded-2xl border p-6 shadow-sm'>
+                            <h3 className='text-lg font-semibold mb-4'>
+                                Rider and OBR
+                            </h3>
+                            <p className='text-sm text-muted-foreground mb-4'>
+                                Members lock these after a change (rider
+                                nickname 2 months, OBR details 3 months). Admins
+                                can correct them at any time.
+                            </p>
+                            <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                                <div className='flex flex-col gap-2'>
+                                    <Label htmlFor='rider_nickname'>
+                                        Rider Nickname
+                                    </Label>
+                                    <Input
+                                        {...register('rider_nickname')}
+                                        id='rider_nickname'
+                                    />
+                                </div>
+                                <div className='flex flex-col gap-2'>
+                                    <Label htmlFor='rider_size'>
+                                        Rider Size
+                                    </Label>
+                                    <Controller
+                                        name='rider_size'
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                width='w-full'
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                }}
+                                                value={field.value ?? undefined}
+                                                options={SIZES.map((size) => ({
+                                                    label: size,
+                                                    value: size,
+                                                }))}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                                <div className='md:col-span-2 flex flex-col gap-2'>
+                                    <Label htmlFor='obr_full_name'>
+                                        OBR Full Name
+                                    </Label>
+                                    <Input
+                                        {...register('obr_full_name')}
+                                        id='obr_full_name'
+                                    />
+                                </div>
+                                <div className='flex flex-col gap-2'>
+                                    <Label htmlFor='obr_nickname'>
+                                        OBR Nickname
+                                    </Label>
+                                    <Input
+                                        {...register('obr_nickname')}
+                                        id='obr_nickname'
+                                    />
+                                </div>
+                                <div className='flex flex-col gap-2'>
+                                    <Label htmlFor='obr_size'>OBR Size</Label>
+                                    <Controller
+                                        name='obr_size'
+                                        control={control}
+                                        render={({ field }) => (
+                                            <Select
+                                                width='w-full'
+                                                onChange={(value) => {
+                                                    field.onChange(value);
+                                                }}
+                                                value={field.value ?? undefined}
+                                                options={SIZES.map((size) => ({
+                                                    label: size,
+                                                    value: size,
+                                                }))}
+                                            />
+                                        )}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
                     {/* Section: Profile Photo */}
                     <div className='rounded-2xl border p-6 shadow-sm'>
                         <h3 className='text-lg font-semibold mb-4'>
@@ -276,7 +367,7 @@ const UserForm = ({
                         </div>
                     </div>
 
-                    {/* Section: Club Info */}
+                    {/* Section: Emergency Info */}
                     <div className='rounded-2xl border p-6 shadow-sm'>
                         <h3 className='text-lg font-semibold mb-4'>
                             Emergency Info
@@ -336,6 +427,16 @@ const UserForm = ({
                             </div>
                         </div>
                     </div>
+
+                    {/* Section: Change History */}
+                    {memberId && (
+                        <div className='rounded-2xl border p-6 shadow-sm'>
+                            <h3 className='text-lg font-semibold mb-4'>
+                                Change History
+                            </h3>
+                            <MemberChangeLog userId={memberId} />
+                        </div>
+                    )}
                 </div>
             </ScrollArea>
 

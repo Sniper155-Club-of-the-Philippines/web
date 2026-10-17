@@ -348,6 +348,14 @@ describe('user api', () => {
         expect(http.get).toHaveBeenCalledWith('/v1/users/u1/password');
     });
 
+    it('changes returns the member change log', async () => {
+        const changes = [{ id: 'c1', field: 'obr_size' }];
+        http.get.mockResolvedValue({ data: { changes } });
+
+        expect(await user.changes(http, 'u1')).toEqual(changes);
+        expect(http.get).toHaveBeenCalledWith('/v1/users/u1/changes');
+    });
+
     it('sendCredentials returns how many members were queued', async () => {
         http.post.mockResolvedValue({ data: { queued: 181 } });
 
