@@ -42,7 +42,10 @@ export async function updateProfile(
     http: AxiosInstance,
     payload: {
         rider_nickname?: string | null;
+        rider_size?: string | null;
+        obr_full_name?: string | null;
         obr_nickname?: string | null;
+        obr_size?: string | null;
     },
 ) {
     const { data } = await http.patch<{ user: User }>('/v1/profile', payload);

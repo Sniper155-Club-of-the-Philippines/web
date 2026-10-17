@@ -17,10 +17,9 @@ import { useAtomValue } from 'jotai';
 import { Download, LoaderCircle } from 'lucide-react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { SIZES } from '@/lib/sizes';
 import { useForm } from 'react-hook-form';
 import { toast } from 'sonner';
-
-const sizes = ['S', 'M', 'L', 'XL', '2XL', '3XL', '4XL', '5XL'];
 
 type OverrideInputs = {
     price: string;
@@ -47,7 +46,7 @@ function ProductOverride({
         {
             defaultValues: {
                 price: override ? centavosToPesos(override.price) : '0.00',
-                available_sizes: override?.available_sizes ?? sizes,
+                available_sizes: override?.available_sizes ?? [...SIZES],
                 rider_allowed: override?.rider_allowed ?? true,
                 obr_allowed: override?.obr_allowed ?? true,
                 rider_limit: override?.rider_limit ?? 1,
@@ -171,7 +170,7 @@ function ProductOverride({
                     Available sizes
                 </legend>
                 <div className='flex flex-wrap gap-4'>
-                    {sizes.map((size) => (
+                    {SIZES.map((size) => (
                         <label
                             key={size}
                             className='flex items-center gap-2 text-sm'

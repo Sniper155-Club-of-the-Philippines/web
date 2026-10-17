@@ -14,7 +14,7 @@ export default function MemberProfilePage() {
         <>
             <MemberPageHeader
                 title='Profile'
-                description='Your membership details and the names printed on your merchandise.'
+                description='Your membership details and the names and sizes used for your merchandise.'
             />
 
             <div className='grid items-start gap-6 lg:grid-cols-2'>
@@ -33,10 +33,9 @@ export default function MemberProfilePage() {
 
                 <Card>
                     <CardHeader>
-                        <CardTitle>Order nicknames</CardTitle>
+                        <CardTitle>Rider and OBR details</CardTitle>
                         <CardDescription>
-                            The rider and OBR names printed on the items you
-                            order.
+                            The names and sizes used for the items you order.
                         </CardDescription>
                     </CardHeader>
                     <CardContent>

@@ -1,51 +1,55 @@
 import { describe, expect, it } from 'vitest';
-import { OBR_LOCK_DAYS, obrNicknameLock } from './profile';
+import {
+    formatUnlockDate,
+    OBR_LOCK_MONTHS,
+    profileLock,
+    RIDER_LOCK_MONTHS,
+} from './profile';
 
-const DAY = 24 * 60 * 60 * 1000;
-
-describe('obrNicknameLock', () => {
-    it('is unlocked and free when never set', () => {
-        expect(obrNicknameLock(null)).toEqual({
+describe('profileLock', () => {
+    it('is unlocked when the group was never changed', () => {
+        expect(profileLock(null, OBR_LOCK_MONTHS)).toEqual({
             locked: false,
-            daysRemaining: 0,
             unlockAt: null,
         });
-        expect(obrNicknameLock(undefined).locked).toBe(false);
+        expect(profileLock(undefined, RIDER_LOCK_MONTHS).locked).toBe(false);
     });
 
-    it('is locked within the 90-day window with days remaining rounded up', () => {
-        const now = new Date('2026-06-27T00:00:00Z');
-        const changedAt = new Date(now.getTime() - 10 * DAY).toISOString();
+    it('locks the rider nickname for two calendar months', () => {
+        const changedAt = '2026-09-30T09:00:00';
 
-        const state = obrNicknameLock(changedAt, now);
+        expect(
+            profileLock(
+                changedAt,
+                RIDER_LOCK_MONTHS,
+                new Date('2026-11-29T09:00:00'),
+            ),
+        ).toEqual({ locked: true, unlockAt: new Date('2026-11-30T09:00:00') });
+        expect(
+            profileLock(
+                changedAt,
+                RIDER_LOCK_MONTHS,
+                new Date('2026-11-30T09:00:00'),
+            ).locked,
+        ).toBe(false);
+    });
 
+    it('clamps to the end of a shorter month like the API', () => {
+        const state = profileLock(
+            '2026-08-31T09:00:00',
+            OBR_LOCK_MONTHS,
+            new Date('2026-10-17T09:00:00'),
+        );
+
+        expect(state.unlockAt).toEqual(new Date('2026-11-30T09:00:00'));
         expect(state.locked).toBe(true);
-        expect(state.daysRemaining).toBe(OBR_LOCK_DAYS - 10);
-        expect(state.unlockAt).toBeInstanceOf(Date);
     });
+});
 
-    it('rounds partial days up', () => {
-        const now = new Date('2026-06-27T00:00:00Z');
-        // 89.5 days ago -> 0.5 days remaining -> rounds to 1
-        const changedAt = new Date(now.getTime() - 89.5 * DAY);
-
-        expect(obrNicknameLock(changedAt, now).daysRemaining).toBe(1);
-    });
-
-    it('unlocks exactly at and after the window', () => {
-        const now = new Date('2026-06-27T00:00:00Z');
-        const changedAt = new Date(now.getTime() - OBR_LOCK_DAYS * DAY);
-
-        const state = obrNicknameLock(changedAt, now);
-        expect(state.locked).toBe(false);
-        expect(state.daysRemaining).toBe(0);
-        expect(state.unlockAt).toBeInstanceOf(Date);
-    });
-
-    it('accepts a Date instance as well as a string', () => {
-        const now = new Date('2026-06-27T00:00:00Z');
-        const changedAt = new Date(now.getTime() - 5 * DAY);
-
-        expect(obrNicknameLock(changedAt, now).daysRemaining).toBe(85);
+describe('formatUnlockDate', () => {
+    it('formats the unlock date for members', () => {
+        expect(formatUnlockDate(new Date('2026-11-30T09:00:00'))).toBe(
+            'Nov 30, 2026',
+        );
     });
 });
